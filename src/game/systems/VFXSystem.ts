@@ -61,6 +61,13 @@ export class VFXSystem {
     });
   }
 
+  emitMilestone(x: number, y: number): void {
+    const { count, speed, lifeMs } = FEEL.particles.milestone;
+    this.burst(x, y, count, speed, lifeMs, (i) =>
+      i % 2 === 0 ? 0x00f5d4 : 0xffffff,
+    );
+  }
+
   update(deltaMs: number): void {
     for (const p of this.pool) {
       if (!p.active) continue;

@@ -17,7 +17,7 @@ import { CameraSystem } from "../systems/CameraSystem";
 import type { TargetKind } from "../../data/targetConfig";
 import { tweenManager } from "../util/TweenManager";
 import { FEEL } from "../config/feel";
-import { useRunStore } from "../../state/runStore";
+import { useRunStore, COMBO_MILESTONES } from "../../state/runStore";
 
 export class Game {
   private readonly parent: HTMLElement;
@@ -84,7 +84,9 @@ export class Game {
 
   private handleStagePointerDown = (event: FederatedPointerEvent): void => {
     if (this.app !== null && event.target === this.app.stage) {
-      useRunStore.getState().loseHP();
+      const store = useRunStore.getState();
+      store.loseHP();
+      store.resetCombo();
     }
   };
 
@@ -161,6 +163,9 @@ export class Game {
       if (target === undefined) continue;
       target.update(deltaMs);
       if (target.isDead) {
+        if (target.expiredUnclicked && target.kind !== "bomb") {
+          useRunStore.getState().resetCombo();
+        }
         this.removeTargetAt(i);
       }
     }
@@ -198,14 +203,17 @@ export class Game {
     if (!target.isInteractive) return;
 
     const result = target.onClick();
+    const store = useRunStore.getState();
 
     if (result.effects.includes("lose_hp")) {
-      useRunStore.getState().loseHP();
+      store.loseHP();
+      store.resetCombo();
     }
 
     if (result.destroyed) {
-      if (result.score > 0) {
-        useRunStore.getState().addScore(result.score);
+      if (target.kind !== "bomb" && result.score > 0) {
+        store.registerHit(result.score);
+        this.handleComboMilestone();
       }
       this.emitHitVfx(target);
       this.triggerJuice(target);
@@ -213,6 +221,15 @@ export class Game {
     } else if (target.kind === "multi") {
       this.vfx?.emitSubHit(target.x, target.y, target.color);
     }
+  }
+
+  private handleComboMilestone(): void {
+    if (this.app === null) return;
+    const combo = useRunStore.getState().combo;
+    if (!COMBO_MILESTONES.includes(combo)) return;
+    this.camera?.shake(FEEL.shake.comboIntensity, FEEL.shake.comboMs);
+    const { width, height } = this.app.renderer.screen;
+    this.vfx?.emitMilestone(width / 2, height / 2);
   }
 
   private emitHitVfx(target: Target): void {

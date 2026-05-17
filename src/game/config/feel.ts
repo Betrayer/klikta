@@ -15,6 +15,7 @@ export const FEEL = {
     golden: { count: 18, speed: 0.26, lifeMs: 520 },
     bomb: { count: 28, speed: 0.34, lifeMs: 600 },
     subhit: { count: 5, speed: 0.12, lifeMs: 220 },
+    milestone: { count: 36, speed: 0.4, lifeMs: 700 },
   },
   shake: {
     goldenIntensity: 2,

@@ -48,6 +48,7 @@ export abstract class Target {
   protected animScale = 0;
 
   private readonly tweens: Tween[] = [];
+  private exitedByMiss = false;
 
   constructor(kind: TargetKind, spawn: TargetSpawn) {
     const config = TARGET_CONFIG[kind];
@@ -80,6 +81,10 @@ export abstract class Target {
 
   get color(): number {
     return this.config.color;
+  }
+
+  get expiredUnclicked(): boolean {
+    return this.exitedByMiss;
   }
 
   protected spawn(): void {
@@ -163,6 +168,7 @@ export abstract class Target {
 
   protected beginMissExit(): void {
     if (this.phase === "exiting" || this.phase === "dead") return;
+    this.exitedByMiss = true;
     this.startExit();
 
     this.track(
