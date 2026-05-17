@@ -1,6 +1,12 @@
-import { Application, Container, type Ticker } from "pixi.js";
-import { Target } from "../entities/Target";
-import { SpawnSystem, type SpawnEvent } from "../systems/SpawnSystem";
+import {
+  Application,
+  Container,
+  type FederatedPointerEvent,
+  type Ticker,
+} from 'pixi.js';
+import { Target } from '../entities/Target';
+import { SpawnSystem, type SpawnEvent } from '../systems/SpawnSystem';
+import { useRunStore } from '../../state/runStore';
 
 export class Game {
   private readonly parent: HTMLElement;
@@ -19,7 +25,7 @@ export class Game {
     const app = new Application();
     await app.init({
       resizeTo: this.parent,
-      background: "#1a0033",
+      background: '#1a0033',
       antialias: true,
       autoDensity: true,
       resolution: window.devicePixelRatio || 1,
@@ -37,9 +43,19 @@ export class Game {
     this.targetLayer = targetLayer;
     app.stage.addChild(targetLayer);
 
+    app.stage.eventMode = 'static';
+    app.stage.hitArea = app.screen;
+    app.stage.on('pointerdown', this.handleStagePointerDown);
+
     this.spawnSystem = new SpawnSystem(this.clockMs);
     app.ticker.add(this.tick);
   }
+
+  private handleStagePointerDown = (event: FederatedPointerEvent): void => {
+    if (this.app !== null && event.target === this.app.stage) {
+      useRunStore.getState().loseHP();
+    }
+  };
 
   private tick = (ticker: Ticker): void => {
     if (
@@ -58,8 +74,7 @@ export class Game {
       if (target === undefined) continue;
       target.update(deltaMs);
       if (!target.alive) {
-        target.destroy();
-        this.targets.splice(i, 1);
+        this.removeTargetAt(i);
       }
     }
 
@@ -76,8 +91,24 @@ export class Game {
       lifetimeMs: event.lifetimeMs,
       score: 10,
     });
+    target.graphics.on('pointerdown', () => this.handleTargetClick(target));
     this.targetLayer.addChild(target.graphics);
     this.targets.push(target);
+  }
+
+  private handleTargetClick(target: Target): void {
+    if (!target.alive) return;
+    target.alive = false;
+    const index = this.targets.indexOf(target);
+    if (index !== -1) this.removeTargetAt(index);
+    useRunStore.getState().addScore(target.score);
+  }
+
+  private removeTargetAt(index: number): void {
+    const target = this.targets[index];
+    if (target === undefined) return;
+    this.targets.splice(index, 1);
+    target.destroy();
   }
 
   get fps(): number {
@@ -92,6 +123,7 @@ export class Game {
     this.destroyed = true;
     if (this.app === null) return;
     this.app.ticker.remove(this.tick);
+    this.app.stage.off('pointerdown', this.handleStagePointerDown);
     for (const target of this.targets) target.destroy();
     this.targets.length = 0;
     this.app.destroy(true, { children: true });

@@ -18,7 +18,7 @@ export const FpsCounter = ({ getFps }: FpsCounterProps) => {
   return (
     <Paper
       pos="fixed"
-      top={8}
+      bottom={8}
       right={12}
       px="xs"
       py={2}
