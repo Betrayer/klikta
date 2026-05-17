@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 
-export type RunStatus = 'idle' | 'playing' | 'gameOver';
+export type RunStatus = "idle" | "playing" | "gameOver";
 
 export interface RunState {
   status: RunStatus;
@@ -26,26 +26,25 @@ const freshRun = {
 export const useRunStore = create<RunState>()(
   devtools(
     (set) => ({
-      status: 'idle',
+      status: "idle",
       ...freshRun,
       startRun: () =>
-        set({ status: 'playing', ...freshRun }, false, 'startRun'),
-      addScore: (n) =>
-        set((s) => ({ score: s.score + n }), false, 'addScore'),
+        set({ status: "playing", ...freshRun }, false, "startRun"),
+      addScore: (n) => set((s) => ({ score: s.score + n }), false, "addScore"),
       loseHP: () =>
         set(
           (s) => {
             if (s.hp <= 0) return s;
             const hp = s.hp - 1;
-            return hp <= 0 ? { hp: 0, status: 'gameOver' } : { hp };
+            return hp <= 0 ? { hp: 0, status: "gameOver" } : { hp };
           },
           false,
-          'loseHP',
+          "loseHP",
         ),
       tickElapsed: (ms) =>
-        set((s) => ({ elapsedMs: s.elapsedMs + ms }), false, 'tickElapsed'),
-      reset: () => set({ status: 'idle', ...freshRun }, false, 'reset'),
+        set((s) => ({ elapsedMs: s.elapsedMs + ms }), false, "tickElapsed"),
+      reset: () => set({ status: "idle", ...freshRun }, false, "reset"),
     }),
-    { name: 'runStore' },
+    { name: "runStore" },
   ),
 );

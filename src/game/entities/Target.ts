@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js';
+import { Graphics } from "pixi.js";
 
 export interface TargetConfig {
   x: number;
@@ -36,8 +36,8 @@ export class Target {
 
     this.graphics = new Graphics().circle(0, 0, INITIAL_RADIUS).fill(0xff006e);
     this.graphics.position.set(this.x, this.y);
-    this.graphics.eventMode = 'static';
-    this.graphics.cursor = 'pointer';
+    this.graphics.eventMode = "static";
+    this.graphics.cursor = "pointer";
   }
 
   update(deltaMs: number): void {
