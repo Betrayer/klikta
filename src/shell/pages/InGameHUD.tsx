@@ -1,5 +1,6 @@
 import { Paper, Text } from '@mantine/core';
 import { useRunStore } from '../../state/runStore';
+import { ComboCounter } from '../components/ComboCounter';
 
 export const InGameHUD = () => {
   const score = useRunStore((s) => s.score);
@@ -21,6 +22,8 @@ export const InGameHUD = () => {
           {score}
         </Text>
       </Paper>
+
+      <ComboCounter />
 
       <Paper
         pos="fixed"

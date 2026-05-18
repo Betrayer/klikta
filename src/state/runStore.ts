@@ -7,9 +7,12 @@ export interface RunState {
   status: RunStatus;
   score: number;
   hp: number;
+  combo: number;
+  maxCombo: number;
   elapsedMs: number;
   startRun: () => void;
-  addScore: (n: number) => void;
+  registerHit: (baseScore: number) => void;
+  resetCombo: () => void;
   loseHP: () => void;
   tickElapsed: (ms: number) => void;
   reset: () => void;
@@ -20,7 +23,20 @@ const INITIAL_HP = 3;
 const freshRun = {
   score: 0,
   hp: INITIAL_HP,
+  combo: 0,
+  maxCombo: 0,
   elapsedMs: 0,
+};
+
+export const COMBO_MILESTONES: readonly number[] = [10, 25, 50, 100];
+
+export const comboMultiplier = (combo: number): number => {
+  if (combo >= 100) return 5;
+  if (combo >= 50) return 4;
+  if (combo >= 30) return 3;
+  if (combo >= 15) return 2;
+  if (combo >= 5) return 1.5;
+  return 1;
 };
 
 export const useRunStore = create<RunState>()(
@@ -30,7 +46,22 @@ export const useRunStore = create<RunState>()(
       ...freshRun,
       startRun: () =>
         set({ status: "playing", ...freshRun }, false, "startRun"),
-      addScore: (n) => set((s) => ({ score: s.score + n }), false, "addScore"),
+      registerHit: (baseScore) =>
+        set(
+          (s) => {
+            const combo = s.combo + 1;
+            const gained = Math.round(baseScore * comboMultiplier(combo));
+            return {
+              combo,
+              maxCombo: Math.max(s.maxCombo, combo),
+              score: s.score + gained,
+            };
+          },
+          false,
+          "registerHit",
+        ),
+      resetCombo: () =>
+        set((s) => (s.combo === 0 ? s : { combo: 0 }), false, "resetCombo"),
       loseHP: () =>
         set(
           (s) => {

@@ -1,0 +1,35 @@
+export const FEEL = {
+  spawnMs: 220,
+  hitMs: 200,
+  hitOvershootScale: 1.3,
+  missMs: 300,
+  pulseMs: 150,
+  bombHitMs: 220,
+  bombHitScale: 1.5,
+  shieldShardMs: 280,
+  shieldShardCount: 5,
+  particles: {
+    poolSize: 220,
+    baseRadius: 4,
+    hit: { count: 10, speed: 0.18, lifeMs: 320 },
+    golden: { count: 18, speed: 0.26, lifeMs: 520 },
+    bomb: { count: 28, speed: 0.34, lifeMs: 600 },
+    subhit: { count: 5, speed: 0.12, lifeMs: 220 },
+    milestone: { count: 36, speed: 0.4, lifeMs: 700 },
+  },
+  shake: {
+    goldenIntensity: 2,
+    goldenMs: 80,
+    bombIntensity: 12,
+    bombMs: 200,
+    comboIntensity: 5,
+    comboMs: 150,
+  },
+  hitFrameMs: 50,
+  hitFrameSlow: 0.1,
+  flashAlpha: 0.22,
+  flashInMs: 30,
+  flashOutMs: 60,
+} as const;
+
+export const BOMB_PARTICLE_COLORS = [0xff1f3f, 0xff8c00] as const;
