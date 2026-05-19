@@ -10,11 +10,13 @@ export interface RunState {
   combo: number;
   maxCombo: number;
   elapsedMs: number;
+  paused: boolean;
   startRun: () => void;
   registerHit: (baseScore: number) => void;
   resetCombo: () => void;
   loseHP: () => void;
   tickElapsed: (ms: number) => void;
+  setPaused: (paused: boolean) => void;
   reset: () => void;
 }
 
@@ -26,6 +28,7 @@ const freshRun = {
   combo: 0,
   maxCombo: 0,
   elapsedMs: 0,
+  paused: false,
 };
 
 export const COMBO_MILESTONES: readonly number[] = [10, 25, 50, 100];
@@ -74,6 +77,8 @@ export const useRunStore = create<RunState>()(
         ),
       tickElapsed: (ms) =>
         set((s) => ({ elapsedMs: s.elapsedMs + ms }), false, "tickElapsed"),
+      setPaused: (paused) =>
+        set((s) => (s.paused === paused ? s : { paused }), false, "setPaused"),
       reset: () => set({ status: "idle", ...freshRun }, false, "reset"),
     }),
     { name: "runStore" },
