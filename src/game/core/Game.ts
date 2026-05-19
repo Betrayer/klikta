@@ -14,6 +14,7 @@ import { ShieldedTarget } from "../entities/ShieldedTarget";
 import { SpawnSystem, type SpawnEvent } from "../systems/SpawnSystem";
 import { VFXSystem } from "../systems/VFXSystem";
 import { CameraSystem } from "../systems/CameraSystem";
+import { audioSystem } from "../systems/AudioSystem";
 import type { TargetKind } from "../../data/targetConfig";
 import { tweenManager } from "../util/TweenManager";
 import { FEEL } from "../config/feel";
@@ -25,6 +26,7 @@ export class Game {
   private targetLayer: Container | null = null;
   private readonly targets: Target[] = [];
   private spawnSystem: SpawnSystem | null = null;
+  private unsubPause: (() => void) | null = null;
   private vfx: VFXSystem | null = null;
   private camera: CameraSystem | null = null;
   private flashGfx: Graphics | null = null;
@@ -79,14 +81,27 @@ export class Game {
 
     tweenManager.clear();
     this.spawnSystem = new SpawnSystem(this.clockMs);
+    audioSystem.startMusic();
+    this.syncMusicToCombo();
     app.ticker.add(this.tick);
+
+    this.unsubPause = useRunStore.subscribe((state, prev) => {
+      if (state.paused !== prev.paused) this.applyPaused(state.paused);
+    });
+  }
+
+  private applyPaused(paused: boolean): void {
+    if (this.app === null) return;
+    if (paused) this.app.ticker.stop();
+    else this.app.ticker.start();
+    audioSystem.setPaused(paused);
   }
 
   private handleStagePointerDown = (event: FederatedPointerEvent): void => {
+    if (useRunStore.getState().paused) return;
     if (this.app !== null && event.target === this.app.stage) {
-      const store = useRunStore.getState();
-      store.loseHP();
-      store.resetCombo();
+      audioSystem.playSFX("miss");
+      this.loseHpAndCheck();
     }
   };
 
@@ -165,6 +180,7 @@ export class Game {
       if (target.isDead) {
         if (target.expiredUnclicked && target.kind !== "bomb") {
           useRunStore.getState().resetCombo();
+          this.syncMusicToCombo();
         }
         this.removeTargetAt(i);
       }
@@ -200,33 +216,65 @@ export class Game {
   }
 
   private handleTargetClick(target: Target): void {
+    if (useRunStore.getState().paused) return;
     if (!target.isInteractive) return;
 
     const result = target.onClick();
-    const store = useRunStore.getState();
 
     if (result.effects.includes("lose_hp")) {
-      store.loseHP();
-      store.resetCombo();
+      audioSystem.playSFX("bomb_click");
+      this.loseHpAndCheck();
     }
 
     if (result.destroyed) {
-      if (target.kind !== "bomb" && result.score > 0) {
-        store.registerHit(result.score);
+      if (target.kind !== "bomb") {
+        if (result.score > 0) {
+          useRunStore.getState().registerHit(result.score);
+        }
+        this.syncMusicToCombo();
+        audioSystem.playSFX(this.hitSfx(target.kind));
         this.handleComboMilestone();
       }
       this.emitHitVfx(target);
       this.triggerJuice(target);
       target.beginHitExit();
     } else if (target.kind === "multi") {
+      audioSystem.playSFX("hit_multi_partial");
       this.vfx?.emitSubHit(target.x, target.y, target.color);
+    } else if (target.kind === "shielded") {
+      audioSystem.playSFX("hit_shielded_break");
     }
+  }
+
+  private hitSfx(kind: TargetKind): string {
+    if (kind === "golden") return "hit_golden";
+    if (kind === "multi") return "hit_multi_complete";
+    return "hit_regular";
+  }
+
+  private loseHpAndCheck(): void {
+    const store = useRunStore.getState();
+    store.loseHP();
+    store.resetCombo();
+    if (useRunStore.getState().status === "gameOver") {
+      audioSystem.playSFX("game_over");
+      audioSystem.musicGameOver();
+    } else {
+      this.syncMusicToCombo();
+    }
+  }
+
+  private syncMusicToCombo(): void {
+    const combo = useRunStore.getState().combo;
+    audioSystem.setMusicIntensity(Math.min(combo / 50, 1));
   }
 
   private handleComboMilestone(): void {
     if (this.app === null) return;
     const combo = useRunStore.getState().combo;
     if (!COMBO_MILESTONES.includes(combo)) return;
+    audioSystem.playSFX("combo_milestone");
+    audioSystem.musicSwell();
     this.camera?.shake(FEEL.shake.comboIntensity, FEEL.shake.comboMs);
     const { width, height } = this.app.renderer.screen;
     this.vfx?.emitMilestone(width / 2, height / 2);
@@ -263,6 +311,9 @@ export class Game {
     if (this.app === null) return;
     this.app.ticker.remove(this.tick);
     this.app.ticker.speed = 1;
+    this.unsubPause?.();
+    this.unsubPause = null;
+    audioSystem.setPaused(false);
     this.app.renderer.off("resize", this.handleResize);
     this.app.stage.off("pointerdown", this.handleStagePointerDown);
     tweenManager.clear();
