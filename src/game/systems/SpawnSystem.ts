@@ -87,6 +87,7 @@ export class SpawnSystem {
     const surge = this.policy.spawnRateSurge;
     if (surge === null) return 1;
     const elapsed = currentTimeMs - this.startTimeMs;
+    if (elapsed < surge.periodMs) return 1;
     const phase = elapsed % surge.periodMs;
     return phase < surge.durationMs ? surge.mul : 1;
   }

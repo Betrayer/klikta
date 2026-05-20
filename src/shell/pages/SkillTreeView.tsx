@@ -55,6 +55,9 @@ const applySelection = (
     return;
   }
   meta.selectPerk(key, option.id);
+  if (meta.unlockAchievement('first-skill')) {
+    meta.awardCurrency(25);
+  }
   for (const eff of option.effects) {
     if (eff.kind === 'ultimateUnlock') {
       meta.unlockUltimate(eff.id);

@@ -8,6 +8,25 @@ export interface StartRunOptions {
   comboCap?: number;
 }
 
+export interface AchievementAward {
+  id: string;
+  amount: number;
+}
+
+export interface CurrencyBreakdown {
+  base: number;
+  comboBonus: number;
+  bombBounty: number;
+  comboCoin: number;
+  achievements: AchievementAward[];
+  total: number;
+}
+
+export interface RunResults {
+  currencyEarned: number;
+  currencyBreakdown: CurrencyBreakdown;
+}
+
 export interface RunState {
   status: RunStatus;
   score: number;
@@ -19,6 +38,9 @@ export interface RunState {
   elapsedMs: number;
   paused: boolean;
   timePulseIncoming: boolean;
+  bombClicksThisRun: number;
+  currencyEarned: number;
+  currencyBreakdown: CurrencyBreakdown | null;
   startRun: (opts?: StartRunOptions) => void;
   registerHit: (baseScore: number) => void;
   resetCombo: () => void;
@@ -29,6 +51,8 @@ export interface RunState {
   tickElapsed: (ms: number) => void;
   setPaused: (paused: boolean) => void;
   setTimePulseIncoming: (incoming: boolean) => void;
+  recordBombClick: () => void;
+  recordRunResults: (results: RunResults) => void;
   reset: () => void;
 }
 
@@ -45,6 +69,9 @@ const freshRun = {
   elapsedMs: 0,
   paused: false,
   timePulseIncoming: false,
+  bombClicksThisRun: 0,
+  currencyEarned: 0,
+  currencyBreakdown: null as CurrencyBreakdown | null,
 };
 
 export const COMBO_MILESTONES: readonly number[] = [10, 25, 50, 100];
@@ -147,9 +174,26 @@ export const useRunStore = create<RunState>()(
       setTimePulseIncoming: (incoming) =>
         set(
           (s) =>
-            s.timePulseIncoming === incoming ? s : { timePulseIncoming: incoming },
+            s.timePulseIncoming === incoming
+              ? s
+              : { timePulseIncoming: incoming },
           false,
           "setTimePulseIncoming",
+        ),
+      recordBombClick: () =>
+        set(
+          (s) => ({ bombClicksThisRun: s.bombClicksThisRun + 1 }),
+          false,
+          "recordBombClick",
+        ),
+      recordRunResults: (results) =>
+        set(
+          {
+            currencyEarned: results.currencyEarned,
+            currencyBreakdown: results.currencyBreakdown,
+          },
+          false,
+          "recordRunResults",
         ),
       reset: () => set({ status: "idle", ...freshRun }, false, "reset"),
     }),

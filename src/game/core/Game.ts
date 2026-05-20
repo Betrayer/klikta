@@ -18,7 +18,13 @@ import { audioSystem } from "../systems/AudioSystem";
 import type { TargetKind } from "../../data/targetConfig";
 import { tweenManager } from "../util/TweenManager";
 import { FEEL } from "../config/feel";
-import { useRunStore, COMBO_MILESTONES } from "../../state/runStore";
+import {
+  useRunStore,
+  COMBO_MILESTONES,
+  type CurrencyBreakdown,
+  type AchievementAward,
+} from "../../state/runStore";
+import { useMetaStore } from "../../state/metaStore";
 import {
   EffectResolver,
   type RunModifiers,
@@ -29,6 +35,14 @@ import { getActiveResolver } from "../effects/activeResolver";
 
 const TIME_PULSE_SPEEDS = [0.6, 1.6] as const;
 const TIME_PULSE_WARNING_MS = 500;
+
+const comboBonusForMax = (maxCombo: number): number => {
+  if (maxCombo >= 100) return 100;
+  if (maxCombo >= 50) return 40;
+  if (maxCombo >= 25) return 15;
+  if (maxCombo >= 10) return 5;
+  return 0;
+};
 
 export class Game {
   private readonly parent: HTMLElement;
@@ -53,7 +67,8 @@ export class Game {
   private cursorX = 0;
   private cursorY = 0;
   private missesThisRun = 0;
-  private bombClicksThisRun = 0;
+  private bombBountyEarned = 0;
+  private comboCoinEarned = 0;
   private scoreAtLastRegen = 0;
   private lastDamageMs = -Infinity;
   private baseTickerSpeed = 1;
@@ -73,6 +88,11 @@ export class Game {
     this.runMods = this.resolver.buildRunModifiers();
     this.spawnPolicy = this.resolver.buildSpawnPolicy();
     this.targetMods = this.resolver.buildBaseTargetModifiers();
+    this.bombBountyEarned = 0;
+    this.comboCoinEarned = 0;
+    this.missesThisRun = 0;
+    this.scoreAtLastRegen = 0;
+    this.lastDamageMs = -Infinity;
 
     const app = new Application();
     await app.init({
@@ -270,9 +290,8 @@ export class Game {
       this.timePulseEndMs === 0 &&
       this.clockMs >= this.timePulseNextStartMs
     ) {
-      const speed = TIME_PULSE_SPEEDS[
-        Math.floor(Math.random() * TIME_PULSE_SPEEDS.length)
-      ];
+      const speed =
+        TIME_PULSE_SPEEDS[Math.floor(Math.random() * TIME_PULSE_SPEEDS.length)];
       this.baseTickerSpeed = speed ?? 1;
       this.timePulseEndMs = this.clockMs + pulse.durationMs;
       this.timePulseNextStartMs = this.clockMs + pulse.periodMs;
@@ -336,8 +355,12 @@ export class Game {
           target.pairTarget = null;
           pair.beginPairKill();
         }
-        if (target.expiredUnclicked && target.kind !== "bomb") {
-          this.handleMissExpiry();
+        if (target.expiredUnclicked) {
+          if (target.kind === "bomb") {
+            this.tryAwardBombBounty();
+          } else {
+            this.handleMissExpiry();
+          }
         }
         this.removeTargetAt(i);
       }
@@ -348,10 +371,7 @@ export class Game {
   };
 
   private handleMissExpiry(): void {
-    if (
-      this.runMods.firstMissForgiven &&
-      this.missesThisRun === 0
-    ) {
+    if (this.runMods.firstMissForgiven && this.missesThisRun === 0) {
       this.missesThisRun = 1;
       return;
     }
@@ -380,6 +400,7 @@ export class Game {
     if (useRunStore.getState().status === "gameOver") {
       audioSystem.playSFX("game_over");
       audioSystem.musicGameOver();
+      this.awardRunRewards();
     }
   }
 
@@ -393,7 +414,11 @@ export class Game {
       case "bomb":
         return new BombTarget(spawn, event.modifiers, event.appearAsGolden);
       case "multi":
-        return new MultiTarget(spawn, event.modifiers, event.multiClicksOverride);
+        return new MultiTarget(
+          spawn,
+          event.modifiers,
+          event.multiClicksOverride,
+        );
       case "shielded":
         return new ShieldedTarget(spawn, event.modifiers);
     }
@@ -443,6 +468,7 @@ export class Game {
             scaled *= pf.bonusMul;
           }
           useRunStore.getState().registerHit(Math.round(scaled));
+          this.tryAwardComboCoin();
         }
         this.syncMusicToCombo();
         audioSystem.playSFX(this.hitSfx(target.kind));
@@ -469,14 +495,80 @@ export class Game {
   }
 
   private handleBombClick(): void {
-    this.bombClicksThisRun += 1;
-    const free =
-      this.runMods.bombClickFreeAfterFirst && this.bombClicksThisRun > 1;
+    const store = useRunStore.getState();
+    store.recordBombClick();
+    const count = useRunStore.getState().bombClicksThisRun;
+    const free = this.runMods.bombClickFreeAfterFirst && count > 1;
     if (!free) this.applyDamage(this.runMods.bombClickHPMul);
     if (!this.runMods.comboNoResetOnBombClick) {
       useRunStore.getState().resetCombo();
       this.syncMusicToCombo();
     }
+  }
+
+  private tryAwardBombBounty(): void {
+    const chance = this.runMods.bombExpireCurrencyChance;
+    if (chance <= 0 || this.runMods.currencyDisabled) return;
+    if (Math.random() >= chance) return;
+    useMetaStore.getState().awardCurrency(1);
+    this.bombBountyEarned += 1;
+  }
+
+  private tryAwardComboCoin(): void {
+    const cfg = this.runMods.currencyPerHit;
+    if (cfg === null || this.runMods.currencyDisabled) return;
+    const combo = useRunStore.getState().combo;
+    if (combo < cfg.combo) return;
+    useMetaStore.getState().awardCurrency(cfg.amount);
+    this.comboCoinEarned += cfg.amount;
+  }
+
+  private awardRunRewards(): void {
+    const run = useRunStore.getState();
+    const meta = useMetaStore.getState();
+    const score = run.score;
+    const maxCombo = run.maxCombo;
+    const bombClicks = run.bombClicksThisRun;
+    const disabled = this.runMods.currencyDisabled;
+    const isFirstRunEver = meta.runsCompleted === 0;
+
+    const base = disabled ? 0 : Math.floor(score / 100);
+    const comboBonus = disabled ? 0 : comboBonusForMax(maxCombo);
+
+    const achievements: AchievementAward[] = [];
+    if (!disabled) {
+      const candidates: { id: string; amount: number; condition: boolean }[] = [
+        { id: "first-run", amount: 50, condition: isFirstRunEver },
+        { id: "combo-25", amount: 25, condition: maxCombo >= 25 },
+        { id: "combo-50", amount: 75, condition: maxCombo >= 50 },
+        { id: "combo-100", amount: 200, condition: maxCombo >= 100 },
+        { id: "no-bomb-clicks", amount: 100, condition: bombClicks === 0 },
+      ];
+      for (const c of candidates) {
+        if (!c.condition) continue;
+        if (meta.unlockAchievement(c.id)) {
+          achievements.push({ id: c.id, amount: c.amount });
+        }
+      }
+    }
+
+    const achievementsTotal = achievements.reduce((s, a) => s + a.amount, 0);
+    const endTotal = base + comboBonus + achievementsTotal;
+    if (!disabled && endTotal > 0) meta.awardCurrency(endTotal);
+    meta.recordRun(score);
+
+    const breakdown: CurrencyBreakdown = {
+      base,
+      comboBonus,
+      bombBounty: this.bombBountyEarned,
+      comboCoin: this.comboCoinEarned,
+      achievements,
+      total: endTotal + this.bombBountyEarned + this.comboCoinEarned,
+    };
+    run.recordRunResults({
+      currencyEarned: breakdown.total,
+      currencyBreakdown: breakdown,
+    });
   }
 
   private hitSfx(kind: TargetKind): string {
