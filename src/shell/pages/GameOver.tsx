@@ -1,9 +1,9 @@
 import { Button, Center, Stack, Text, Title } from '@mantine/core';
 import { useRunStore } from '../../state/runStore';
+import { startNewRun } from '../../game/runLauncher';
 
 export const GameOver = () => {
   const score = useRunStore((s) => s.score);
-  const startRun = useRunStore((s) => s.startRun);
 
   return (
     <Center h="100vh" bg="#0a0014">
@@ -14,7 +14,7 @@ export const GameOver = () => {
         <Text ff="monospace" fz="xl" c="#00f5d4">
           Score: {score}
         </Text>
-        <Button size="xl" radius="xl" color="#ff006e" onClick={startRun}>
+        <Button size="xl" radius="xl" color="#ff006e" onClick={startNewRun}>
           Restart
         </Button>
       </Stack>

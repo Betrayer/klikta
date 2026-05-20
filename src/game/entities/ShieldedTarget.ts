@@ -3,15 +3,35 @@ import { Target, type ClickResult, type TargetSpawn } from "./Target";
 import { tweenManager } from "../util/TweenManager";
 import { easeOutCubic } from "../util/easings";
 import { FEEL } from "../config/feel";
+import {
+  DEFAULT_TARGET_MODIFIERS,
+  type TargetSpawnModifiers,
+} from "../effects/EffectResolver";
 
 const SHIELD_COLOR = 0x00f0ff;
 
 export class ShieldedTarget extends Target {
   private shieldUp = true;
 
-  constructor(spawn: TargetSpawn) {
-    super("shielded", spawn);
+  constructor(
+    spawn: TargetSpawn,
+    modifiers: TargetSpawnModifiers = DEFAULT_TARGET_MODIFIERS,
+  ) {
+    super("shielded", spawn, modifiers);
     this.spawn();
+  }
+
+  get hasShield(): boolean {
+    return this.shieldUp;
+  }
+
+  breakShield(): boolean {
+    if (!this.shieldUp || !this.isInteractive) return false;
+    this.shieldUp = false;
+    this.render();
+    this.spawnShards();
+    this.pulse();
+    return true;
   }
 
   render(): void {
@@ -31,13 +51,14 @@ export class ShieldedTarget extends Target {
 
   onClick(): ClickResult {
     if (this.shieldUp) {
-      this.shieldUp = false;
-      this.render();
-      this.spawnShards();
-      this.pulse();
+      this.breakShield();
       return { destroyed: false, score: 0, effects: [] };
     }
-    return { destroyed: true, score: this.config.score, effects: [] };
+    return {
+      destroyed: true,
+      score: this.config.score * this.scoreMul,
+      effects: [],
+    };
   }
 
   private spawnShards(): void {

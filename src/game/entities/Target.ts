@@ -13,6 +13,10 @@ import {
   linear,
 } from "../util/easings";
 import { FEEL } from "../config/feel";
+import {
+  DEFAULT_TARGET_MODIFIERS,
+  type TargetSpawnModifiers,
+} from "../effects/EffectResolver";
 
 export type TargetEffect = "lose_hp";
 
@@ -29,38 +33,55 @@ export interface TargetSpawn {
   y: number;
 }
 
+export interface TargetUpdateContext {
+  cursorX: number;
+  cursorY: number;
+  centerX: number;
+  centerY: number;
+}
+
 export abstract class Target {
   readonly id: string;
   readonly kind: TargetKind;
-  readonly x: number;
-  readonly y: number;
   readonly spawnTime: number;
   readonly lifetimeMs: number;
   readonly graphics: Graphics;
+  readonly scoreMul: number;
+  readonly modifiers: TargetSpawnModifiers;
 
+  x: number;
+  y: number;
   currentSize: number;
   phase: TargetPhase = "spawning";
+  pairTarget: Target | null = null;
 
   protected readonly config: TargetTypeConfig;
   protected readonly initialSize: number;
   protected elapsedMs = 0;
   protected lifeScale = 1;
   protected animScale = 0;
+  protected phaseInvisible = false;
 
   private readonly tweens: Tween[] = [];
   private exitedByMiss = false;
 
-  constructor(kind: TargetKind, spawn: TargetSpawn) {
+  constructor(
+    kind: TargetKind,
+    spawn: TargetSpawn,
+    modifiers: TargetSpawnModifiers = DEFAULT_TARGET_MODIFIERS,
+  ) {
     const config = TARGET_CONFIG[kind];
     this.kind = kind;
     this.config = config;
+    this.modifiers = modifiers;
     this.id = crypto.randomUUID();
     this.x = spawn.x;
     this.y = spawn.y;
-    this.lifetimeMs = config.lifetimeMs;
+    this.lifetimeMs = config.lifetimeMs * modifiers.lifetimeMul;
     this.spawnTime = performance.now();
-    this.initialSize = config.radius;
-    this.currentSize = config.radius;
+    this.initialSize = config.radius * modifiers.sizeMul;
+    this.currentSize = this.initialSize;
+    this.scoreMul = modifiers.scoreMul;
 
     this.graphics = new Graphics();
     this.graphics.position.set(this.x, this.y);
@@ -87,6 +108,10 @@ export abstract class Target {
     return this.exitedByMiss;
   }
 
+  get isPhaseInvisible(): boolean {
+    return this.phaseInvisible;
+  }
+
   protected spawn(): void {
     this.render();
     this.phase = "spawning";
@@ -94,7 +119,7 @@ export abstract class Target {
       tweenManager.to(
         0,
         1,
-        FEEL.spawnMs,
+        FEEL.spawnMs * this.modifiers.spawnAnimMul,
         (v) => {
           this.animScale = v;
           this.applyScale();
@@ -107,16 +132,13 @@ export abstract class Target {
     );
   }
 
-  update(deltaMs: number): void {
+  update(deltaMs: number, ctx: TargetUpdateContext): void {
     if (this.phase === "dead") return;
 
     this.elapsedMs += deltaMs;
-
-    if (this.phase === "active" && this.config.shrinks) {
-      this.lifeScale = Math.max(1 - this.elapsedMs / this.lifetimeMs, 0);
-      this.currentSize = this.initialSize * this.lifeScale;
-      this.applyScale();
-    }
+    this.applyDrift(deltaMs, ctx);
+    this.updateLifeAndAlpha();
+    this.graphics.position.set(this.x, this.y);
 
     if (
       (this.phase === "spawning" || this.phase === "active") &&
@@ -124,6 +146,70 @@ export abstract class Target {
     ) {
       this.beginMissExit();
     }
+  }
+
+  protected updateLifeAndAlpha(): void {
+    if (this.phase === "active" && this.config.shrinks) {
+      const phaseMs = this.modifiers.slowBloomPhaseMs;
+      if (phaseMs > 0 && this.elapsedMs < phaseMs) {
+        this.lifeScale = this.elapsedMs / phaseMs;
+      } else {
+        const tail = Math.max(this.lifetimeMs - phaseMs, 1);
+        this.lifeScale = Math.max(1 - (this.elapsedMs - phaseMs) / tail, 0);
+      }
+      this.currentSize = this.initialSize * this.lifeScale;
+      this.applyScale();
+    }
+
+    this.applyPhaseFlash();
+  }
+
+  protected applyPhaseFlash(): void {
+    const pf = this.modifiers.phaseFlash;
+    if (pf === null) {
+      this.phaseInvisible = false;
+      return;
+    }
+    if (this.phase !== "spawning" && this.phase !== "active") {
+      this.phaseInvisible = false;
+      return;
+    }
+    const cycle = this.elapsedMs % pf.periodMs;
+    const visibleMs = pf.periodMs - pf.invisibleMs;
+    const invisible = cycle >= visibleMs;
+    this.phaseInvisible = invisible;
+    this.graphics.alpha = invisible ? 0.1 : 1;
+  }
+
+  private applyDrift(deltaMs: number, ctx: TargetUpdateContext): void {
+    if (!this.isInteractive) return;
+    const conv = this.modifiers.convergentDriftSpeed;
+    const mag = this.modifiers.magnetSpeed;
+    if (conv <= 0 && mag <= 0) return;
+
+    let vx = 0;
+    let vy = 0;
+    if (conv > 0) {
+      const dx = ctx.centerX - this.x;
+      const dy = ctx.centerY - this.y;
+      const d = Math.hypot(dx, dy);
+      if (d > 0.5) {
+        vx += (dx / d) * conv;
+        vy += (dy / d) * conv;
+      }
+    }
+    if (mag > 0) {
+      const dx = ctx.cursorX - this.x;
+      const dy = ctx.cursorY - this.y;
+      const d = Math.hypot(dx, dy);
+      if (d > 0.5) {
+        vx += (dx / d) * mag;
+        vy += (dy / d) * mag;
+      }
+    }
+    const dt = deltaMs / 1000;
+    this.x += vx * dt;
+    this.y += vy * dt;
   }
 
   beginHitExit(): void {
@@ -164,6 +250,27 @@ export abstract class Target {
       ),
     );
     this.fadeOut(FEEL.hitMs);
+  }
+
+  beginPairKill(): void {
+    if (this.phase === "exiting" || this.phase === "dead") return;
+    this.startExit();
+    this.track(
+      tweenManager.to(
+        this.animScale,
+        0,
+        FEEL.missMs,
+        (v) => {
+          this.animScale = v;
+          this.applyScale();
+        },
+        easeInOutQuad,
+        () => {
+          this.phase = "dead";
+        },
+      ),
+    );
+    this.fadeOut(FEEL.missMs);
   }
 
   protected beginMissExit(): void {
@@ -237,6 +344,7 @@ export abstract class Target {
   destroy(): void {
     this.phase = "dead";
     this.cancelTweens();
+    this.pairTarget = null;
     this.graphics.removeFromParent();
     this.graphics.destroy();
   }

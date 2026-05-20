@@ -1,9 +1,7 @@
 import { Button, Center, Stack, Title } from '@mantine/core';
-import { useRunStore } from '../../state/runStore';
+import { startNewRun } from '../../game/runLauncher';
 
 export const MainMenu = () => {
-  const startRun = useRunStore((s) => s.startRun);
-
   return (
     <Center h="100vh" bg="#0a0014">
       <Stack align="center" gap={48}>
@@ -14,7 +12,7 @@ export const MainMenu = () => {
           size="xl"
           radius="xl"
           color="#ff006e"
-          onClick={startRun}
+          onClick={startNewRun}
         >
           Start
         </Button>

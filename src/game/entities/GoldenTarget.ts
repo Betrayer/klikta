@@ -1,8 +1,15 @@
 import { Target, type ClickResult, type TargetSpawn } from "./Target";
+import {
+  DEFAULT_TARGET_MODIFIERS,
+  type TargetSpawnModifiers,
+} from "../effects/EffectResolver";
 
 export class GoldenTarget extends Target {
-  constructor(spawn: TargetSpawn) {
-    super("golden", spawn);
+  constructor(
+    spawn: TargetSpawn,
+    modifiers: TargetSpawnModifiers = DEFAULT_TARGET_MODIFIERS,
+  ) {
+    super("golden", spawn, modifiers);
     this.spawn();
   }
 
@@ -15,6 +22,10 @@ export class GoldenTarget extends Target {
   }
 
   onClick(): ClickResult {
-    return { destroyed: true, score: this.config.score, effects: [] };
+    return {
+      destroyed: true,
+      score: this.config.score * this.scoreMul,
+      effects: [],
+    };
   }
 }
