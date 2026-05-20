@@ -25,6 +25,7 @@ export interface CurrencyBreakdown {
 export interface RunResults {
   currencyEarned: number;
   currencyBreakdown: CurrencyBreakdown;
+  previousBestScore: number;
 }
 
 export interface RunState {
@@ -41,6 +42,7 @@ export interface RunState {
   bombClicksThisRun: number;
   currencyEarned: number;
   currencyBreakdown: CurrencyBreakdown | null;
+  previousBestScore: number;
   startRun: (opts?: StartRunOptions) => void;
   registerHit: (baseScore: number) => void;
   resetCombo: () => void;
@@ -72,6 +74,7 @@ const freshRun = {
   bombClicksThisRun: 0,
   currencyEarned: 0,
   currencyBreakdown: null as CurrencyBreakdown | null,
+  previousBestScore: 0,
 };
 
 export const COMBO_MILESTONES: readonly number[] = [10, 25, 50, 100];
@@ -191,6 +194,7 @@ export const useRunStore = create<RunState>()(
           {
             currencyEarned: results.currencyEarned,
             currencyBreakdown: results.currencyBreakdown,
+            previousBestScore: results.previousBestScore,
           },
           false,
           "recordRunResults",
