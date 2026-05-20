@@ -1,0 +1,174 @@
+import { useMemo } from 'react';
+import { Box, Paper, Progress, Text, UnstyledButton } from '@mantine/core';
+import { useMetaStore } from '../../state/metaStore';
+import { useRunStore } from '../../state/runStore';
+import {
+  SKILL_TREE,
+  findUltimateForBranch,
+  type BranchId,
+} from '../../data/skillTree';
+import { requestUltimateActivation } from '../../game/systems/ultimateActivation';
+
+interface UltimateSlot {
+  hotkey: number;
+  ultimateId: string;
+  ultimateName: string;
+  branchId: BranchId;
+  color: string;
+}
+
+export const UltimateBar = () => {
+  const selectedPerks = useMetaStore((s) => s.selectedPerks);
+  const charges = useRunStore((s) => s.ultimateCharges);
+  const activeUltimate = useRunStore((s) => s.activeUltimate);
+
+  const slots = useMemo<UltimateSlot[]>(() => {
+    const out: UltimateSlot[] = [];
+    SKILL_TREE.forEach((branch, index) => {
+      const t4Key = `${branch.id}-t4`;
+      const perkId = selectedPerks[t4Key];
+      if (perkId === undefined) return;
+      const ult = findUltimateForBranch(branch.id);
+      if (ult === undefined) return;
+      out.push({
+        hotkey: index + 1,
+        ultimateId: ult.id,
+        ultimateName: ult.name,
+        branchId: branch.id,
+        color: branch.color,
+      });
+    });
+    return out;
+  }, [selectedPerks]);
+
+  if (slots.length === 0) return null;
+
+  const someoneBlocking = activeUltimate !== null;
+
+  return (
+    <Box
+      pos="fixed"
+      bottom={20}
+      left="50%"
+      style={{
+        transform: 'translateX(-50%)',
+        zIndex: 10,
+        display: 'flex',
+        gap: 8,
+      }}
+    >
+      {slots.map((slot) => (
+        <UltimateCard
+          key={slot.ultimateId}
+          slot={slot}
+          charge={charges[slot.ultimateId] ?? 0}
+          isActive={activeUltimate === slot.ultimateId}
+          isBlocked={someoneBlocking && activeUltimate !== slot.ultimateId}
+        />
+      ))}
+    </Box>
+  );
+};
+
+interface UltimateCardProps {
+  slot: UltimateSlot;
+  charge: number;
+  isActive: boolean;
+  isBlocked: boolean;
+}
+
+const UltimateCard = ({
+  slot,
+  charge,
+  isActive,
+  isBlocked,
+}: UltimateCardProps) => {
+  const ready = charge >= 100 && !isActive && !isBlocked;
+  const canClick = ready;
+  const dim = isBlocked && !isActive;
+
+  const handleClick = (): void => {
+    if (!canClick) return;
+    requestUltimateActivation(slot.ultimateId);
+  };
+
+  return (
+    <UnstyledButton
+      onClick={handleClick}
+      disabled={!canClick}
+      style={{
+        pointerEvents: canClick ? 'auto' : 'none',
+      }}
+    >
+      <Paper
+        px="sm"
+        py="xs"
+        radius="md"
+        bg="rgba(0, 0, 0, 0.55)"
+        style={{
+          width: 96,
+          border: `1px solid ${isActive ? slot.color : 'rgba(255,255,255,0.08)'}`,
+          boxShadow: ready
+            ? `0 0 16px ${slot.color}`
+            : isActive
+              ? `0 0 24px ${slot.color}`
+              : 'none',
+          opacity: dim ? 0.4 : 1,
+          transition: 'box-shadow 200ms ease-out, opacity 200ms ease-out',
+          userSelect: 'none',
+        }}
+      >
+        <Box
+          mb={4}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'baseline',
+          }}
+        >
+          <Text
+            ff="monospace"
+            fz="xs"
+            fw={900}
+            c={slot.color}
+            style={{ letterSpacing: 1 }}
+          >
+            {slot.hotkey}
+          </Text>
+          <Text
+            ff="monospace"
+            fz={9}
+            c={slot.color}
+            style={{ letterSpacing: 1 }}
+          >
+            {isActive ? 'ACTIVE' : `${Math.floor(charge)}%`}
+          </Text>
+        </Box>
+        <Progress
+          value={isActive ? 100 : charge}
+          color={slot.color}
+          size="sm"
+          radius="xl"
+          transitionDuration={120}
+          striped={isActive}
+          animated={isActive}
+        />
+        <Text
+          ff="monospace"
+          fz={9}
+          ta="center"
+          mt={4}
+          c={ready ? slot.color : 'gray.5'}
+          style={{
+            letterSpacing: 1,
+            animation: ready
+              ? 'klikta-pulse-warn 220ms ease-in-out infinite alternate'
+              : 'none',
+          }}
+        >
+          {slot.ultimateName.toUpperCase()}
+        </Text>
+      </Paper>
+    </UnstyledButton>
+  );
+};

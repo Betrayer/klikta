@@ -61,9 +61,6 @@ const applySelection = (
   for (const eff of option.effects) {
     if (eff.kind === 'ultimateUnlock') {
       meta.unlockUltimate(eff.id);
-      if (meta.activeUltimate === null) {
-        meta.setActiveUltimate(eff.id);
-      }
     }
   }
 };

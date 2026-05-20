@@ -43,6 +43,8 @@ export interface RunState {
   currencyEarned: number;
   currencyBreakdown: CurrencyBreakdown | null;
   previousBestScore: number;
+  ultimateCharges: Record<string, number>;
+  activeUltimate: string | null;
   startRun: (opts?: StartRunOptions) => void;
   registerHit: (baseScore: number) => void;
   resetCombo: () => void;
@@ -55,6 +57,8 @@ export interface RunState {
   setTimePulseIncoming: (incoming: boolean) => void;
   recordBombClick: () => void;
   recordRunResults: (results: RunResults) => void;
+  setUltimateCharges: (charges: Record<string, number>) => void;
+  setActiveUltimate: (id: string | null) => void;
   reset: () => void;
 }
 
@@ -75,6 +79,8 @@ const freshRun = {
   currencyEarned: 0,
   currencyBreakdown: null as CurrencyBreakdown | null,
   previousBestScore: 0,
+  ultimateCharges: {} as Record<string, number>,
+  activeUltimate: null as string | null,
 };
 
 export const COMBO_MILESTONES: readonly number[] = [10, 25, 50, 100];
@@ -198,6 +204,14 @@ export const useRunStore = create<RunState>()(
           },
           false,
           "recordRunResults",
+        ),
+      setUltimateCharges: (charges) =>
+        set({ ultimateCharges: charges }, false, "setUltimateCharges"),
+      setActiveUltimate: (id) =>
+        set(
+          (s) => (s.activeUltimate === id ? s : { activeUltimate: id }),
+          false,
+          "setActiveUltimate",
         ),
       reset: () => set({ status: "idle", ...freshRun }, false, "reset"),
     }),

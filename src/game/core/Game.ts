@@ -15,6 +15,15 @@ import { SpawnSystem, type SpawnEvent } from "../systems/SpawnSystem";
 import { VFXSystem } from "../systems/VFXSystem";
 import { CameraSystem } from "../systems/CameraSystem";
 import { audioSystem } from "../systems/AudioSystem";
+import {
+  CHARGE_PER_COMBO_MILESTONE,
+  CHARGE_PER_HIT,
+  UltimateSystem,
+} from "../systems/UltimateSystem";
+import { setUltimateActivationHandler } from "../systems/ultimateActivation";
+import { createUltimateRegistry } from "../ultimates/registry";
+import type { GameContext } from "../ultimates/types";
+import { SKILL_TREE, findUltimateForBranch } from "../../data/skillTree";
 import type { TargetKind } from "../../data/targetConfig";
 import { tweenManager } from "../util/TweenManager";
 import { FEEL } from "../config/feel";
@@ -35,6 +44,13 @@ import { getActiveResolver } from "../effects/activeResolver";
 
 const TIME_PULSE_SPEEDS = [0.6, 1.6] as const;
 const TIME_PULSE_WARNING_MS = 500;
+const ULTIMATE_HOTKEYS: readonly string[] = [
+  "Digit1",
+  "Digit2",
+  "Digit3",
+  "Digit4",
+  "Digit5",
+];
 
 const comboBonusForMax = (maxCombo: number): number => {
   if (maxCombo >= 100) return 100;
@@ -63,6 +79,8 @@ export class Game {
   private runMods: RunModifiers;
   private spawnPolicy: SpawnPolicy;
   private targetMods: TargetSpawnModifiers;
+  private ultimateSystem: UltimateSystem | null = null;
+  private readonly scoreMultiplier = { current: 1 };
 
   private cursorX = 0;
   private cursorY = 0;
@@ -93,6 +111,14 @@ export class Game {
     this.missesThisRun = 0;
     this.scoreAtLastRegen = 0;
     this.lastDamageMs = -Infinity;
+    this.scoreMultiplier.current = 1;
+
+    const unlockedFromPerks = this.resolver.getUltimateUnlocks();
+    this.ultimateSystem = new UltimateSystem(
+      unlockedFromPerks,
+      createUltimateRegistry(),
+    );
+    setUltimateActivationHandler((id) => this.tryActivateUltimate(id));
 
     const app = new Application();
     await app.init({
@@ -153,9 +179,50 @@ export class Game {
     this.syncMusicToCombo();
     app.ticker.add(this.tick);
 
+    window.addEventListener("keydown", this.handleKeydown);
+
     this.unsubPause = useRunStore.subscribe((state, prev) => {
       if (state.paused !== prev.paused) this.applyPaused(state.paused);
     });
+  }
+
+  private buildUltimateContext(): GameContext | null {
+    if (
+      this.app === null ||
+      this.spawnSystem === null ||
+      this.vfx === null
+    ) {
+      return null;
+    }
+    return {
+      app: this.app,
+      spawnSystem: this.spawnSystem,
+      targets: this.targets,
+      vfx: this.vfx,
+      scoreMultiplier: this.scoreMultiplier,
+    };
+  }
+
+  private handleKeydown = (event: KeyboardEvent): void => {
+    if (event.repeat) return;
+    const idx = ULTIMATE_HOTKEYS.indexOf(event.code);
+    if (idx < 0) return;
+    const branch = SKILL_TREE[idx];
+    if (branch === undefined) return;
+    const ult = findUltimateForBranch(branch.id);
+    if (ult === undefined) return;
+    event.preventDefault();
+    this.tryActivateUltimate(ult.id);
+  };
+
+  private tryActivateUltimate(id: string): void {
+    if (this.ultimateSystem === null) return;
+    const run = useRunStore.getState();
+    if (run.status !== "playing" || run.paused) return;
+    if (!this.ultimateSystem.canActivate(id)) return;
+    const ctx = this.buildUltimateContext();
+    if (ctx === null) return;
+    this.ultimateSystem.activate(id, this.clockMs, ctx);
   }
 
   private applyPaused(paused: boolean): void {
@@ -335,6 +402,10 @@ export class Game {
     this.updateHitFrame();
     this.updateTimePulse();
     this.applyHpRegen();
+    if (this.ultimateSystem !== null) {
+      const ctx = this.buildUltimateContext();
+      if (ctx !== null) this.ultimateSystem.update(this.clockMs, ctx);
+    }
 
     const { width, height } = this.app.renderer.screen;
     const ctx = {
@@ -470,6 +541,7 @@ export class Game {
           useRunStore.getState().registerHit(Math.round(scaled));
           this.tryAwardComboCoin();
         }
+        this.ultimateSystem?.addCharge(CHARGE_PER_HIT[target.kind]);
         this.syncMusicToCombo();
         audioSystem.playSFX(this.hitSfx(target.kind));
         this.handleComboMilestone();
@@ -591,6 +663,7 @@ export class Game {
     audioSystem.playSFX("combo_milestone");
     audioSystem.musicSwell();
     this.camera?.shake(FEEL.shake.comboIntensity, FEEL.shake.comboMs);
+    this.ultimateSystem?.addCharge(CHARGE_PER_COMBO_MILESTONE);
     const { width, height } = this.app.renderer.screen;
     this.vfx?.emitMilestone(width / 2, height / 2);
   }
@@ -623,6 +696,13 @@ export class Game {
 
   destroy(): void {
     this.destroyed = true;
+    window.removeEventListener("keydown", this.handleKeydown);
+    setUltimateActivationHandler(null);
+    if (this.ultimateSystem !== null) {
+      const ctx = this.buildUltimateContext();
+      if (ctx !== null) this.ultimateSystem.forceCleanup(ctx);
+      this.ultimateSystem = null;
+    }
     if (this.app === null) return;
     this.app.ticker.remove(this.tick);
     this.app.ticker.speed = 1;

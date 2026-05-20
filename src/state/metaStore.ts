@@ -6,7 +6,6 @@ export interface MetaState {
   totalEarnedCurrency: number;
   selectedPerks: Record<string, string>;
   unlockedUltimates: string[];
-  activeUltimate: string | null;
 
   runsCompleted: number;
   totalRunScore: number;
@@ -18,7 +17,6 @@ export interface MetaState {
   selectPerk: (tierKey: string, perkId: string) => void;
   unselectPerk: (tierKey: string) => void;
   unlockUltimate: (id: string) => void;
-  setActiveUltimate: (id: string | null) => void;
   recordRun: (score: number) => void;
   unlockAchievement: (id: string) => boolean;
   resetAllProgress: () => void;
@@ -29,7 +27,6 @@ const initialMeta = {
   totalEarnedCurrency: 0,
   selectedPerks: {} as Record<string, string>,
   unlockedUltimates: [] as string[],
-  activeUltimate: null as string | null,
   runsCompleted: 0,
   totalRunScore: 0,
   bestScore: 0,
@@ -90,9 +87,6 @@ export const useMetaStore = create<MetaState>()(
             "unlockUltimate",
           ),
 
-        setActiveUltimate: (id) =>
-          set({ activeUltimate: id }, false, "setActiveUltimate"),
-
         recordRun: (score) =>
           set(
             (s) => ({
@@ -127,7 +121,6 @@ export const useMetaStore = create<MetaState>()(
           totalEarnedCurrency: state.totalEarnedCurrency,
           selectedPerks: state.selectedPerks,
           unlockedUltimates: state.unlockedUltimates,
-          activeUltimate: state.activeUltimate,
           runsCompleted: state.runsCompleted,
           totalRunScore: state.totalRunScore,
           bestScore: state.bestScore,
