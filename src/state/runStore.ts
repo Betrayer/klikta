@@ -18,6 +18,7 @@ export interface RunState {
   comboCap: number;
   elapsedMs: number;
   paused: boolean;
+  timePulseIncoming: boolean;
   startRun: (opts?: StartRunOptions) => void;
   registerHit: (baseScore: number) => void;
   resetCombo: () => void;
@@ -27,6 +28,7 @@ export interface RunState {
   fullHeal: () => void;
   tickElapsed: (ms: number) => void;
   setPaused: (paused: boolean) => void;
+  setTimePulseIncoming: (incoming: boolean) => void;
   reset: () => void;
 }
 
@@ -42,6 +44,7 @@ const freshRun = {
   comboCap: DEFAULT_COMBO_CAP,
   elapsedMs: 0,
   paused: false,
+  timePulseIncoming: false,
 };
 
 export const COMBO_MILESTONES: readonly number[] = [10, 25, 50, 100];
@@ -141,6 +144,13 @@ export const useRunStore = create<RunState>()(
         set((s) => ({ elapsedMs: s.elapsedMs + ms }), false, "tickElapsed"),
       setPaused: (paused) =>
         set((s) => (s.paused === paused ? s : { paused }), false, "setPaused"),
+      setTimePulseIncoming: (incoming) =>
+        set(
+          (s) =>
+            s.timePulseIncoming === incoming ? s : { timePulseIncoming: incoming },
+          false,
+          "setTimePulseIncoming",
+        ),
       reset: () => set({ status: "idle", ...freshRun }, false, "reset"),
     }),
     { name: "runStore" },

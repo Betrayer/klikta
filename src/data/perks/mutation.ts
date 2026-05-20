@@ -1,5 +1,5 @@
 import type { SkillBranch } from "../skillTree";
-import { TIER_REQUIRES_POINTS } from "../skillTree";
+import { TIER_REQUIRES_POINTS } from "../tier";
 
 export const MUTATION_BRANCH: SkillBranch = {
   id: "mutation",
@@ -34,10 +34,10 @@ export const MUTATION_BRANCH: SkillBranch = {
           id: "mutation-t1-convergent",
           name: "Convergent",
           description:
-            "All targets drift toward screen center at 5 px/s. Tighter cluster — bombs too.",
+            "All targets drift toward screen center at ~30 px/s. Tighter cluster — bombs too.",
           icon: "🎯",
           cost: 100,
-          effects: [{ kind: "convergentDriftSpeed", value: 5 }],
+          effects: [{ kind: "convergentDriftSpeed", value: 30 }],
         },
       ],
     },
@@ -115,7 +115,7 @@ export const MUTATION_BRANCH: SkillBranch = {
           id: "mutation-t4-bloom",
           name: "Bloom",
           description:
-            "Ultimate: 5 s where all targets and bombs grow from 100% to 200% over their lifetime. Scores ×2.",
+            "Ultimate: 5 s where targets and bombs grow from 100% to 200% over their lifetime, current spawn rate doubles, and all scores ×2.",
           icon: "🌸",
           cost: 2200,
           effects: [{ kind: "ultimateUnlock", id: "bloom" }],

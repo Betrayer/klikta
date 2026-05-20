@@ -4,10 +4,11 @@ import { GREED_BRANCH } from "./perks/greed";
 import { SURVIVAL_BRANCH } from "./perks/survival";
 import { WILD_BRANCH } from "./perks/wild";
 import { MUTATION_BRANCH } from "./perks/mutation";
+import { TIER_REQUIRES_POINTS } from "./tier";
+import type { TierLevel } from "./tier";
 
 export type BranchId = "reaction" | "greed" | "survival" | "wild" | "mutation";
-
-export type TierLevel = 1 | 2 | 3 | 4;
+export type { TierLevel };
 
 export interface SkillOption {
   id: string;
@@ -31,13 +32,6 @@ export interface SkillBranch {
   color: string;
   tiers: readonly SkillTier[];
 }
-
-export const TIER_REQUIRES_POINTS: Readonly<Record<TierLevel, number>> = {
-  1: 0,
-  2: 1,
-  3: 2,
-  4: 3,
-};
 
 export const tierKey = (branchId: BranchId, tier: TierLevel): string =>
   `${branchId}-t${tier}`;

@@ -1,5 +1,5 @@
 import type { SkillBranch } from "../skillTree";
-import { TIER_REQUIRES_POINTS } from "../skillTree";
+import { TIER_REQUIRES_POINTS } from "../tier";
 
 export const WILD_BRANCH: SkillBranch = {
   id: "wild",
@@ -85,10 +85,11 @@ export const WILD_BRANCH: SkillBranch = {
         {
           id: "wild-t3-cursor-magnet",
           name: "Cursor Magnet",
-          description: "Targets drift toward your cursor at 10% of pointer speed.",
+          description:
+            "Targets drift toward your cursor at ~25 px/s — stronger than mutation magnet.",
           icon: "🧲",
           cost: 700,
-          effects: [{ kind: "targetsFollowCursorSpeed", value: 0.1 }],
+          effects: [{ kind: "targetsFollowCursorSpeed", value: 25 }],
         },
       ],
     },

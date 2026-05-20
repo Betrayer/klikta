@@ -28,6 +28,7 @@ import {
 import { getActiveResolver } from "../effects/activeResolver";
 
 const TIME_PULSE_SPEEDS = [0.6, 1.6] as const;
+const TIME_PULSE_WARNING_MS = 500;
 
 export class Game {
   private readonly parent: HTMLElement;
@@ -257,6 +258,7 @@ export class Game {
   private updateTimePulse(): void {
     const pulse = this.spawnPolicy.timePulse;
     if (pulse === null) return;
+    const store = useRunStore.getState();
 
     if (this.timePulseEndMs > 0 && this.clockMs >= this.timePulseEndMs) {
       this.timePulseEndMs = 0;
@@ -275,6 +277,15 @@ export class Game {
       this.timePulseEndMs = this.clockMs + pulse.durationMs;
       this.timePulseNextStartMs = this.clockMs + pulse.periodMs;
       this.updateTickerSpeed();
+      if (store.timePulseIncoming) store.setTimePulseIncoming(false);
+      return;
+    }
+
+    const inWarningWindow =
+      this.timePulseEndMs === 0 &&
+      this.timePulseNextStartMs - this.clockMs <= TIME_PULSE_WARNING_MS;
+    if (inWarningWindow !== store.timePulseIncoming) {
+      store.setTimePulseIncoming(inWarningWindow);
     }
   }
 

@@ -1,5 +1,5 @@
 import type { SkillBranch } from "../skillTree";
-import { TIER_REQUIRES_POINTS } from "../skillTree";
+import { TIER_REQUIRES_POINTS } from "../tier";
 
 export const GREED_BRANCH: SkillBranch = {
   id: "greed",

@@ -115,6 +115,13 @@ export abstract class Target {
   protected spawn(): void {
     this.render();
     this.phase = "spawning";
+    if (this.modifiers.slowBloomPhaseMs > 0 && this.config.shrinks) {
+      this.animScale = 1;
+      this.lifeScale = 0;
+      this.phase = "active";
+      this.applyScale();
+      return;
+    }
     this.track(
       tweenManager.to(
         0,

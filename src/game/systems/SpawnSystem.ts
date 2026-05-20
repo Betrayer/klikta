@@ -138,6 +138,7 @@ export class SpawnSystem {
     return {
       ...source,
       x: bounds.width - source.x,
+      y: bounds.height - source.y,
       pairWithNext: false,
     };
   }
