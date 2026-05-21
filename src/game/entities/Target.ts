@@ -17,6 +17,7 @@ import {
   DEFAULT_TARGET_MODIFIERS,
   type TargetSpawnModifiers,
 } from "../effects/EffectResolver";
+import { bloomState, BLOOM_MAX_SCALE } from "../ultimates/BloomState";
 
 export type TargetEffect = "lose_hp";
 
@@ -157,12 +158,20 @@ export abstract class Target {
 
   protected updateLifeAndAlpha(): void {
     if (this.phase === "active" && this.config.shrinks) {
-      const phaseMs = this.modifiers.slowBloomPhaseMs;
-      if (phaseMs > 0 && this.elapsedMs < phaseMs) {
-        this.lifeScale = this.elapsedMs / phaseMs;
+      if (bloomState.active) {
+        // Bloom ultimate: grow toward 200% over lifetime instead of shrinking.
+        this.lifeScale = Math.min(
+          1 + this.elapsedMs / this.lifetimeMs,
+          BLOOM_MAX_SCALE,
+        );
       } else {
-        const tail = Math.max(this.lifetimeMs - phaseMs, 1);
-        this.lifeScale = Math.max(1 - (this.elapsedMs - phaseMs) / tail, 0);
+        const phaseMs = this.modifiers.slowBloomPhaseMs;
+        if (phaseMs > 0 && this.elapsedMs < phaseMs) {
+          this.lifeScale = this.elapsedMs / phaseMs;
+        } else {
+          const tail = Math.max(this.lifetimeMs - phaseMs, 1);
+          this.lifeScale = Math.max(1 - (this.elapsedMs - phaseMs) / tail, 0);
+        }
       }
       this.currentSize = this.initialSize * this.lifeScale;
       this.applyScale();

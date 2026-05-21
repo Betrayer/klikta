@@ -7,6 +7,7 @@ import {
   DEFAULT_TARGET_MODIFIERS,
   type TargetSpawnModifiers,
 } from "../effects/EffectResolver";
+import { bloomState, BLOOM_BOMB_MAX_SCALE } from "../ultimates/BloomState";
 
 const SPIKES = 6;
 const DECOY_GOLDEN_COLOR = TARGET_CONFIG.golden.color;
@@ -49,6 +50,16 @@ export class BombTarget extends Target {
   protected override updateLifeAndAlpha(): void {
     if (this.phase !== "active") return;
 
+    if (bloomState.active) {
+      // Bloom ultimate: bombs grow alongside targets instead of pulsing.
+      const t = Math.min(this.elapsedMs / this.lifetimeMs, 1);
+      this.lifeScale = 1 + (BLOOM_BOMB_MAX_SCALE - 1) * t;
+      this.currentSize = this.initialSize * this.lifeScale;
+      this.applyScale();
+      this.graphics.alpha = 1;
+      return;
+    }
+
     const beacon = this.modifiers.beaconBombGrowToScale;
     if (beacon !== null) {
       const t = Math.min(this.elapsedMs / this.lifetimeMs, 1);
@@ -57,6 +68,12 @@ export class BombTarget extends Target {
       this.applyScale();
       this.graphics.alpha = 1;
       return;
+    }
+
+    // Plain bombs keep scale 1; reset it in case Bloom just ended mid-life.
+    if (this.lifeScale !== 1) {
+      this.lifeScale = 1;
+      this.applyScale();
     }
 
     const remaining = 1 - this.elapsedMs / this.lifetimeMs;

@@ -80,7 +80,26 @@ export class Game {
   private spawnPolicy: SpawnPolicy;
   private targetMods: TargetSpawnModifiers;
   private ultimateSystem: UltimateSystem | null = null;
+  private ultimateCtx: GameContext | null = null;
+  private ultimateTimeScale = 1;
+  private hpRegenDisabled = false;
   private readonly scoreMultiplier = { current: 1 };
+
+  private readonly setUltimateTimeScale = (scale: number): void => {
+    this.ultimateTimeScale = scale;
+    this.updateTickerSpeed();
+  };
+
+  private readonly ultimateShake = (
+    intensity: number,
+    durationMs: number,
+  ): void => {
+    this.camera?.shake(intensity, durationMs);
+  };
+
+  private readonly disableHpRegenForRun = (): void => {
+    this.hpRegenDisabled = true;
+  };
 
   private cursorX = 0;
   private cursorY = 0;
@@ -112,6 +131,8 @@ export class Game {
     this.scoreAtLastRegen = 0;
     this.lastDamageMs = -Infinity;
     this.scoreMultiplier.current = 1;
+    this.ultimateTimeScale = 1;
+    this.hpRegenDisabled = false;
 
     const unlockedFromPerks = this.resolver.getUltimateUnlocks();
     this.ultimateSystem = new UltimateSystem(
@@ -140,6 +161,10 @@ export class Game {
     const targetLayer = new Container();
     this.targetLayer = targetLayer;
     app.stage.addChild(targetLayer);
+
+    const overlayLayer = new Container();
+    overlayLayer.eventMode = "none";
+    app.stage.addChild(overlayLayer);
 
     const particleLayer = new Container();
     app.stage.addChild(particleLayer);
@@ -175,6 +200,18 @@ export class Game {
       this.timePulseNextStartMs =
         this.clockMs + this.spawnPolicy.timePulse.periodMs;
     }
+    this.ultimateCtx = {
+      app,
+      overlay: overlayLayer,
+      spawnSystem: this.spawnSystem,
+      targets: this.targets,
+      vfx: this.vfx,
+      audio: audioSystem,
+      scoreMultiplier: this.scoreMultiplier,
+      setTimeScale: this.setUltimateTimeScale,
+      shake: this.ultimateShake,
+      disableHpRegen: this.disableHpRegenForRun,
+    };
     audioSystem.startMusic();
     this.syncMusicToCombo();
     app.ticker.add(this.tick);
@@ -187,20 +224,7 @@ export class Game {
   }
 
   private buildUltimateContext(): GameContext | null {
-    if (
-      this.app === null ||
-      this.spawnSystem === null ||
-      this.vfx === null
-    ) {
-      return null;
-    }
-    return {
-      app: this.app,
-      spawnSystem: this.spawnSystem,
-      targets: this.targets,
-      vfx: this.vfx,
-      scoreMultiplier: this.scoreMultiplier,
-    };
+    return this.ultimateCtx;
   }
 
   private handleKeydown = (event: KeyboardEvent): void => {
@@ -379,10 +403,10 @@ export class Game {
     if (this.app === null) return;
     const inHitFrame =
       this.hitFrameUntil > 0 && performance.now() < this.hitFrameUntil;
-    const speed = inHitFrame
+    const base = inHitFrame
       ? this.baseTickerSpeed * FEEL.hitFrameSlow
       : this.baseTickerSpeed;
-    this.app.ticker.speed = speed;
+    this.app.ticker.speed = base * this.ultimateTimeScale;
   }
 
   private tick = (ticker: Ticker): void => {
@@ -452,6 +476,7 @@ export class Game {
   }
 
   private applyHpRegen(): void {
+    if (this.hpRegenDisabled) return;
     if (this.runMods.hpRegenPer1000Score <= 0) return;
     const score = useRunStore.getState().score;
     const earned = score - this.scoreAtLastRegen;
@@ -533,7 +558,8 @@ export class Game {
     if (result.destroyed) {
       if (target.kind !== "bomb") {
         if (result.score > 0) {
-          let scaled = result.score * this.runMods.scoreMul;
+          let scaled =
+            result.score * this.runMods.scoreMul * this.scoreMultiplier.current;
           const pf = target.modifiers.phaseFlash;
           if (wasPhaseInvisible && pf !== null) {
             scaled *= pf.bonusMul;
@@ -545,6 +571,7 @@ export class Game {
         this.syncMusicToCombo();
         audioSystem.playSFX(this.hitSfx(target.kind));
         this.handleComboMilestone();
+        this.spawnFrenzyBurst(target.x, target.y);
       }
       this.emitHitVfx(target);
       this.triggerJuice(target);
@@ -556,6 +583,13 @@ export class Game {
     } else if (target.kind === "shielded") {
       audioSystem.playSFX("hit_shielded_break");
     }
+  }
+
+  private spawnFrenzyBurst(x: number, y: number): void {
+    if (this.spawnSystem === null || this.app === null) return;
+    const { width, height } = this.app.renderer.screen;
+    const burst = this.spawnSystem.onTargetHit(x, y, { width, height });
+    if (burst.length > 0) this.spawnEvents(burst);
   }
 
   private killPair(target: Target): void {
@@ -720,6 +754,8 @@ export class Game {
     this.app.destroy(true, { children: true });
     this.app = null;
     this.targetLayer = null;
+    this.ultimateCtx = null;
+    this.ultimateTimeScale = 1;
     this.spawnSystem = null;
     this.vfx = null;
     this.camera = null;
