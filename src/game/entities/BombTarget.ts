@@ -1,18 +1,41 @@
+import { TARGET_CONFIG } from "../../data/targetConfig";
 import { Target, type ClickResult, type TargetSpawn } from "./Target";
 import { tweenManager } from "../util/TweenManager";
 import { easeOutCubic, linear } from "../util/easings";
 import { FEEL } from "../config/feel";
+import {
+  DEFAULT_TARGET_MODIFIERS,
+  type TargetSpawnModifiers,
+} from "../effects/EffectResolver";
+import { bloomState, BLOOM_BOMB_MAX_SCALE } from "../ultimates/BloomState";
 
 const SPIKES = 6;
+const DECOY_GOLDEN_COLOR = TARGET_CONFIG.golden.color;
 
 export class BombTarget extends Target {
-  constructor(spawn: TargetSpawn) {
-    super("bomb", spawn);
+  readonly appearAsGolden: boolean;
+
+  constructor(
+    spawn: TargetSpawn,
+    modifiers: TargetSpawnModifiers = DEFAULT_TARGET_MODIFIERS,
+    appearAsGolden = false,
+  ) {
+    super("bomb", spawn, modifiers);
+    this.appearAsGolden = appearAsGolden;
     this.spawn();
   }
 
   render(): void {
     this.graphics.clear();
+    if (this.appearAsGolden) {
+      this.graphics
+        .circle(0, 0, this.initialSize * 0.8)
+        .fill(DECOY_GOLDEN_COLOR);
+      this.graphics
+        .circle(0, 0, this.initialSize * 0.44)
+        .stroke({ width: 4, color: 0xffffff });
+      return;
+    }
     const outer = this.initialSize;
     const inner = this.initialSize * 0.5;
     const points: number[] = [];
@@ -24,11 +47,41 @@ export class BombTarget extends Target {
     this.graphics.poly(points).fill(this.config.color);
   }
 
-  update(deltaMs: number): void {
-    super.update(deltaMs);
+  protected override updateLifeAndAlpha(): void {
     if (this.phase !== "active") return;
+
+    if (bloomState.active) {
+      // Bloom ultimate: bombs grow alongside targets instead of pulsing.
+      const t = Math.min(this.elapsedMs / this.lifetimeMs, 1);
+      this.lifeScale = 1 + (BLOOM_BOMB_MAX_SCALE - 1) * t;
+      this.currentSize = this.initialSize * this.lifeScale;
+      this.applyScale();
+      this.graphics.alpha = 1;
+      return;
+    }
+
+    const beacon = this.modifiers.beaconBombGrowToScale;
+    if (beacon !== null) {
+      const t = Math.min(this.elapsedMs / this.lifetimeMs, 1);
+      this.lifeScale = 1 + (beacon - 1) * t;
+      this.currentSize = this.initialSize * this.lifeScale;
+      this.applyScale();
+      this.graphics.alpha = 1;
+      return;
+    }
+
+    // Plain bombs keep scale 1; reset it in case Bloom just ended mid-life.
+    if (this.lifeScale !== 1) {
+      this.lifeScale = 1;
+      this.applyScale();
+    }
+
     const remaining = 1 - this.elapsedMs / this.lifetimeMs;
-    const periodMs = 120 + 360 * remaining;
+    let periodMs = 120 + 360 * remaining;
+    const endZoneMs = this.modifiers.bombBlinkFasterEndMs;
+    if (endZoneMs > 0 && this.lifetimeMs - this.elapsedMs < endZoneMs) {
+      periodMs *= 0.5;
+    }
     const visible = Math.floor(this.elapsedMs / periodMs) % 2 === 0;
     this.graphics.alpha = visible ? 1 : 0.3;
   }

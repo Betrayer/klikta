@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActionIcon,
   Button,
+  Group,
   Modal,
   Slider,
   Stack,
@@ -9,6 +10,7 @@ import {
 } from '@mantine/core';
 import { useRunStore } from '../../state/runStore';
 import { useSettingsStore } from '../../state/settingsStore';
+import { useMetaStore } from '../../state/metaStore';
 import { audioSystem } from '../../game/systems/AudioSystem';
 
 const toPercent = (v: number): number => Math.round(v * 100);
@@ -24,6 +26,8 @@ export const SettingsOverlay = () => {
   const setSFXVolume = useSettingsStore((s) => s.setSFXVolume);
   const setMusicVolume = useSettingsStore((s) => s.setMusicVolume);
 
+  const [confirmReset, setConfirmReset] = useState(false);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
@@ -38,6 +42,12 @@ export const SettingsOverlay = () => {
   const quitToMenu = () => {
     audioSystem.stopMusic();
     useRunStore.getState().reset();
+  };
+
+  const performReset = () => {
+    useMetaStore.getState().resetAllProgress();
+    useSettingsStore.getState().reset();
+    setConfirmReset(false);
   };
 
   return (
@@ -100,9 +110,40 @@ export const SettingsOverlay = () => {
           <Button fullWidth color="#ff006e" onClick={() => setPaused(false)}>
             Resume
           </Button>
+          <Button
+            fullWidth
+            variant="outline"
+            color="red"
+            onClick={() => setConfirmReset(true)}
+          >
+            Reset Progress
+          </Button>
           <Button fullWidth variant="default" onClick={quitToMenu}>
             Quit to Menu
           </Button>
+        </Stack>
+      </Modal>
+
+      <Modal
+        opened={confirmReset}
+        onClose={() => setConfirmReset(false)}
+        title="Delete all progress?"
+        centered
+        zIndex={1100}
+        overlayProps={{ backgroundOpacity: 0.7 }}
+      >
+        <Stack>
+          <Text size="sm">
+            This erases currency, perks, achievements, and settings. Cannot be undone.
+          </Text>
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setConfirmReset(false)}>
+              Cancel
+            </Button>
+            <Button color="red" onClick={performReset}>
+              Delete everything
+            </Button>
+          </Group>
         </Stack>
       </Modal>
     </>

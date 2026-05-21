@@ -15,10 +15,45 @@ import { SpawnSystem, type SpawnEvent } from "../systems/SpawnSystem";
 import { VFXSystem } from "../systems/VFXSystem";
 import { CameraSystem } from "../systems/CameraSystem";
 import { audioSystem } from "../systems/AudioSystem";
+import { UltimateSystem } from "../systems/UltimateSystem";
+import { setUltimateActivationHandler } from "../systems/ultimateActivation";
+import { createUltimateRegistry } from "../ultimates/registry";
+import type { GameContext } from "../ultimates/types";
+import { SKILL_TREE, findUltimateForBranch } from "../../data/skillTree";
 import type { TargetKind } from "../../data/targetConfig";
 import { tweenManager } from "../util/TweenManager";
 import { FEEL } from "../config/feel";
-import { useRunStore, COMBO_MILESTONES } from "../../state/runStore";
+import {
+  ACHIEVEMENT_REWARDS,
+  CHARGE_PER_COMBO_MILESTONE,
+  CHARGE_PER_HIT,
+  SCORE_PER_CURRENCY,
+  comboBonusForMax,
+} from "../config/balance";
+import {
+  useRunStore,
+  COMBO_MILESTONES,
+  type CurrencyBreakdown,
+  type AchievementAward,
+} from "../../state/runStore";
+import { useMetaStore } from "../../state/metaStore";
+import {
+  EffectResolver,
+  type RunModifiers,
+  type SpawnPolicy,
+  type TargetSpawnModifiers,
+} from "../effects/EffectResolver";
+import { getActiveResolver } from "../effects/activeResolver";
+
+const TIME_PULSE_SPEEDS = [0.6, 1.6] as const;
+const TIME_PULSE_WARNING_MS = 500;
+const ULTIMATE_HOTKEYS: readonly string[] = [
+  "Digit1",
+  "Digit2",
+  "Digit3",
+  "Digit4",
+  "Digit5",
+];
 
 export class Game {
   private readonly parent: HTMLElement;
@@ -35,11 +70,72 @@ export class Game {
   private clockMs = 0;
   private destroyed = false;
 
+  private resolver: EffectResolver = EffectResolver.empty();
+  private runMods: RunModifiers;
+  private spawnPolicy: SpawnPolicy;
+  private targetMods: TargetSpawnModifiers;
+  private ultimateSystem: UltimateSystem | null = null;
+  private ultimateCtx: GameContext | null = null;
+  private ultimateTimeScale = 1;
+  private hpRegenDisabled = false;
+  private readonly scoreMultiplier = { current: 1 };
+
+  private readonly setUltimateTimeScale = (scale: number): void => {
+    this.ultimateTimeScale = scale;
+    this.updateTickerSpeed();
+  };
+
+  private readonly ultimateShake = (
+    intensity: number,
+    durationMs: number,
+  ): void => {
+    this.camera?.shake(intensity, durationMs);
+  };
+
+  private readonly disableHpRegenForRun = (): void => {
+    this.hpRegenDisabled = true;
+  };
+
+  private cursorX = 0;
+  private cursorY = 0;
+  private missesThisRun = 0;
+  private bombBountyEarned = 0;
+  private comboCoinEarned = 0;
+  private scoreAtLastRegen = 0;
+  private lastDamageMs = -Infinity;
+  private baseTickerSpeed = 1;
+  private timePulseNextStartMs = Infinity;
+  private timePulseEndMs = 0;
+
   constructor(parent: HTMLElement) {
     this.parent = parent;
+    const empty = EffectResolver.empty();
+    this.runMods = empty.buildRunModifiers();
+    this.spawnPolicy = empty.buildSpawnPolicy();
+    this.targetMods = empty.buildBaseTargetModifiers();
   }
 
   async start(): Promise<void> {
+    this.resolver = getActiveResolver();
+    this.runMods = this.resolver.buildRunModifiers();
+    this.spawnPolicy = this.resolver.buildSpawnPolicy();
+    this.targetMods = this.resolver.buildBaseTargetModifiers();
+    this.bombBountyEarned = 0;
+    this.comboCoinEarned = 0;
+    this.missesThisRun = 0;
+    this.scoreAtLastRegen = 0;
+    this.lastDamageMs = -Infinity;
+    this.scoreMultiplier.current = 1;
+    this.ultimateTimeScale = 1;
+    this.hpRegenDisabled = false;
+
+    const unlockedFromPerks = this.resolver.getUltimateUnlocks();
+    this.ultimateSystem = new UltimateSystem(
+      unlockedFromPerks,
+      createUltimateRegistry(),
+    );
+    setUltimateActivationHandler((id) => this.tryActivateUltimate(id));
+
     const app = new Application();
     await app.init({
       resizeTo: this.parent,
@@ -61,6 +157,10 @@ export class Game {
     this.targetLayer = targetLayer;
     app.stage.addChild(targetLayer);
 
+    const overlayLayer = new Container();
+    overlayLayer.eventMode = "none";
+    app.stage.addChild(overlayLayer);
+
     const particleLayer = new Container();
     app.stage.addChild(particleLayer);
     this.vfx = new VFXSystem(particleLayer);
@@ -78,16 +178,70 @@ export class Game {
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
     app.stage.on("pointerdown", this.handleStagePointerDown);
+    app.stage.on("pointermove", this.handleStagePointerMove);
 
     tweenManager.clear();
-    this.spawnSystem = new SpawnSystem(this.clockMs);
+    const screen = app.renderer.screen;
+    this.cursorX = screen.width / 2;
+    this.cursorY = screen.height / 2;
+    this.spawnSystem = new SpawnSystem(
+      this.clockMs,
+      this.spawnPolicy,
+      this.targetMods,
+      this.resolver.goldenLifetimeMul(),
+      this.runMods.multiClicksOverride,
+    );
+    if (this.spawnPolicy.timePulse !== null) {
+      this.timePulseNextStartMs =
+        this.clockMs + this.spawnPolicy.timePulse.periodMs;
+    }
+    this.ultimateCtx = {
+      app,
+      overlay: overlayLayer,
+      spawnSystem: this.spawnSystem,
+      targets: this.targets,
+      vfx: this.vfx,
+      audio: audioSystem,
+      scoreMultiplier: this.scoreMultiplier,
+      setTimeScale: this.setUltimateTimeScale,
+      shake: this.ultimateShake,
+      disableHpRegen: this.disableHpRegenForRun,
+    };
     audioSystem.startMusic();
     this.syncMusicToCombo();
     app.ticker.add(this.tick);
 
+    window.addEventListener("keydown", this.handleKeydown);
+
     this.unsubPause = useRunStore.subscribe((state, prev) => {
       if (state.paused !== prev.paused) this.applyPaused(state.paused);
     });
+  }
+
+  private buildUltimateContext(): GameContext | null {
+    return this.ultimateCtx;
+  }
+
+  private handleKeydown = (event: KeyboardEvent): void => {
+    if (event.repeat) return;
+    const idx = ULTIMATE_HOTKEYS.indexOf(event.code);
+    if (idx < 0) return;
+    const branch = SKILL_TREE[idx];
+    if (branch === undefined) return;
+    const ult = findUltimateForBranch(branch.id);
+    if (ult === undefined) return;
+    event.preventDefault();
+    this.tryActivateUltimate(ult.id);
+  };
+
+  private tryActivateUltimate(id: string): void {
+    if (this.ultimateSystem === null) return;
+    const run = useRunStore.getState();
+    if (run.status !== "playing" || run.paused) return;
+    if (!this.ultimateSystem.canActivate(id)) return;
+    const ctx = this.buildUltimateContext();
+    if (ctx === null) return;
+    this.ultimateSystem.activate(id, this.clockMs, ctx);
   }
 
   private applyPaused(paused: boolean): void {
@@ -97,13 +251,62 @@ export class Game {
     audioSystem.setPaused(paused);
   }
 
+  private handleStagePointerMove = (event: FederatedPointerEvent): void => {
+    this.cursorX = event.global.x;
+    this.cursorY = event.global.y;
+  };
+
   private handleStagePointerDown = (event: FederatedPointerEvent): void => {
     if (useRunStore.getState().paused) return;
-    if (this.app !== null && event.target === this.app.stage) {
-      audioSystem.playSFX("miss");
-      this.loseHpAndCheck();
+    if (this.app === null || event.target !== this.app.stage) return;
+
+    if (this.runMods.shieldedShieldBreaksOnMiss) {
+      const broken = this.tryBreakNearestShield(event.global.x, event.global.y);
+      if (broken) {
+        audioSystem.playSFX("hit_shielded_break");
+        return;
+      }
     }
+
+    audioSystem.playSFX("miss");
+
+    if (this.runMods.backgroundClickIgnored) {
+      return;
+    }
+
+    const skipHpLoss =
+      this.runMods.shieldedMissNoHPLoss && this.hasActiveShield();
+    useRunStore.getState().resetCombo();
+    if (!skipHpLoss) this.applyDamage(1);
+    this.syncMusicToCombo();
   };
+
+  private tryBreakNearestShield(x: number, y: number): boolean {
+    let best: ShieldedTarget | null = null;
+    let bestDist = Infinity;
+    for (const t of this.targets) {
+      if (!(t instanceof ShieldedTarget)) continue;
+      if (!t.hasShield || !t.isInteractive) continue;
+      const dx = t.x - x;
+      const dy = t.y - y;
+      const d = Math.hypot(dx, dy);
+      if (d < bestDist) {
+        bestDist = d;
+        best = t;
+      }
+    }
+    if (best === null) return false;
+    return best.breakShield();
+  }
+
+  private hasActiveShield(): boolean {
+    for (const t of this.targets) {
+      if (t instanceof ShieldedTarget && t.hasShield && t.isInteractive) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   private handleResize = (): void => {
     this.drawFlash();
@@ -132,16 +335,17 @@ export class Game {
 
   private triggerHitFrame(): void {
     if (this.app === null) return;
-    this.app.ticker.speed = FEEL.hitFrameSlow;
     this.hitFrameUntil = performance.now() + FEEL.hitFrameMs;
     this.flashStartMs = performance.now();
+    this.updateTickerSpeed();
   }
 
   private updateHitFrame(): void {
     if (this.app === null) return;
     const now = performance.now();
-    if (this.app.ticker.speed !== 1 && now >= this.hitFrameUntil) {
-      this.app.ticker.speed = 1;
+    if (this.hitFrameUntil > 0 && now >= this.hitFrameUntil) {
+      this.hitFrameUntil = 0;
+      this.updateTickerSpeed();
     }
     if (this.flashGfx === null || this.flashStartMs < 0) return;
     const elapsed = now - this.flashStartMs;
@@ -155,6 +359,49 @@ export class Game {
       this.flashGfx.alpha = 0;
       this.flashStartMs = -1;
     }
+  }
+
+  private updateTimePulse(): void {
+    const pulse = this.spawnPolicy.timePulse;
+    if (pulse === null) return;
+    const store = useRunStore.getState();
+
+    if (this.timePulseEndMs > 0 && this.clockMs >= this.timePulseEndMs) {
+      this.timePulseEndMs = 0;
+      this.baseTickerSpeed = 1;
+      this.updateTickerSpeed();
+    }
+
+    if (
+      this.timePulseEndMs === 0 &&
+      this.clockMs >= this.timePulseNextStartMs
+    ) {
+      const speed =
+        TIME_PULSE_SPEEDS[Math.floor(Math.random() * TIME_PULSE_SPEEDS.length)];
+      this.baseTickerSpeed = speed ?? 1;
+      this.timePulseEndMs = this.clockMs + pulse.durationMs;
+      this.timePulseNextStartMs = this.clockMs + pulse.periodMs;
+      this.updateTickerSpeed();
+      if (store.timePulseIncoming) store.setTimePulseIncoming(false);
+      return;
+    }
+
+    const inWarningWindow =
+      this.timePulseEndMs === 0 &&
+      this.timePulseNextStartMs - this.clockMs <= TIME_PULSE_WARNING_MS;
+    if (inWarningWindow !== store.timePulseIncoming) {
+      store.setTimePulseIncoming(inWarningWindow);
+    }
+  }
+
+  private updateTickerSpeed(): void {
+    if (this.app === null) return;
+    const inHitFrame =
+      this.hitFrameUntil > 0 && performance.now() < this.hitFrameUntil;
+    const base = inHitFrame
+      ? this.baseTickerSpeed * FEEL.hitFrameSlow
+      : this.baseTickerSpeed;
+    this.app.ticker.speed = base * this.ultimateTimeScale;
   }
 
   private tick = (ticker: Ticker): void => {
@@ -172,72 +419,159 @@ export class Game {
     this.vfx?.update(deltaMs);
     this.camera?.update(deltaMs);
     this.updateHitFrame();
+    this.updateTimePulse();
+    this.applyHpRegen();
+    if (this.ultimateSystem !== null) {
+      const ctx = this.buildUltimateContext();
+      if (ctx !== null) this.ultimateSystem.update(this.clockMs, ctx);
+    }
+
+    const { width, height } = this.app.renderer.screen;
+    const ctx = {
+      cursorX: this.cursorX,
+      cursorY: this.cursorY,
+      centerX: width / 2,
+      centerY: height / 2,
+    };
 
     for (let i = this.targets.length - 1; i >= 0; i--) {
       const target = this.targets[i];
       if (target === undefined) continue;
-      target.update(deltaMs);
+      target.update(deltaMs, ctx);
       if (target.isDead) {
-        if (target.expiredUnclicked && target.kind !== "bomb") {
-          useRunStore.getState().resetCombo();
-          this.syncMusicToCombo();
+        const pair = target.pairTarget;
+        if (pair !== null && !pair.isDead) {
+          pair.pairTarget = null;
+          target.pairTarget = null;
+          pair.beginPairKill();
+        }
+        if (target.expiredUnclicked) {
+          if (target.kind === "bomb") {
+            this.tryAwardBombBounty();
+          } else {
+            this.handleMissExpiry();
+          }
         }
         this.removeTargetAt(i);
       }
     }
 
-    const { width, height } = this.app.renderer.screen;
-    const event = this.spawnSystem.tick(this.clockMs, { width, height });
-    if (event !== null) this.spawnTarget(event);
+    const events = this.spawnSystem.tick(this.clockMs, { width, height });
+    if (events.length > 0) this.spawnEvents(events);
   };
 
-  private createTarget(kind: TargetKind, x: number, y: number): Target {
-    const spawn = { x, y };
-    switch (kind) {
-      case "regular":
-        return new RegularTarget(spawn);
-      case "golden":
-        return new GoldenTarget(spawn);
-      case "bomb":
-        return new BombTarget(spawn);
-      case "multi":
-        return new MultiTarget(spawn);
-      case "shielded":
-        return new ShieldedTarget(spawn);
+  private handleMissExpiry(): void {
+    if (this.runMods.firstMissForgiven && this.missesThisRun === 0) {
+      this.missesThisRun = 1;
+      return;
+    }
+    this.missesThisRun += 1;
+    useRunStore.getState().resetCombo();
+    this.syncMusicToCombo();
+  }
+
+  private applyHpRegen(): void {
+    if (this.hpRegenDisabled) return;
+    if (this.runMods.hpRegenPer1000Score <= 0) return;
+    const score = useRunStore.getState().score;
+    const earned = score - this.scoreAtLastRegen;
+    if (earned < 1000) return;
+    const steps = Math.floor(earned / 1000);
+    this.scoreAtLastRegen += steps * 1000;
+    useRunStore.getState().healHP(steps * this.runMods.hpRegenPer1000Score);
+  }
+
+  private applyDamage(amount: number): void {
+    if (amount <= 0) return;
+    const iframes = this.runMods.damageIframesMs;
+    if (iframes > 0 && this.clockMs - this.lastDamageMs < iframes) return;
+    this.lastDamageMs = this.clockMs;
+    const store = useRunStore.getState();
+    store.loseHPBy(amount);
+    if (useRunStore.getState().status === "gameOver") {
+      audioSystem.playSFX("game_over");
+      audioSystem.musicGameOver();
+      this.awardRunRewards();
     }
   }
 
-  private spawnTarget(event: SpawnEvent): void {
+  private createTarget(event: SpawnEvent): Target {
+    const spawn = { x: event.x, y: event.y };
+    switch (event.kind) {
+      case "regular":
+        return new RegularTarget(spawn, event.modifiers);
+      case "golden":
+        return new GoldenTarget(spawn, event.modifiers);
+      case "bomb":
+        return new BombTarget(spawn, event.modifiers, event.appearAsGolden);
+      case "multi":
+        return new MultiTarget(
+          spawn,
+          event.modifiers,
+          event.multiClicksOverride,
+        );
+      case "shielded":
+        return new ShieldedTarget(spawn, event.modifiers);
+    }
+  }
+
+  private spawnEvents(events: SpawnEvent[]): void {
     if (this.targetLayer === null) return;
-    const target = this.createTarget(event.kind, event.x, event.y);
-    target.graphics.on("pointerdown", () => this.handleTargetClick(target));
-    this.targetLayer.addChild(target.graphics);
-    this.targets.push(target);
+    const spawned: Target[] = [];
+    for (const event of events) {
+      const target = this.createTarget(event);
+      target.graphics.on("pointerdown", () => this.handleTargetClick(target));
+      this.targetLayer.addChild(target.graphics);
+      this.targets.push(target);
+      spawned.push(target);
+    }
+    if (
+      this.spawnPolicy.mirrorSpawn &&
+      spawned.length === 2 &&
+      events[0]?.pairWithNext === true
+    ) {
+      const [a, b] = spawned;
+      if (a !== undefined && b !== undefined) {
+        a.pairTarget = b;
+        b.pairTarget = a;
+      }
+    }
   }
 
   private handleTargetClick(target: Target): void {
     if (useRunStore.getState().paused) return;
     if (!target.isInteractive) return;
 
+    const wasPhaseInvisible = target.isPhaseInvisible;
     const result = target.onClick();
 
     if (result.effects.includes("lose_hp")) {
       audioSystem.playSFX("bomb_click");
-      this.loseHpAndCheck();
+      this.handleBombClick();
     }
 
     if (result.destroyed) {
       if (target.kind !== "bomb") {
         if (result.score > 0) {
-          useRunStore.getState().registerHit(result.score);
+          let scaled =
+            result.score * this.runMods.scoreMul * this.scoreMultiplier.current;
+          const pf = target.modifiers.phaseFlash;
+          if (wasPhaseInvisible && pf !== null) {
+            scaled *= pf.bonusMul;
+          }
+          useRunStore.getState().registerHit(Math.round(scaled));
+          this.tryAwardComboCoin();
         }
+        this.ultimateSystem?.addCharge(CHARGE_PER_HIT[target.kind]);
         this.syncMusicToCombo();
         audioSystem.playSFX(this.hitSfx(target.kind));
         this.handleComboMilestone();
+        this.spawnFrenzyBurst(target.x, target.y);
       }
       this.emitHitVfx(target);
       this.triggerJuice(target);
       target.beginHitExit();
+      this.killPair(target);
     } else if (target.kind === "multi") {
       audioSystem.playSFX("hit_multi_partial");
       this.vfx?.emitSubHit(target.x, target.y, target.color);
@@ -246,22 +580,124 @@ export class Game {
     }
   }
 
+  private spawnFrenzyBurst(x: number, y: number): void {
+    if (this.spawnSystem === null || this.app === null) return;
+    const { width, height } = this.app.renderer.screen;
+    const burst = this.spawnSystem.onTargetHit(x, y, { width, height });
+    if (burst.length > 0) this.spawnEvents(burst);
+  }
+
+  private killPair(target: Target): void {
+    const pair = target.pairTarget;
+    if (pair === null) return;
+    target.pairTarget = null;
+    pair.pairTarget = null;
+    pair.beginPairKill();
+  }
+
+  private handleBombClick(): void {
+    const store = useRunStore.getState();
+    store.recordBombClick();
+    const count = useRunStore.getState().bombClicksThisRun;
+    const free = this.runMods.bombClickFreeAfterFirst && count > 1;
+    if (!free) this.applyDamage(this.runMods.bombClickHPMul);
+    if (!this.runMods.comboNoResetOnBombClick) {
+      useRunStore.getState().resetCombo();
+      this.syncMusicToCombo();
+    }
+  }
+
+  private tryAwardBombBounty(): void {
+    const chance = this.runMods.bombExpireCurrencyChance;
+    if (chance <= 0 || this.runMods.currencyDisabled) return;
+    if (Math.random() >= chance) return;
+    useMetaStore.getState().awardCurrency(1);
+    this.bombBountyEarned += 1;
+  }
+
+  private tryAwardComboCoin(): void {
+    const cfg = this.runMods.currencyPerHit;
+    if (cfg === null || this.runMods.currencyDisabled) return;
+    const combo = useRunStore.getState().combo;
+    if (combo < cfg.combo) return;
+    useMetaStore.getState().awardCurrency(cfg.amount);
+    this.comboCoinEarned += cfg.amount;
+  }
+
+  private awardRunRewards(): void {
+    const run = useRunStore.getState();
+    const meta = useMetaStore.getState();
+    const score = run.score;
+    const maxCombo = run.maxCombo;
+    const bombClicks = run.bombClicksThisRun;
+    const disabled = this.runMods.currencyDisabled;
+    const isFirstRunEver = meta.runsCompleted === 0;
+
+    const base = disabled ? 0 : Math.floor(score / SCORE_PER_CURRENCY);
+    const comboBonus = disabled ? 0 : comboBonusForMax(maxCombo);
+
+    const achievements: AchievementAward[] = [];
+    if (!disabled) {
+      const candidates: { id: string; amount: number; condition: boolean }[] = [
+        {
+          id: "first-run",
+          amount: ACHIEVEMENT_REWARDS["first-run"],
+          condition: isFirstRunEver,
+        },
+        {
+          id: "combo-25",
+          amount: ACHIEVEMENT_REWARDS["combo-25"],
+          condition: maxCombo >= 25,
+        },
+        {
+          id: "combo-50",
+          amount: ACHIEVEMENT_REWARDS["combo-50"],
+          condition: maxCombo >= 50,
+        },
+        {
+          id: "combo-100",
+          amount: ACHIEVEMENT_REWARDS["combo-100"],
+          condition: maxCombo >= 100,
+        },
+        {
+          id: "no-bomb-clicks",
+          amount: ACHIEVEMENT_REWARDS["no-bomb-clicks"],
+          condition: bombClicks === 0,
+        },
+      ];
+      for (const c of candidates) {
+        if (!c.condition) continue;
+        if (meta.unlockAchievement(c.id)) {
+          achievements.push({ id: c.id, amount: c.amount });
+        }
+      }
+    }
+
+    const achievementsTotal = achievements.reduce((s, a) => s + a.amount, 0);
+    const endTotal = base + comboBonus + achievementsTotal;
+    if (!disabled && endTotal > 0) meta.awardCurrency(endTotal);
+    const previousBestScore = meta.bestScore;
+    meta.recordRun(score);
+
+    const breakdown: CurrencyBreakdown = {
+      base,
+      comboBonus,
+      bombBounty: this.bombBountyEarned,
+      comboCoin: this.comboCoinEarned,
+      achievements,
+      total: endTotal + this.bombBountyEarned + this.comboCoinEarned,
+    };
+    run.recordRunResults({
+      currencyEarned: breakdown.total,
+      currencyBreakdown: breakdown,
+      previousBestScore,
+    });
+  }
+
   private hitSfx(kind: TargetKind): string {
     if (kind === "golden") return "hit_golden";
     if (kind === "multi") return "hit_multi_complete";
     return "hit_regular";
-  }
-
-  private loseHpAndCheck(): void {
-    const store = useRunStore.getState();
-    store.loseHP();
-    store.resetCombo();
-    if (useRunStore.getState().status === "gameOver") {
-      audioSystem.playSFX("game_over");
-      audioSystem.musicGameOver();
-    } else {
-      this.syncMusicToCombo();
-    }
   }
 
   private syncMusicToCombo(): void {
@@ -276,6 +712,7 @@ export class Game {
     audioSystem.playSFX("combo_milestone");
     audioSystem.musicSwell();
     this.camera?.shake(FEEL.shake.comboIntensity, FEEL.shake.comboMs);
+    this.ultimateSystem?.addCharge(CHARGE_PER_COMBO_MILESTONE);
     const { width, height } = this.app.renderer.screen;
     this.vfx?.emitMilestone(width / 2, height / 2);
   }
@@ -308,6 +745,13 @@ export class Game {
 
   destroy(): void {
     this.destroyed = true;
+    window.removeEventListener("keydown", this.handleKeydown);
+    setUltimateActivationHandler(null);
+    if (this.ultimateSystem !== null) {
+      const ctx = this.buildUltimateContext();
+      if (ctx !== null) this.ultimateSystem.forceCleanup(ctx);
+      this.ultimateSystem = null;
+    }
     if (this.app === null) return;
     this.app.ticker.remove(this.tick);
     this.app.ticker.speed = 1;
@@ -316,6 +760,7 @@ export class Game {
     audioSystem.setPaused(false);
     this.app.renderer.off("resize", this.handleResize);
     this.app.stage.off("pointerdown", this.handleStagePointerDown);
+    this.app.stage.off("pointermove", this.handleStagePointerMove);
     tweenManager.clear();
     this.vfx?.clear();
     this.camera?.reset();
@@ -324,6 +769,8 @@ export class Game {
     this.app.destroy(true, { children: true });
     this.app = null;
     this.targetLayer = null;
+    this.ultimateCtx = null;
+    this.ultimateTimeScale = 1;
     this.spawnSystem = null;
     this.vfx = null;
     this.camera = null;
