@@ -104,7 +104,7 @@ export const GREED_BRANCH: SkillBranch = {
           description:
             "Ultimate: 8 seconds where every hit spawns 2 extras nearby and score is ×2.",
           icon: "💥",
-          cost: 2000,
+          cost: 2400,
           effects: [{ kind: "ultimateUnlock", id: "frenzy" }],
         },
       ],

@@ -15,11 +15,7 @@ import { SpawnSystem, type SpawnEvent } from "../systems/SpawnSystem";
 import { VFXSystem } from "../systems/VFXSystem";
 import { CameraSystem } from "../systems/CameraSystem";
 import { audioSystem } from "../systems/AudioSystem";
-import {
-  CHARGE_PER_COMBO_MILESTONE,
-  CHARGE_PER_HIT,
-  UltimateSystem,
-} from "../systems/UltimateSystem";
+import { UltimateSystem } from "../systems/UltimateSystem";
 import { setUltimateActivationHandler } from "../systems/ultimateActivation";
 import { createUltimateRegistry } from "../ultimates/registry";
 import type { GameContext } from "../ultimates/types";
@@ -27,6 +23,13 @@ import { SKILL_TREE, findUltimateForBranch } from "../../data/skillTree";
 import type { TargetKind } from "../../data/targetConfig";
 import { tweenManager } from "../util/TweenManager";
 import { FEEL } from "../config/feel";
+import {
+  ACHIEVEMENT_REWARDS,
+  CHARGE_PER_COMBO_MILESTONE,
+  CHARGE_PER_HIT,
+  SCORE_PER_CURRENCY,
+  comboBonusForMax,
+} from "../config/balance";
 import {
   useRunStore,
   COMBO_MILESTONES,
@@ -51,14 +54,6 @@ const ULTIMATE_HOTKEYS: readonly string[] = [
   "Digit4",
   "Digit5",
 ];
-
-const comboBonusForMax = (maxCombo: number): number => {
-  if (maxCombo >= 100) return 100;
-  if (maxCombo >= 50) return 40;
-  if (maxCombo >= 25) return 15;
-  if (maxCombo >= 10) return 5;
-  return 0;
-};
 
 export class Game {
   private readonly parent: HTMLElement;
@@ -638,17 +633,37 @@ export class Game {
     const disabled = this.runMods.currencyDisabled;
     const isFirstRunEver = meta.runsCompleted === 0;
 
-    const base = disabled ? 0 : Math.floor(score / 100);
+    const base = disabled ? 0 : Math.floor(score / SCORE_PER_CURRENCY);
     const comboBonus = disabled ? 0 : comboBonusForMax(maxCombo);
 
     const achievements: AchievementAward[] = [];
     if (!disabled) {
       const candidates: { id: string; amount: number; condition: boolean }[] = [
-        { id: "first-run", amount: 50, condition: isFirstRunEver },
-        { id: "combo-25", amount: 25, condition: maxCombo >= 25 },
-        { id: "combo-50", amount: 75, condition: maxCombo >= 50 },
-        { id: "combo-100", amount: 200, condition: maxCombo >= 100 },
-        { id: "no-bomb-clicks", amount: 100, condition: bombClicks === 0 },
+        {
+          id: "first-run",
+          amount: ACHIEVEMENT_REWARDS["first-run"],
+          condition: isFirstRunEver,
+        },
+        {
+          id: "combo-25",
+          amount: ACHIEVEMENT_REWARDS["combo-25"],
+          condition: maxCombo >= 25,
+        },
+        {
+          id: "combo-50",
+          amount: ACHIEVEMENT_REWARDS["combo-50"],
+          condition: maxCombo >= 50,
+        },
+        {
+          id: "combo-100",
+          amount: ACHIEVEMENT_REWARDS["combo-100"],
+          condition: maxCombo >= 100,
+        },
+        {
+          id: "no-bomb-clicks",
+          amount: ACHIEVEMENT_REWARDS["no-bomb-clicks"],
+          condition: bombClicks === 0,
+        },
       ];
       for (const c of candidates) {
         if (!c.condition) continue;

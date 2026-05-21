@@ -103,7 +103,7 @@ export const REACTION_BRANCH: SkillBranch = {
           name: "Time Slow",
           description: "Ultimate: slow the world to half speed for 5 seconds.",
           icon: "🕒",
-          cost: 1800,
+          cost: 2200,
           effects: [{ kind: "ultimateUnlock", id: "time-slow" }],
         },
       ],

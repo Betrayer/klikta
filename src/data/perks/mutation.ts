@@ -117,7 +117,7 @@ export const MUTATION_BRANCH: SkillBranch = {
           description:
             "Ultimate: 5 s where targets and bombs grow from 100% to 200% over their lifetime, current spawn rate doubles, and all scores ×2.",
           icon: "🌸",
-          cost: 2200,
+          cost: 2600,
           effects: [{ kind: "ultimateUnlock", id: "bloom" }],
         },
       ],

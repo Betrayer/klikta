@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { BASE_HP, DEFAULT_COMBO_CAP } from "../game/config/balance";
 
 export type RunStatus = "idle" | "playing" | "gameOver";
 
@@ -61,9 +62,6 @@ export interface RunState {
   setActiveUltimate: (id: string | null) => void;
   reset: () => void;
 }
-
-const BASE_HP = 3;
-const DEFAULT_COMBO_CAP = 5;
 
 const freshRun = {
   score: 0,

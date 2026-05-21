@@ -1,18 +1,6 @@
 import { useRunStore } from "../../state/runStore";
-import type { TargetKind } from "../../data/targetConfig";
 import type { GameContext, UltimateImpl } from "../ultimates/types";
-
-const MAX_CHARGE = 100;
-
-export const CHARGE_PER_HIT: Record<TargetKind, number> = {
-  regular: 1,
-  golden: 3,
-  multi: 2,
-  shielded: 2.5,
-  bomb: 0,
-};
-
-export const CHARGE_PER_COMBO_MILESTONE = 5;
+import { MAX_CHARGE } from "../config/balance";
 
 export class UltimateSystem {
   private readonly chargeMap = new Map<string, number>();

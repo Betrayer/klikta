@@ -103,7 +103,7 @@ export const WILD_BRANCH: SkillBranch = {
           description:
             "Ultimate: 4 seconds of ×4 spawn rate, fully randomized target types, glitch shader.",
           icon: "🌀",
-          cost: 2200,
+          cost: 2600,
           effects: [{ kind: "ultimateUnlock", id: "chaos-storm" }],
         },
       ],
