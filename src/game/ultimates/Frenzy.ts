@@ -1,8 +1,6 @@
 import type { GameContext, UltimateImpl } from "./types";
 import { ScreenTint, tintEnvelope } from "./ScreenTint";
 
-// Greed T4: every hit spawns two extra short-lived targets nearby (handled by
-// SpawnSystem.onTargetHit) and all score is doubled while active.
 const TINT_COLOR = 0xff6b35;
 const PEAK_ALPHA = 0.18;
 const SCORE_MUL = 2;

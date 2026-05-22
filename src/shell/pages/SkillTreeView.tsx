@@ -65,6 +65,17 @@ const applySelection = (
   }
 };
 
+const TEST_CURRENCY_GRANT = 20000;
+
+const grantTestCurrency = (): void => {
+  useMetaStore.getState().awardCurrency(TEST_CURRENCY_GRANT);
+};
+
+const resetTestCurrency = (): void => {
+  const meta = useMetaStore.getState();
+  meta.spendCurrency(meta.currency);
+};
+
 export const SkillTreeView = () => {
   const [hoveredPerkId, setHoveredPerkId] = useState<string | null>(null);
   const [pinnedPerkId, setPinnedPerkId] = useState<string | null>(null);
@@ -167,6 +178,25 @@ export const SkillTreeView = () => {
           </Stack>
         )}
       </Modal>
+
+      <Group pos="fixed" bottom={12} left={12} gap="xs" style={{ zIndex: 100 }}>
+        <Button
+          size="xs"
+          variant="light"
+          color="teal"
+          onClick={grantTestCurrency}
+        >
+          test +{TEST_CURRENCY_GRANT}
+        </Button>
+        <Button
+          size="xs"
+          variant="subtle"
+          color="gray"
+          onClick={resetTestCurrency}
+        >
+          reset test
+        </Button>
+      </Group>
     </Box>
   );
 };

@@ -2,10 +2,6 @@ import type { GameContext, UltimateImpl } from "./types";
 import { ScreenTint, tintEnvelope } from "./ScreenTint";
 import { bloomState } from "./BloomState";
 
-// Mutation T4: inverts core target behavior — every target and bomb grows from
-// 100% to 200% over its lifetime instead of shrinking (see Target/BombTarget,
-// driven by the shared bloomState flag). Spawn rate and score both double while
-// active.
 const TINT_COLOR = 0xff8fcf;
 const PEAK_ALPHA = 0.2;
 const SCORE_MUL = 2;
