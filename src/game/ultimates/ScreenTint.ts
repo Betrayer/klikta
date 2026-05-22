@@ -7,11 +7,8 @@ interface ScreenSize {
   height: number;
 }
 
-// Drawn larger than the screen so camera shake never reveals the edges.
 const OVERSIZE = 80;
 
-// Fade-in / hold / fade-out alpha envelope driven by an ultimate's elapsed
-// game-time. Deterministic and pause-safe (advances only with the ticker).
 export const tintEnvelope = (
   elapsedMs: number,
   durationMs: number,
@@ -28,8 +25,6 @@ export const tintEnvelope = (
   return peakAlpha;
 };
 
-// Full-screen colored overlay. Filled white and recolored via tint so color
-// changes (e.g. ChaosStorm glitch) are cheap and need no redraw.
 export class ScreenTint {
   readonly gfx: Graphics;
 
@@ -69,8 +64,6 @@ export class ScreenTint {
     this.gfx.destroy();
   }
 
-  // One-shot self-removing flash. Used by instant ultimates (Restore) whose
-  // apply/cleanup run back-to-back, so they cannot animate via update().
   static flash(
     parent: Container,
     screen: ScreenSize,

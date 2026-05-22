@@ -1,9 +1,6 @@
 import type { GameContext, UltimateImpl } from "./types";
 import { ScreenTint, tintEnvelope } from "./ScreenTint";
 
-// Wild T4: spawn rate x4 with fully randomized target types (SpawnSystem chaos
-// mode), plus a flickering multi-color overlay faking a glitch effect. A real
-// glitch shader is deferred (would need an extra @pixi/filter-glitch dep).
 const GLITCH_COLORS = [0xff006e, 0x00f0ff, 0x9d4edd] as const;
 const FALLBACK_COLOR = 0xff006e;
 const PEAK_ALPHA = 0.24;

@@ -51,7 +51,6 @@ export class BombTarget extends Target {
     if (this.phase !== "active") return;
 
     if (bloomState.active) {
-      // Bloom ultimate: bombs grow alongside targets instead of pulsing.
       const t = Math.min(this.elapsedMs / this.lifetimeMs, 1);
       this.lifeScale = 1 + (BLOOM_BOMB_MAX_SCALE - 1) * t;
       this.currentSize = this.initialSize * this.lifeScale;
@@ -70,7 +69,6 @@ export class BombTarget extends Target {
       return;
     }
 
-    // Plain bombs keep scale 1; reset it in case Bloom just ended mid-life.
     if (this.lifeScale !== 1) {
       this.lifeScale = 1;
       this.applyScale();

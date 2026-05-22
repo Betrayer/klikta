@@ -1,9 +1,6 @@
 import type { GameContext, UltimateImpl } from "./types";
 import { ScreenTint, tintEnvelope } from "./ScreenTint";
 
-// Reaction T4: halve game speed, giving the player far more reaction time.
-// NOTE: duration is measured in game-time, which is itself slowed — at 0.5x
-// the window lasts ~10s of wall time. Tune in the balance pass (Task 9).
 const SLOW_SCALE = 0.5;
 const TINT_COLOR = 0x4cc9f0;
 const PEAK_ALPHA = 0.22;

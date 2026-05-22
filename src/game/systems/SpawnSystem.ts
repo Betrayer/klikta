@@ -28,13 +28,11 @@ const DECAY_FACTOR = 0.95;
 const MIN_INTERVAL_MS = 300;
 const EVERY_FIFTH_BOMB_AT = 5;
 
-// Frenzy ultimate: extra targets spawn near each hit, short-lived and chaotic.
 const FRENZY_LIFETIME_MUL = 0.6;
 const FRENZY_MIN_DIST = 60;
 const FRENZY_DIST_RANGE = 140;
 const FRENZY_EXTRA_COUNT = 2;
 
-// Chaos Storm ultimate: faster spawns with fully randomized target kinds.
 const CHAOS_RATE_MUL = 4;
 
 const KINDS = Object.keys(TARGET_CONFIG) as TargetKind[];
@@ -118,13 +116,10 @@ export class SpawnSystem {
     this.chaosActive = active;
   }
 
-  // Multiplies spawn frequency without altering kind weights (Bloom ultimate).
   setRateMultiplier(mul: number): void {
     this.extraRateMul = mul > 0 ? mul : 1;
   }
 
-  // Frenzy: called by Game on every scoring hit. Returns extra short-lived
-  // targets clustered near the hit, or [] when Frenzy is inactive.
   onTargetHit(x: number, y: number, bounds: SpawnBounds): SpawnEvent[] {
     if (!this.frenzyActive) return [];
     const out: SpawnEvent[] = [];
@@ -143,7 +138,11 @@ export class SpawnSystem {
     const dist = FRENZY_MIN_DIST + Math.random() * FRENZY_DIST_RANGE;
     const marginX = bounds.width * EDGE_MARGIN;
     const marginY = bounds.height * EDGE_MARGIN;
-    const px = clamp(x + Math.cos(angle) * dist, marginX, bounds.width - marginX);
+    const px = clamp(
+      x + Math.cos(angle) * dist,
+      marginX,
+      bounds.width - marginX,
+    );
     const py = clamp(
       y + Math.sin(angle) * dist,
       marginY,

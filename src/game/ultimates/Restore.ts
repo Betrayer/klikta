@@ -2,10 +2,6 @@ import { useRunStore } from "../../state/runStore";
 import type { GameContext, UltimateImpl } from "./types";
 import { ScreenTint } from "./ScreenTint";
 
-// Survival T4: instant full heal. Passive HP regen is disabled for the rest of
-// the run so it cannot be chained with Score Heal into infinite sustain.
-// Non-blocking, so apply/cleanup run back-to-back: all work happens in apply
-// and the visual is a self-removing flash + particle burst.
 const HEAL_COLOR = 0x52ffb8;
 
 class RestoreUltimate implements UltimateImpl {

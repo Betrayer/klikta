@@ -159,7 +159,6 @@ export abstract class Target {
   protected updateLifeAndAlpha(): void {
     if (this.phase === "active" && this.config.shrinks) {
       if (bloomState.active) {
-        // Bloom ultimate: grow toward 200% over lifetime instead of shrinking.
         this.lifeScale = Math.min(
           1 + this.elapsedMs / this.lifetimeMs,
           BLOOM_MAX_SCALE,
