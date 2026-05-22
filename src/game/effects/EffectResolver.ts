@@ -18,6 +18,7 @@ export interface RunModifiers {
   readonly hpRegenPer1000Score: number;
   readonly bombExpireCurrencyChance: number;
   readonly currencyPerHit: { combo: number; amount: number } | null;
+  readonly echoPhantom: { durationMs: number; bonusMul: number } | null;
 }
 
 export interface TargetSpawnModifiers {
@@ -74,6 +75,7 @@ export const DEFAULT_RUN_MODIFIERS: RunModifiers = {
   hpRegenPer1000Score: 0,
   bombExpireCurrencyChance: 0,
   currencyPerHit: null,
+  echoPhantom: null,
 };
 
 export const DEFAULT_TARGET_MODIFIERS: TargetSpawnModifiers = {
@@ -149,6 +151,7 @@ export class EffectResolver {
     let hpRegenPer1000Score = 0;
     let bombExpireCurrencyChance = 0;
     let currencyPerHit: { combo: number; amount: number } | null = null;
+    let echoPhantom: RunModifiers["echoPhantom"] = null;
 
     for (const eff of this.effects) {
       switch (eff.kind) {
@@ -205,6 +208,9 @@ export class EffectResolver {
         case "currencyPerHitAtComboGte":
           currencyPerHit = { combo: eff.combo, amount: eff.amount };
           break;
+        case "echoPhantomMs":
+          echoPhantom = { durationMs: eff.duration, bonusMul: eff.bonusMul };
+          break;
         default:
           break;
       }
@@ -227,6 +233,7 @@ export class EffectResolver {
       hpRegenPer1000Score,
       bombExpireCurrencyChance,
       currencyPerHit,
+      echoPhantom,
     };
   }
 

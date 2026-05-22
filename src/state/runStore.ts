@@ -48,6 +48,7 @@ export interface RunState {
   activeUltimate: string | null;
   startRun: (opts?: StartRunOptions) => void;
   registerHit: (baseScore: number) => void;
+  addScore: (amount: number) => void;
   resetCombo: () => void;
   loseHP: () => void;
   loseHPBy: (amount: number) => void;
@@ -139,6 +140,12 @@ export const useRunStore = create<RunState>()(
           },
           false,
           "registerHit",
+        ),
+      addScore: (amount) =>
+        set(
+          (s) => (amount <= 0 ? s : { score: s.score + amount }),
+          false,
+          "addScore",
         ),
       resetCombo: () =>
         set((s) => (s.combo === 0 ? s : { combo: 0 }), false, "resetCombo"),

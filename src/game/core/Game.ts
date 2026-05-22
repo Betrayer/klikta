@@ -6,6 +6,7 @@ import {
   type Ticker,
 } from "pixi.js";
 import type { Target } from "../entities/Target";
+import { PhantomTarget } from "../entities/PhantomTarget";
 import { RegularTarget } from "../entities/RegularTarget";
 import { GoldenTarget } from "../entities/GoldenTarget";
 import { BombTarget } from "../entities/BombTarget";
@@ -59,7 +60,9 @@ export class Game {
   private readonly parent: HTMLElement;
   private app: Application | null = null;
   private targetLayer: Container | null = null;
+  private phantomLayer: Container | null = null;
   private readonly targets: Target[] = [];
+  private readonly phantoms: PhantomTarget[] = [];
   private spawnSystem: SpawnSystem | null = null;
   private unsubPause: (() => void) | null = null;
   private vfx: VFXSystem | null = null;
@@ -152,6 +155,10 @@ export class Game {
 
     this.app = app;
     this.parent.appendChild(app.canvas);
+
+    const phantomLayer = new Container();
+    this.phantomLayer = phantomLayer;
+    app.stage.addChild(phantomLayer);
 
     const targetLayer = new Container();
     this.targetLayer = targetLayer;
@@ -456,6 +463,16 @@ export class Game {
       }
     }
 
+    for (let i = this.phantoms.length - 1; i >= 0; i--) {
+      const phantom = this.phantoms[i];
+      if (phantom === undefined) continue;
+      phantom.update(deltaMs);
+      if (phantom.isDead) {
+        this.phantoms.splice(i, 1);
+        phantom.destroy();
+      }
+    }
+
     const events = this.spawnSystem.tick(this.clockMs, { width, height });
     if (events.length > 0) this.spawnEvents(events);
   };
@@ -559,8 +576,13 @@ export class Game {
           if (wasPhaseInvisible && pf !== null) {
             scaled *= pf.bonusMul;
           }
+          const scoreBefore = useRunStore.getState().score;
           useRunStore.getState().registerHit(Math.round(scaled));
           this.tryAwardComboCoin();
+          this.spawnEchoPhantom(
+            target,
+            useRunStore.getState().score - scoreBefore,
+          );
         }
         this.ultimateSystem?.addCharge(CHARGE_PER_HIT[target.kind]);
         this.syncMusicToCombo();
@@ -585,6 +607,33 @@ export class Game {
     const { width, height } = this.app.renderer.screen;
     const burst = this.spawnSystem.onTargetHit(x, y, { width, height });
     if (burst.length > 0) this.spawnEvents(burst);
+  }
+
+  private spawnEchoPhantom(target: Target, awardedScore: number): void {
+    const echo = this.runMods.echoPhantom;
+    if (echo === null || this.phantomLayer === null) return;
+    const bonus = Math.round(awardedScore * (echo.bonusMul - 1));
+    if (bonus <= 0) return;
+    const phantom = new PhantomTarget({
+      x: target.x,
+      y: target.y,
+      radius: Math.max(target.currentSize, 12),
+      color: target.color,
+      bonusScore: bonus,
+      lifetimeMs: echo.durationMs,
+    });
+    phantom.graphics.on("pointerdown", () => this.handlePhantomClick(phantom));
+    this.phantomLayer.addChild(phantom.graphics);
+    this.phantoms.push(phantom);
+  }
+
+  private handlePhantomClick(phantom: PhantomTarget): void {
+    if (useRunStore.getState().paused) return;
+    if (!phantom.isInteractive) return;
+    phantom.collect();
+    useRunStore.getState().addScore(phantom.bonusScore);
+    audioSystem.playSFX("hit_multi_partial");
+    this.vfx?.emitSubHit(phantom.x, phantom.y, phantom.color);
   }
 
   private killPair(target: Target): void {
@@ -766,9 +815,12 @@ export class Game {
     this.camera?.reset();
     for (const target of this.targets) target.destroy();
     this.targets.length = 0;
+    for (const phantom of this.phantoms) phantom.destroy();
+    this.phantoms.length = 0;
     this.app.destroy(true, { children: true });
     this.app = null;
     this.targetLayer = null;
+    this.phantomLayer = null;
     this.ultimateCtx = null;
     this.ultimateTimeScale = 1;
     this.spawnSystem = null;
