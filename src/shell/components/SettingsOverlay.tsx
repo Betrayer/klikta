@@ -11,6 +11,7 @@ import {
 import { useRunStore } from '../../state/runStore';
 import { useSettingsStore } from '../../state/settingsStore';
 import { useMetaStore } from '../../state/metaStore';
+import { useCampaignStore } from '../../state/campaignStore';
 import { audioSystem } from '../../game/systems/AudioSystem';
 
 const toPercent = (v: number): number => Math.round(v * 100);
@@ -18,6 +19,7 @@ const toPercent = (v: number): number => Math.round(v * 100);
 export const SettingsOverlay = () => {
   const paused = useRunStore((s) => s.paused);
   const setPaused = useRunStore((s) => s.setPaused);
+  const waveBreakActive = useCampaignStore((s) => s.breakActive);
 
   const masterVolume = useSettingsStore((s) => s.masterVolume);
   const sfxVolume = useSettingsStore((s) => s.sfxVolume);
@@ -31,6 +33,7 @@ export const SettingsOverlay = () => {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
+      if (useCampaignStore.getState().breakActive) return;
       const state = useRunStore.getState();
       if (state.status !== 'playing') return;
       state.setPaused(!state.paused);
@@ -52,7 +55,7 @@ export const SettingsOverlay = () => {
 
   return (
     <>
-      {!paused && (
+      {!paused && !waveBreakActive && (
         <ActionIcon
           variant="subtle"
           color="gray"

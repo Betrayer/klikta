@@ -1,4 +1,10 @@
-export type TargetKind = "regular" | "golden" | "bomb" | "multi" | "shielded";
+export type TargetKind =
+  | "regular"
+  | "golden"
+  | "bomb"
+  | "multi"
+  | "shielded"
+  | "splitter";
 
 export interface TargetTypeConfig {
   score: number;
@@ -55,5 +61,14 @@ export const TARGET_CONFIG: Record<TargetKind, TargetTypeConfig> = {
     shrinks: true,
     clicksRequired: 2,
     spawnWeight: 8,
+  },
+  splitter: {
+    score: 20,
+    lifetimeMs: 2200,
+    radius: 42,
+    color: 0xfb5607,
+    shrinks: true,
+    clicksRequired: 1,
+    spawnWeight: 0,
   },
 };

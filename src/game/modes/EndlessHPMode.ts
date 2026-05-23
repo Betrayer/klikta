@@ -13,6 +13,10 @@ export class EndlessHPMode implements ModePolicy {
     return ctx.hp <= 0;
   }
 
+  isVictory(): boolean {
+    return false;
+  }
+
   onHit(): void {}
 
   onMiss(): PenaltyKind {
@@ -22,4 +26,6 @@ export class EndlessHPMode implements ModePolicy {
   onBombClick(): PenaltyKind {
     return "hp";
   }
+
+  resumeFromBreak(): void {}
 }

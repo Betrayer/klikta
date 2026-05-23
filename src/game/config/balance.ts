@@ -33,6 +33,7 @@ export const CHARGE_PER_HIT: Record<TargetKind, number> = {
   golden: 3,
   multi: 2,
   shielded: 2.5,
+  splitter: 1.5,
   bomb: 0,
 };
 export const CHARGE_PER_COMBO_MILESTONE = 5;
@@ -47,5 +48,15 @@ export const TIMER_GAIN_BY_KIND: Record<TargetKind, number> = {
   golden: 800,
   multi: 1000,
   shielded: 600,
+  splitter: 400,
   bomb: 0,
 };
+
+export const SPLITTER_FRAGMENT_COUNT = 3;
+export const SPLITTER_FRAGMENT_LIFETIME_MS = 1200;
+export const SPLITTER_FRAGMENT_SIZE_MUL = 0.5;
+export const SPLITTER_FRAGMENT_SCORE_MUL = 0.5;
+export const SPLITTER_FRAGMENT_SPREAD_MIN = 52;
+export const SPLITTER_FRAGMENT_SPREAD_RANGE = 64;
+
+export const VICTORY_BONUS_CURRENCY = 150;

@@ -1,5 +1,6 @@
 import { GameCanvas } from './shell/components/GameCanvas';
 import { InGameHUD } from './shell/pages/InGameHUD';
+import { WaveBreak } from './shell/components/WaveBreak';
 import { SettingsOverlay } from './shell/components/SettingsOverlay';
 import { MainMenu } from './shell/pages/MainMenu';
 import { PostRunSummary } from './shell/pages/PostRunSummary';
@@ -29,6 +30,7 @@ export const App = () => {
       <>
         <GameCanvas />
         <InGameHUD />
+        <WaveBreak />
         <SettingsOverlay />
       </>
     );

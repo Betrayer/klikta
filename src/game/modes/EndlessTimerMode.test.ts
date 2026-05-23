@@ -15,6 +15,7 @@ const snapshot = (): ModeContext => {
     score: s.score,
     hp: s.hp,
     timeRemainingMs: s.timeRemainingMs,
+    liveTargetCount: 0,
   };
 };
 
@@ -50,7 +51,9 @@ describe("EndlessTimerMode", () => {
   it("never adds time for a bomb hit", () => {
     mode.onTick(1000);
     mode.onHit(snapshot(), "bomb");
-    expect(useRunStore.getState().timeRemainingMs).toBe(TIMER_INITIAL_MS - 1000);
+    expect(useRunStore.getState().timeRemainingMs).toBe(
+      TIMER_INITIAL_MS - 1000,
+    );
   });
 
   it("costs time on a bomb click and never charges HP", () => {

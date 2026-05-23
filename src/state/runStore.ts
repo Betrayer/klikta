@@ -23,6 +23,7 @@ export interface CurrencyBreakdown {
   comboBonus: number;
   bombBounty: number;
   comboCoin: number;
+  victoryBonus: number;
   achievements: AchievementAward[];
   total: number;
 }
@@ -45,6 +46,7 @@ export interface RunState {
   elapsedMs: number;
   timeRemainingMs: number;
   paused: boolean;
+  victory: boolean;
   timePulseIncoming: boolean;
   bombClicksThisRun: number;
   currencyEarned: number;
@@ -59,13 +61,15 @@ export interface RunState {
   loseHPBy: (amount: number) => void;
   healHP: (amount: number) => void;
   fullHeal: () => void;
+  addMaxHP: (amount: number) => void;
+  setComboCap: (cap: number) => void;
   tickElapsed: (ms: number) => void;
   adjustTimeRemaining: (deltaMs: number) => void;
   setPaused: (paused: boolean) => void;
   setTimePulseIncoming: (incoming: boolean) => void;
   recordBombClick: () => void;
   recordRunResults: (results: RunResults) => void;
-  endRun: () => void;
+  endRun: (victory?: boolean) => void;
   setUltimateCharges: (charges: Record<string, number>) => void;
   setActiveUltimate: (id: string | null) => void;
   reset: () => void;
@@ -82,6 +86,7 @@ const freshRun = {
   elapsedMs: 0,
   timeRemainingMs: 0,
   paused: false,
+  victory: false,
   timePulseIncoming: false,
   bombClicksThisRun: 0,
   currencyEarned: 0,
@@ -181,6 +186,22 @@ export const useRunStore = create<RunState>()(
         ),
       fullHeal: () =>
         set((s) => (s.hp === s.maxHp ? s : { hp: s.maxHp }), false, "fullHeal"),
+      addMaxHP: (amount) =>
+        set(
+          (s) => {
+            if (amount <= 0) return s;
+            const maxHp = s.maxHp + amount;
+            return { maxHp, hp: clampHP(s.hp + amount, maxHp) };
+          },
+          false,
+          "addMaxHP",
+        ),
+      setComboCap: (cap) =>
+        set(
+          (s) => (s.comboCap === cap ? s : { comboCap: cap }),
+          false,
+          "setComboCap",
+        ),
       tickElapsed: (ms) =>
         set((s) => ({ elapsedMs: s.elapsedMs + ms }), false, "tickElapsed"),
       adjustTimeRemaining: (deltaMs) =>
@@ -218,9 +239,10 @@ export const useRunStore = create<RunState>()(
           false,
           "recordRunResults",
         ),
-      endRun: () =>
+      endRun: (victory = false) =>
         set(
-          (s) => (s.status === "gameOver" ? s : { status: "gameOver" }),
+          (s) =>
+            s.status === "gameOver" ? s : { status: "gameOver", victory },
           false,
           "endRun",
         ),

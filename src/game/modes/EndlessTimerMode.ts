@@ -22,6 +22,10 @@ export class EndlessTimerMode implements ModePolicy {
     return ctx.timeRemainingMs <= 0;
   }
 
+  isVictory(): boolean {
+    return false;
+  }
+
   onHit(_ctx: ModeContext, kind: TargetKind): void {
     const gain = TIMER_GAIN_BY_KIND[kind];
     if (gain > 0) useRunStore.getState().adjustTimeRemaining(gain);
@@ -35,4 +39,6 @@ export class EndlessTimerMode implements ModePolicy {
     useRunStore.getState().adjustTimeRemaining(-TIMER_BOMB_PENALTY_MS);
     return "none";
   }
+
+  resumeFromBreak(): void {}
 }

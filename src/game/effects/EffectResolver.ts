@@ -134,6 +134,11 @@ export class EffectResolver {
     this.effects = effects;
   }
 
+  extend(extra: readonly SkillEffect[]): EffectResolver {
+    if (extra.length === 0) return this;
+    return new EffectResolver([...this.effects, ...extra]);
+  }
+
   buildRunModifiers(): RunModifiers {
     let scoreMul = 1;
     let comboCap = DEFAULT_RUN_MODIFIERS.comboCap;

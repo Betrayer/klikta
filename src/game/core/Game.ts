@@ -12,16 +12,22 @@ import { GoldenTarget } from "../entities/GoldenTarget";
 import { BombTarget } from "../entities/BombTarget";
 import { MultiTarget } from "../entities/MultiTarget";
 import { ShieldedTarget } from "../entities/ShieldedTarget";
+import { SplitterTarget } from "../entities/SplitterTarget";
 import { SpawnSystem, type SpawnEvent } from "../systems/SpawnSystem";
 import { VFXSystem } from "../systems/VFXSystem";
 import { CameraSystem } from "../systems/CameraSystem";
 import { audioSystem } from "../systems/AudioSystem";
 import { UltimateSystem } from "../systems/UltimateSystem";
-import { setUltimateActivationHandler } from "../systems/ultimateActivation";
+import {
+  setUltimateActivationHandler,
+  clearUltimateActivationHandler,
+} from "../systems/ultimateActivation";
 import { createUltimateRegistry } from "../ultimates/registry";
 import type { GameContext } from "../ultimates/types";
 import { SKILL_TREE, findUltimateForBranch } from "../../data/skillTree";
-import type { TargetKind } from "../../data/targetConfig";
+import { TARGET_CONFIG, type TargetKind } from "../../data/targetConfig";
+import { rollRunPerkChoices, type RunPerk } from "../../data/runPerks";
+import type { SkillEffect } from "../effects/types";
 import { tweenManager } from "../util/TweenManager";
 import { FEEL } from "../config/feel";
 import {
@@ -29,6 +35,13 @@ import {
   CHARGE_PER_COMBO_MILESTONE,
   CHARGE_PER_HIT,
   SCORE_PER_CURRENCY,
+  SPLITTER_FRAGMENT_COUNT,
+  SPLITTER_FRAGMENT_LIFETIME_MS,
+  SPLITTER_FRAGMENT_SCORE_MUL,
+  SPLITTER_FRAGMENT_SIZE_MUL,
+  SPLITTER_FRAGMENT_SPREAD_MIN,
+  SPLITTER_FRAGMENT_SPREAD_RANGE,
+  VICTORY_BONUS_CURRENCY,
   comboBonusForMax,
 } from "../config/balance";
 import {
@@ -45,9 +58,18 @@ import {
   type TargetSpawnModifiers,
 } from "../effects/EffectResolver";
 import { getActiveResolver } from "../effects/activeResolver";
-import type { ModeContext, ModePolicy } from "../modes/ModePolicy";
+import type {
+  ModeContext,
+  ModePolicy,
+  ModeTickDirective,
+} from "../modes/ModePolicy";
 import { EndlessHPMode } from "../modes/EndlessHPMode";
 import { getActiveModePolicy } from "../modes/activeModePolicy";
+import {
+  setRunPerkPickHandler,
+  clearRunPerkPickHandler,
+} from "../modes/runPerkPick";
+import { useCampaignStore } from "../../state/campaignStore";
 
 const TIME_PULSE_SPEEDS = [0.6, 1.6] as const;
 const TIME_PULSE_WARNING_MS = 500;
@@ -82,6 +104,14 @@ export class Game {
   private runMods: RunModifiers;
   private spawnPolicy: SpawnPolicy;
   private targetMods: TargetSpawnModifiers;
+  private readonly usedRunPerkIds: string[] = [];
+  private waveBreakChoices: RunPerk[] = [];
+  private readonly ultimateHandler = (id: string): void => {
+    this.tryActivateUltimate(id);
+  };
+  private readonly runPerkHandler = (id: string): void => {
+    this.onRunPerkChosen(id);
+  };
   private ultimateSystem: UltimateSystem | null = null;
   private ultimateCtx: GameContext | null = null;
   private ultimateTimeScale = 1;
@@ -137,6 +167,8 @@ export class Game {
     this.ultimateTimeScale = 1;
     this.hpRegenDisabled = false;
     this.runEnded = false;
+    this.usedRunPerkIds.length = 0;
+    this.waveBreakChoices = [];
     this.mode = getActiveModePolicy();
 
     const unlockedFromPerks = this.resolver.getUltimateUnlocks();
@@ -144,7 +176,8 @@ export class Game {
       unlockedFromPerks,
       createUltimateRegistry(),
     );
-    setUltimateActivationHandler((id) => this.tryActivateUltimate(id));
+    setUltimateActivationHandler(this.ultimateHandler);
+    setRunPerkPickHandler(this.runPerkHandler);
 
     const app = new Application();
     await app.init({
@@ -205,6 +238,9 @@ export class Game {
       this.resolver.goldenLifetimeMul(),
       this.runMods.multiClicksOverride,
     );
+    if (this.mode.id === "campaign") {
+      this.spawnSystem.setWaveDriven(true);
+    }
     if (this.spawnPolicy.timePulse !== null) {
       this.timePulseNextStartMs =
         this.clockMs + this.spawnPolicy.timePulse.periodMs;
@@ -437,7 +473,8 @@ export class Game {
     this.updateHitFrame();
     this.updateTimePulse();
     this.applyHpRegen();
-    this.mode.onTick(deltaMs, this.buildModeContext());
+    const directive = this.mode.onTick(deltaMs, this.buildModeContext());
+    if (directive) this.applyModeDirective(directive);
     if (this.ultimateSystem !== null) {
       const ctx = this.buildUltimateContext();
       if (ctx !== null) this.ultimateSystem.update(this.clockMs, ctx);
@@ -546,7 +583,70 @@ export class Game {
       score: run.score,
       hp: run.hp,
       timeRemainingMs: run.timeRemainingMs,
+      liveTargetCount: this.targets.length,
     };
+  }
+
+  private applyModeDirective(directive: ModeTickDirective): void {
+    if (this.spawnSystem === null) return;
+    if (directive.wavePlan !== undefined) {
+      this.spawnSystem.setWavePlan(directive.wavePlan, this.clockMs);
+    }
+    if (directive.startWaveBreak !== undefined) {
+      this.beginWaveBreak(directive.startWaveBreak.upcomingWave);
+    }
+  }
+
+  private beginWaveBreak(upcomingWave: number): void {
+    const choices = rollRunPerkChoices(this.usedRunPerkIds);
+    this.waveBreakChoices = choices;
+    useCampaignStore.getState().openBreak(
+      upcomingWave,
+      choices.map((p) => ({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+      })),
+    );
+    audioSystem.playSFX("combo_milestone");
+    this.setWaveFrozen(true);
+  }
+
+  private onRunPerkChosen(perkId: string): void {
+    const perk = this.waveBreakChoices.find((p) => p.id === perkId);
+    if (perk === undefined) return;
+    this.usedRunPerkIds.push(perkId);
+    this.applyRunEffects(perk.effects);
+    this.waveBreakChoices = [];
+    useCampaignStore.getState().closeBreak();
+    this.mode.resumeFromBreak();
+    this.setWaveFrozen(false);
+  }
+
+  private applyRunEffects(effects: readonly SkillEffect[]): void {
+    const prevHPAdd = this.runMods.startingHPAdd;
+    const prevComboCap = this.runMods.comboCap;
+    this.resolver = this.resolver.extend(effects);
+    this.runMods = this.resolver.buildRunModifiers();
+    this.spawnPolicy = this.resolver.buildSpawnPolicy();
+    this.targetMods = this.resolver.buildBaseTargetModifiers();
+    this.spawnSystem?.reconfigure(
+      this.spawnPolicy,
+      this.targetMods,
+      this.resolver.goldenLifetimeMul(),
+      this.runMods.multiClicksOverride,
+    );
+    const hpDelta = this.runMods.startingHPAdd - prevHPAdd;
+    if (hpDelta > 0) useRunStore.getState().addMaxHP(hpDelta);
+    if (this.runMods.comboCap !== prevComboCap) {
+      useRunStore.getState().setComboCap(this.runMods.comboCap);
+    }
+  }
+
+  private setWaveFrozen(frozen: boolean): void {
+    if (this.app === null) return;
+    if (frozen) this.app.ticker.stop();
+    else this.app.ticker.start();
   }
 
   private checkRunOver(): void {
@@ -557,10 +657,11 @@ export class Game {
 
   private endRun(): void {
     this.runEnded = true;
-    useRunStore.getState().endRun();
+    const victory = this.mode.isVictory(this.buildModeContext());
+    useRunStore.getState().endRun(victory);
     audioSystem.playSFX("game_over");
     audioSystem.musicGameOver();
-    this.awardRunRewards();
+    this.awardRunRewards(victory);
   }
 
   private createTarget(event: SpawnEvent): Target {
@@ -580,6 +681,8 @@ export class Game {
         );
       case "shielded":
         return new ShieldedTarget(spawn, event.modifiers);
+      case "splitter":
+        return new SplitterTarget(spawn, event.modifiers);
     }
   }
 
@@ -644,6 +747,9 @@ export class Game {
       }
       this.emitHitVfx(target);
       this.triggerJuice(target);
+      if (target.kind === "splitter") {
+        this.spawnSplitterFragments(target.x, target.y);
+      }
       target.beginHitExit();
       this.killPair(target);
     } else if (target.kind === "multi") {
@@ -659,6 +765,35 @@ export class Game {
     const { width, height } = this.app.renderer.screen;
     const burst = this.spawnSystem.onTargetHit(x, y, { width, height });
     if (burst.length > 0) this.spawnEvents(burst);
+  }
+
+  private spawnSplitterFragments(x: number, y: number): void {
+    if (this.targetLayer === null) return;
+    const lifetimeMul =
+      (SPLITTER_FRAGMENT_LIFETIME_MS / TARGET_CONFIG.regular.lifetimeMs) *
+      this.targetMods.lifetimeMul;
+    for (let i = 0; i < SPLITTER_FRAGMENT_COUNT; i++) {
+      const angle =
+        (Math.PI * 2 * i) / SPLITTER_FRAGMENT_COUNT + Math.random() * 0.5;
+      const dist =
+        SPLITTER_FRAGMENT_SPREAD_MIN +
+        Math.random() * SPLITTER_FRAGMENT_SPREAD_RANGE;
+      const modifiers: TargetSpawnModifiers = {
+        ...this.targetMods,
+        lifetimeMul,
+        sizeMul: this.targetMods.sizeMul * SPLITTER_FRAGMENT_SIZE_MUL,
+        scoreMul: this.targetMods.scoreMul * SPLITTER_FRAGMENT_SCORE_MUL,
+      };
+      const fragment = new RegularTarget(
+        { x: x + Math.cos(angle) * dist, y: y + Math.sin(angle) * dist },
+        modifiers,
+      );
+      fragment.graphics.on("pointerdown", () =>
+        this.handleTargetClick(fragment),
+      );
+      this.targetLayer.addChild(fragment.graphics);
+      this.targets.push(fragment);
+    }
   }
 
   private spawnEchoPhantom(target: Target, awardedScore: number): void {
@@ -725,7 +860,7 @@ export class Game {
     this.comboCoinEarned += cfg.amount;
   }
 
-  private awardRunRewards(): void {
+  private awardRunRewards(victory: boolean): void {
     const run = useRunStore.getState();
     const meta = useMetaStore.getState();
     const score = run.score;
@@ -775,7 +910,8 @@ export class Game {
     }
 
     const achievementsTotal = achievements.reduce((s, a) => s + a.amount, 0);
-    const endTotal = base + comboBonus + achievementsTotal;
+    const victoryBonus = !disabled && victory ? VICTORY_BONUS_CURRENCY : 0;
+    const endTotal = base + comboBonus + achievementsTotal + victoryBonus;
     if (!disabled && endTotal > 0) meta.awardCurrency(endTotal);
     const previousBestScore = meta.bestScores[run.mode] ?? 0;
     meta.recordRun(run.mode, score);
@@ -785,6 +921,7 @@ export class Game {
       comboBonus,
       bombBounty: this.bombBountyEarned,
       comboCoin: this.comboCoinEarned,
+      victoryBonus,
       achievements,
       total: endTotal + this.bombBountyEarned + this.comboCoinEarned,
     };
@@ -847,7 +984,8 @@ export class Game {
   destroy(): void {
     this.destroyed = true;
     window.removeEventListener("keydown", this.handleKeydown);
-    setUltimateActivationHandler(null);
+    clearUltimateActivationHandler(this.ultimateHandler);
+    clearRunPerkPickHandler(this.runPerkHandler);
     if (this.ultimateSystem !== null) {
       const ctx = this.buildUltimateContext();
       if (ctx !== null) this.ultimateSystem.forceCleanup(ctx);
