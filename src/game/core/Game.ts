@@ -45,6 +45,9 @@ import {
   type TargetSpawnModifiers,
 } from "../effects/EffectResolver";
 import { getActiveResolver } from "../effects/activeResolver";
+import type { ModeContext, ModePolicy } from "../modes/ModePolicy";
+import { EndlessHPMode } from "../modes/EndlessHPMode";
+import { getActiveModePolicy } from "../modes/activeModePolicy";
 
 const TIME_PULSE_SPEEDS = [0.6, 1.6] as const;
 const TIME_PULSE_WARNING_MS = 500;
@@ -72,6 +75,8 @@ export class Game {
   private flashStartMs = -1;
   private clockMs = 0;
   private destroyed = false;
+  private mode: ModePolicy = new EndlessHPMode();
+  private runEnded = false;
 
   private resolver: EffectResolver = EffectResolver.empty();
   private runMods: RunModifiers;
@@ -131,6 +136,8 @@ export class Game {
     this.scoreMultiplier.current = 1;
     this.ultimateTimeScale = 1;
     this.hpRegenDisabled = false;
+    this.runEnded = false;
+    this.mode = getActiveModePolicy();
 
     const unlockedFromPerks = this.resolver.getUltimateUnlocks();
     this.ultimateSystem = new UltimateSystem(
@@ -216,6 +223,7 @@ export class Game {
     };
     audioSystem.startMusic();
     this.syncMusicToCombo();
+    this.mode.onRunStart();
     app.ticker.add(this.tick);
 
     window.addEventListener("keydown", this.handleKeydown);
@@ -284,7 +292,7 @@ export class Game {
     const skipHpLoss =
       this.runMods.shieldedMissNoHPLoss && this.hasActiveShield();
     useRunStore.getState().resetCombo();
-    if (!skipHpLoss) this.applyDamage(1);
+    if (!skipHpLoss) this.applyMissPenalty();
     this.syncMusicToCombo();
   };
 
@@ -428,6 +436,7 @@ export class Game {
     this.updateHitFrame();
     this.updateTimePulse();
     this.applyHpRegen();
+    this.mode.onTick(deltaMs, this.buildModeContext());
     if (this.ultimateSystem !== null) {
       const ctx = this.buildUltimateContext();
       if (ctx !== null) this.ultimateSystem.update(this.clockMs, ctx);
@@ -475,6 +484,8 @@ export class Game {
 
     const events = this.spawnSystem.tick(this.clockMs, { width, height });
     if (events.length > 0) this.spawnEvents(events);
+
+    this.checkRunOver();
   };
 
   private handleMissExpiry(): void {
@@ -503,13 +514,51 @@ export class Game {
     const iframes = this.runMods.damageIframesMs;
     if (iframes > 0 && this.clockMs - this.lastDamageMs < iframes) return;
     this.lastDamageMs = this.clockMs;
-    const store = useRunStore.getState();
-    store.loseHPBy(amount);
-    if (useRunStore.getState().status === "gameOver") {
-      audioSystem.playSFX("game_over");
-      audioSystem.musicGameOver();
-      this.awardRunRewards();
+    useRunStore.getState().loseHPBy(amount);
+    this.checkRunOver();
+  }
+
+  private applyMissPenalty(): void {
+    switch (this.mode.onMiss(this.buildModeContext())) {
+      case "hp":
+        this.applyDamage(1);
+        break;
+      case "none":
+        break;
     }
+  }
+
+  private applyBombPenalty(): void {
+    switch (this.mode.onBombClick(this.buildModeContext())) {
+      case "hp":
+        this.applyDamage(this.runMods.bombClickHPMul);
+        break;
+      case "none":
+        break;
+    }
+  }
+
+  private buildModeContext(): ModeContext {
+    const run = useRunStore.getState();
+    return {
+      elapsedMs: this.clockMs,
+      score: run.score,
+      hp: run.hp,
+    };
+  }
+
+  private checkRunOver(): void {
+    if (this.runEnded) return;
+    if (!this.mode.isRunOver(this.buildModeContext())) return;
+    this.endRun();
+  }
+
+  private endRun(): void {
+    this.runEnded = true;
+    useRunStore.getState().endRun();
+    audioSystem.playSFX("game_over");
+    audioSystem.musicGameOver();
+    this.awardRunRewards();
   }
 
   private createTarget(event: SpawnEvent): Target {
@@ -649,7 +698,7 @@ export class Game {
     store.recordBombClick();
     const count = useRunStore.getState().bombClicksThisRun;
     const free = this.runMods.bombClickFreeAfterFirst && count > 1;
-    if (!free) this.applyDamage(this.runMods.bombClickHPMul);
+    if (!free) this.applyBombPenalty();
     if (!this.runMods.comboNoResetOnBombClick) {
       useRunStore.getState().resetCombo();
       this.syncMusicToCombo();

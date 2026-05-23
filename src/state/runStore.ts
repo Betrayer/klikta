@@ -54,7 +54,6 @@ export interface RunState {
   registerHit: (baseScore: number) => void;
   addScore: (amount: number) => void;
   resetCombo: () => void;
-  loseHP: () => void;
   loseHPBy: (amount: number) => void;
   healHP: (amount: number) => void;
   fullHeal: () => void;
@@ -63,6 +62,7 @@ export interface RunState {
   setTimePulseIncoming: (incoming: boolean) => void;
   recordBombClick: () => void;
   recordRunResults: (results: RunResults) => void;
+  endRun: () => void;
   setUltimateCharges: (charges: Record<string, number>) => void;
   setActiveUltimate: (id: string | null) => void;
   reset: () => void;
@@ -155,22 +155,11 @@ export const useRunStore = create<RunState>()(
         ),
       resetCombo: () =>
         set((s) => (s.combo === 0 ? s : { combo: 0 }), false, "resetCombo"),
-      loseHP: () =>
-        set(
-          (s) => {
-            if (s.hp <= 0) return s;
-            const hp = s.hp - 1;
-            return hp <= 0 ? { hp: 0, status: "gameOver" } : { hp };
-          },
-          false,
-          "loseHP",
-        ),
       loseHPBy: (amount) =>
         set(
           (s) => {
             if (s.hp <= 0 || amount <= 0) return s;
-            const hp = s.hp - amount;
-            return hp <= 0 ? { hp: 0, status: "gameOver" } : { hp };
+            return { hp: clampHP(s.hp - amount, s.maxHp) };
           },
           false,
           "loseHPBy",
@@ -215,6 +204,12 @@ export const useRunStore = create<RunState>()(
           },
           false,
           "recordRunResults",
+        ),
+      endRun: () =>
+        set(
+          (s) => (s.status === "gameOver" ? s : { status: "gameOver" }),
+          false,
+          "endRun",
         ),
       setUltimateCharges: (charges) =>
         set({ ultimateCharges: charges }, false, "setUltimateCharges"),
