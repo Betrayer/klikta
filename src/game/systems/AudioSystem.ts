@@ -1,6 +1,9 @@
 import { Howl, Howler } from "howler";
 import musicUrl from "../../assets/audio/music/music_synthwave_loop_1.mp3";
-import { useSettingsStore, type SettingsState } from "../../state/settingsStore";
+import {
+  useSettingsStore,
+  type SettingsState,
+} from "../../state/settingsStore";
 
 const clamp01 = (v: number): number => Math.min(Math.max(v, 0), 1);
 
@@ -90,6 +93,23 @@ class AudioSystem {
     howl.play();
   }
 
+  playTimerTick(): void {
+    if (this.ctx === null) return;
+    const ctx = this.ctx;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(1040, now);
+    const peak = this.effectiveSfx() * 0.35;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(peak, now + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.16);
+  }
+
   startMusic(): void {
     this.wantMusic = true;
     if (this.musicPlaying) return;
@@ -111,7 +131,11 @@ class AudioSystem {
 
   setMusicIntensity(level: number): void {
     this.musicIntensity = clamp01(level);
-    if (this.ctx === null || this.musicFilter === null || this.musicGain === null) {
+    if (
+      this.ctx === null ||
+      this.musicFilter === null ||
+      this.musicGain === null
+    ) {
       return;
     }
     const now = this.ctx.currentTime;
@@ -141,7 +165,11 @@ class AudioSystem {
   }
 
   musicGameOver(): void {
-    if (this.ctx === null || this.musicFilter === null || this.musicGain === null) {
+    if (
+      this.ctx === null ||
+      this.musicFilter === null ||
+      this.musicGain === null
+    ) {
       return;
     }
     const now = this.ctx.currentTime;
@@ -199,11 +227,16 @@ class AudioSystem {
     if (this.ctx === null || this.musicGain === null) return;
     const now = this.ctx.currentTime;
     this.musicGain.gain.cancelScheduledValues(now);
-    this.musicGain.gain.linearRampToValueAtTime(this.effectiveMusic(), now + 0.1);
+    this.musicGain.gain.linearRampToValueAtTime(
+      this.effectiveMusic(),
+      now + 0.1,
+    );
   }
 
   private filterFreq(): number {
-    return FILTER_MIN_HZ + (FILTER_MAX_HZ - FILTER_MIN_HZ) * this.musicIntensity;
+    return (
+      FILTER_MIN_HZ + (FILTER_MAX_HZ - FILTER_MIN_HZ) * this.musicIntensity
+    );
   }
 
   private effectiveSfx(): number {

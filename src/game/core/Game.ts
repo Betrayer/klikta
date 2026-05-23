@@ -430,6 +430,7 @@ export class Game {
 
     const deltaMs = ticker.deltaMS;
     this.clockMs += deltaMs;
+    useRunStore.getState().tickElapsed(deltaMs);
     tweenManager.update(deltaMs);
     this.vfx?.update(deltaMs);
     this.camera?.update(deltaMs);
@@ -544,6 +545,7 @@ export class Game {
       elapsedMs: this.clockMs,
       score: run.score,
       hp: run.hp,
+      timeRemainingMs: run.timeRemainingMs,
     };
   }
 
@@ -618,6 +620,7 @@ export class Game {
 
     if (result.destroyed) {
       if (target.kind !== "bomb") {
+        this.mode.onHit(this.buildModeContext(), target.kind);
         if (result.score > 0) {
           let scaled =
             result.score * this.runMods.scoreMul * this.scoreMultiplier.current;

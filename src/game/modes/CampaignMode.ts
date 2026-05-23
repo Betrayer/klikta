@@ -3,6 +3,7 @@ import type { ModeContext, ModePolicy, PenaltyKind } from "./ModePolicy";
 
 export class CampaignMode implements ModePolicy {
   readonly id: ModeId = "campaign";
+  readonly initialTimeMs = 0;
 
   onRunStart(): void {}
 
@@ -11,6 +12,8 @@ export class CampaignMode implements ModePolicy {
   isRunOver(ctx: ModeContext): boolean {
     return ctx.hp <= 0;
   }
+
+  onHit(): void {}
 
   onMiss(): PenaltyKind {
     return "hp";

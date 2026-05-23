@@ -1,12 +1,15 @@
 import { Paper, Text } from '@mantine/core';
 import { useRunStore } from '../../state/runStore';
 import { ComboCounter } from '../components/ComboCounter';
+import { TimerReadout } from '../components/TimerReadout';
 import { UltimateBar } from '../components/UltimateBar';
 
 export const InGameHUD = () => {
   const score = useRunStore((s) => s.score);
   const hp = useRunStore((s) => s.hp);
+  const mode = useRunStore((s) => s.mode);
   const timePulseIncoming = useRunStore((s) => s.timePulseIncoming);
+  const usesTimer = mode === 'endless_timer';
 
   return (
     <>
@@ -29,20 +32,24 @@ export const InGameHUD = () => {
 
       <UltimateBar />
 
-      <Paper
-        pos="fixed"
-        top={8}
-        right={12}
-        px="sm"
-        py={4}
-        radius="sm"
-        bg="rgba(0, 0, 0, 0.4)"
-        style={{ pointerEvents: 'none', userSelect: 'none', zIndex: 10 }}
-      >
-        <Text ff="monospace" fz="lg" fw={700} c="#00f5d4">
-          {'♥'.repeat(hp) || '-'}
-        </Text>
-      </Paper>
+      {usesTimer ? (
+        <TimerReadout />
+      ) : (
+        <Paper
+          pos="fixed"
+          top={8}
+          right={12}
+          px="sm"
+          py={4}
+          radius="sm"
+          bg="rgba(0, 0, 0, 0.4)"
+          style={{ pointerEvents: 'none', userSelect: 'none', zIndex: 10 }}
+        >
+          <Text ff="monospace" fz="lg" fw={700} c="#00f5d4">
+            {'♥'.repeat(hp) || '-'}
+          </Text>
+        </Paper>
+      )}
 
       {timePulseIncoming && (
         <Paper

@@ -11,11 +11,13 @@ export const startNewRun = (): void => {
   const selected = useMetaStore.getState().selectedPerks;
   const resolver = EffectResolver.fromMetaSnapshot(selected);
   const mods = resolver.buildRunModifiers();
+  const policy = createModePolicy(mode);
   setActiveResolver(resolver);
-  setActiveModePolicy(createModePolicy(mode));
+  setActiveModePolicy(policy);
   useRunStore.getState().startRun({
     mode,
     startingHPAdd: mods.startingHPAdd,
     comboCap: mods.comboCap,
+    initialTimeMs: policy.initialTimeMs,
   });
 };

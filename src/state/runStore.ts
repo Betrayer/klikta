@@ -10,6 +10,7 @@ export interface StartRunOptions {
   mode?: ModeId;
   startingHPAdd?: number;
   comboCap?: number;
+  initialTimeMs?: number;
 }
 
 export interface AchievementAward {
@@ -42,6 +43,7 @@ export interface RunState {
   maxCombo: number;
   comboCap: number;
   elapsedMs: number;
+  timeRemainingMs: number;
   paused: boolean;
   timePulseIncoming: boolean;
   bombClicksThisRun: number;
@@ -58,6 +60,7 @@ export interface RunState {
   healHP: (amount: number) => void;
   fullHeal: () => void;
   tickElapsed: (ms: number) => void;
+  adjustTimeRemaining: (deltaMs: number) => void;
   setPaused: (paused: boolean) => void;
   setTimePulseIncoming: (incoming: boolean) => void;
   recordBombClick: () => void;
@@ -77,6 +80,7 @@ const freshRun = {
   maxCombo: 0,
   comboCap: DEFAULT_COMBO_CAP,
   elapsedMs: 0,
+  timeRemainingMs: 0,
   paused: false,
   timePulseIncoming: false,
   bombClicksThisRun: 0,
@@ -126,6 +130,7 @@ export const useRunStore = create<RunState>()(
             hp: maxHp,
             maxHp,
             comboCap: cap,
+            timeRemainingMs: opts?.initialTimeMs ?? 0,
           },
           false,
           "startRun",
@@ -178,6 +183,14 @@ export const useRunStore = create<RunState>()(
         set((s) => (s.hp === s.maxHp ? s : { hp: s.maxHp }), false, "fullHeal"),
       tickElapsed: (ms) =>
         set((s) => ({ elapsedMs: s.elapsedMs + ms }), false, "tickElapsed"),
+      adjustTimeRemaining: (deltaMs) =>
+        set(
+          (s) => ({
+            timeRemainingMs: Math.max(0, s.timeRemainingMs + deltaMs),
+          }),
+          false,
+          "adjustTimeRemaining",
+        ),
       setPaused: (paused) =>
         set((s) => (s.paused === paused ? s : { paused }), false, "setPaused"),
       setTimePulseIncoming: (incoming) =>

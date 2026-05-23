@@ -3,6 +3,7 @@ import type { ModeContext, ModePolicy, PenaltyKind } from "./ModePolicy";
 
 export class EndlessHPMode implements ModePolicy {
   readonly id: ModeId = "endless_hp";
+  readonly initialTimeMs = 0;
 
   onRunStart(): void {}
 
@@ -11,6 +12,8 @@ export class EndlessHPMode implements ModePolicy {
   isRunOver(ctx: ModeContext): boolean {
     return ctx.hp <= 0;
   }
+
+  onHit(): void {}
 
   onMiss(): PenaltyKind {
     return "hp";

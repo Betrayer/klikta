@@ -37,3 +37,15 @@ export const CHARGE_PER_HIT: Record<TargetKind, number> = {
 };
 export const CHARGE_PER_COMBO_MILESTONE = 5;
 export const MAX_CHARGE = 100;
+
+export const TIMER_INITIAL_MS = 30000;
+export const TIMER_LOW_WARNING_MS = 5000;
+export const TIMER_BOMB_PENALTY_MS = 3000;
+
+export const TIMER_GAIN_BY_KIND: Record<TargetKind, number> = {
+  regular: 300,
+  golden: 800,
+  multi: 1000,
+  shielded: 600,
+  bomb: 0,
+};
