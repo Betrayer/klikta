@@ -1,6 +1,4 @@
 import { Button, Center, Stack, Title } from '@mantine/core';
-import { startNewRun } from '../../game/runLauncher';
-import { MODES } from '../../data/modes';
 import { useAppStore } from '../../state/appStore';
 
 export const MainMenu = () => {
@@ -11,18 +9,15 @@ export const MainMenu = () => {
           KLIKTA
         </Title>
         <Stack gap="sm" w={260}>
-          {MODES.map((mode) => (
-            <Button
-              key={mode.id}
-              size="lg"
-              radius="xl"
-              color={mode.color}
-              onClick={() => startNewRun(mode.id)}
-              fullWidth
-            >
-              {mode.icon} {mode.name}
-            </Button>
-          ))}
+          <Button
+            size="lg"
+            radius="xl"
+            color="#ff006e"
+            onClick={() => useAppStore.getState().setScreen('mode-select')}
+            fullWidth
+          >
+            Play
+          </Button>
           <Button
             size="md"
             radius="xl"

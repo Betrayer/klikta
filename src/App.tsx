@@ -3,6 +3,7 @@ import { InGameHUD } from './shell/pages/InGameHUD';
 import { WaveBreak } from './shell/components/WaveBreak';
 import { SettingsOverlay } from './shell/components/SettingsOverlay';
 import { MainMenu } from './shell/pages/MainMenu';
+import { ModeSelect } from './shell/pages/ModeSelect';
 import { PostRunSummary } from './shell/pages/PostRunSummary';
 import { SkillTreeView } from './shell/pages/SkillTreeView';
 import { ClosedTest } from './shell/pages/ClosedTest';
@@ -37,6 +38,7 @@ export const App = () => {
   }
 
   if (status === 'gameOver') return <PostRunSummary />;
+  if (screen === 'mode-select') return <ModeSelect />;
   if (screen === 'skill-tree') return <SkillTreeView />;
   return <MainMenu />;
 };

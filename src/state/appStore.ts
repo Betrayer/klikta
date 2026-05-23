@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-export type Screen = "menu" | "skill-tree" | "settings";
+export type Screen = "menu" | "mode-select" | "skill-tree" | "settings";
 
 export interface AppState {
   screen: Screen;
