@@ -4,7 +4,8 @@ export type TargetKind =
   | "bomb"
   | "multi"
   | "shielded"
-  | "splitter";
+  | "splitter"
+  | "sticky";
 
 export interface TargetTypeConfig {
   score: number;
@@ -70,5 +71,14 @@ export const TARGET_CONFIG: Record<TargetKind, TargetTypeConfig> = {
     shrinks: true,
     clicksRequired: 1,
     spawnWeight: 0,
+  },
+  sticky: {
+    score: 15,
+    lifetimeMs: 4500,
+    radius: 34,
+    color: 0x2ec4b6,
+    shrinks: false,
+    clicksRequired: 1,
+    spawnWeight: 20,
   },
 };

@@ -34,6 +34,7 @@ export const CHARGE_PER_HIT: Record<TargetKind, number> = {
   multi: 2,
   shielded: 2.5,
   splitter: 1.5,
+  sticky: 1.5,
   bomb: 0,
 };
 export const CHARGE_PER_COMBO_MILESTONE = 5;
@@ -49,6 +50,7 @@ export const TIMER_GAIN_BY_KIND: Record<TargetKind, number> = {
   multi: 1000,
   shielded: 600,
   splitter: 400,
+  sticky: 400,
   bomb: 0,
 };
 
@@ -60,3 +62,20 @@ export const SPLITTER_FRAGMENT_SPREAD_MIN = 52;
 export const SPLITTER_FRAGMENT_SPREAD_RANGE = 64;
 
 export const VICTORY_BONUS_CURRENCY = 150;
+
+export const STICKY_SCORE_PER_CLICK = 15;
+export const STICKY_MAX_CLUSTER = 5;
+
+export const PHYSICS_BODY_CAP = 40;
+export const PHYSICS_SPEED_MIN = 2.4;
+export const PHYSICS_SPEED_RANGE = 2.6;
+export const PHYSICS_MAX_SPEED = 9;
+export const PHYSICS_SPIN_RANGE = 0.12;
+export const PHYSICS_RESTITUTION = 1;
+export const PHYSICS_WALL_THICKNESS = 120;
+export const PHYSICS_CLICK_IMPULSE = 7;
+export const PHYSICS_CLICK_RADIUS = 220;
+export const PHYSICS_INTERVAL_SCALE = 1.25;
+export const PHYSICS_MULTI_CLICKS = 2;
+export const PHYSICS_FIXED_STEP_MS = 1000 / 60;
+export const PHYSICS_MAX_SUBSTEPS = 5;

@@ -13,7 +13,13 @@ import { BombTarget } from "../entities/BombTarget";
 import { MultiTarget } from "../entities/MultiTarget";
 import { ShieldedTarget } from "../entities/ShieldedTarget";
 import { SplitterTarget } from "../entities/SplitterTarget";
-import { SpawnSystem, type SpawnEvent } from "../systems/SpawnSystem";
+import { StickyTarget } from "../entities/StickyTarget";
+import {
+  SpawnSystem,
+  PHYSICS_KIND_POOL,
+  type SpawnEvent,
+} from "../systems/SpawnSystem";
+import type { PhysicsEngine } from "../systems/PhysicsEngine";
 import { VFXSystem } from "../systems/VFXSystem";
 import { CameraSystem } from "../systems/CameraSystem";
 import { audioSystem } from "../systems/AudioSystem";
@@ -34,6 +40,12 @@ import {
   ACHIEVEMENT_REWARDS,
   CHARGE_PER_COMBO_MILESTONE,
   CHARGE_PER_HIT,
+  PHYSICS_BODY_CAP,
+  PHYSICS_CLICK_RADIUS,
+  PHYSICS_INTERVAL_SCALE,
+  PHYSICS_MULTI_CLICKS,
+  PHYSICS_SPEED_MIN,
+  PHYSICS_SPEED_RANGE,
   SCORE_PER_CURRENCY,
   SPLITTER_FRAGMENT_COUNT,
   SPLITTER_FRAGMENT_LIFETIME_MS,
@@ -98,6 +110,7 @@ export class Game {
   private clockMs = 0;
   private destroyed = false;
   private mode: ModePolicy = new EndlessHPMode();
+  private physics: PhysicsEngine | null = null;
   private runEnded = false;
 
   private resolver: EffectResolver = EffectResolver.empty();
@@ -167,6 +180,7 @@ export class Game {
     this.ultimateTimeScale = 1;
     this.hpRegenDisabled = false;
     this.runEnded = false;
+    this.physics = null;
     this.usedRunPerkIds.length = 0;
     this.waveBreakChoices = [];
     this.mode = getActiveModePolicy();
@@ -231,15 +245,28 @@ export class Game {
     const screen = app.renderer.screen;
     this.cursorX = screen.width / 2;
     this.cursorY = screen.height / 2;
+    const multiClicks =
+      this.mode.id === "physics_chaos"
+        ? (this.runMods.multiClicksOverride ?? PHYSICS_MULTI_CLICKS)
+        : this.runMods.multiClicksOverride;
     this.spawnSystem = new SpawnSystem(
       this.clockMs,
       this.spawnPolicy,
       this.targetMods,
       this.resolver.goldenLifetimeMul(),
-      this.runMods.multiClicksOverride,
+      multiClicks,
     );
     if (this.mode.id === "campaign") {
       this.spawnSystem.setWaveDriven(true);
+    }
+    if (this.mode.id === "physics_chaos") {
+      const { PhysicsEngine } = await import("../systems/PhysicsEngine");
+      if (this.destroyed || this.app === null) return;
+      const physics = new PhysicsEngine();
+      physics.init({ width: screen.width, height: screen.height });
+      this.physics = physics;
+      this.spawnSystem.setKindPool(PHYSICS_KIND_POOL);
+      this.spawnSystem.setIntervalScale(PHYSICS_INTERVAL_SCALE);
     }
     if (this.spawnPolicy.timePulse !== null) {
       this.timePulseNextStartMs =
@@ -311,6 +338,14 @@ export class Game {
     if (useRunStore.getState().paused) return;
     if (this.app === null || event.target !== this.app.stage) return;
 
+    if (this.physics !== null) {
+      this.physics.applyClickImpulse(
+        event.global.x,
+        event.global.y,
+        PHYSICS_CLICK_RADIUS,
+      );
+    }
+
     if (this.runMods.shieldedShieldBreaksOnMiss) {
       const broken = this.tryBreakNearestShield(event.global.x, event.global.y);
       if (broken) {
@@ -361,6 +396,10 @@ export class Game {
 
   private handleResize = (): void => {
     this.drawFlash();
+    if (this.physics !== null && this.app !== null) {
+      const { width, height } = this.app.renderer.screen;
+      this.physics.resize({ width, height });
+    }
   };
 
   private drawFlash(): void {
@@ -478,6 +517,12 @@ export class Game {
     if (this.ultimateSystem !== null) {
       const ctx = this.buildUltimateContext();
       if (ctx !== null) this.ultimateSystem.update(this.clockMs, ctx);
+    }
+
+    if (this.physics !== null) {
+      this.physics.update(deltaMs);
+      this.processStickyMerges();
+      this.physics.syncToTargets(this.targets);
     }
 
     const { width, height } = this.app.renderer.screen;
@@ -683,11 +728,14 @@ export class Game {
         return new ShieldedTarget(spawn, event.modifiers);
       case "splitter":
         return new SplitterTarget(spawn, event.modifiers);
+      case "sticky":
+        return new StickyTarget(spawn, event.modifiers);
     }
   }
 
   private spawnEvents(events: SpawnEvent[]): void {
     if (this.targetLayer === null) return;
+    if (this.physics !== null && this.targets.length >= PHYSICS_BODY_CAP) return;
     const spawned: Target[] = [];
     for (const event of events) {
       const target = this.createTarget(event);
@@ -695,6 +743,7 @@ export class Game {
       this.targetLayer.addChild(target.graphics);
       this.targets.push(target);
       spawned.push(target);
+      if (this.physics !== null) this.bindToPhysics(target);
     }
     if (
       this.spawnPolicy.mirrorSpawn &&
@@ -716,12 +765,17 @@ export class Game {
     const wasPhaseInvisible = target.isPhaseInvisible;
     const result = target.onClick();
 
+    if (this.physics !== null) {
+      this.physics.applyClickImpulse(target.x, target.y, PHYSICS_CLICK_RADIUS);
+    }
+
     if (result.effects.includes("lose_hp")) {
       audioSystem.playSFX("bomb_click");
       this.handleBombClick();
     }
 
     if (result.destroyed) {
+      this.physics?.removeTarget(target.id);
       if (target.kind !== "bomb") {
         this.mode.onHit(this.buildModeContext(), target.kind);
         if (result.score > 0) {
@@ -752,7 +806,7 @@ export class Game {
       }
       target.beginHitExit();
       this.killPair(target);
-    } else if (target.kind === "multi") {
+    } else if (target.kind === "multi" || target.kind === "sticky") {
       audioSystem.playSFX("hit_multi_partial");
       this.vfx?.emitSubHit(target.x, target.y, target.color);
     } else if (target.kind === "shielded") {
@@ -969,8 +1023,52 @@ export class Game {
   private removeTargetAt(index: number): void {
     const target = this.targets[index];
     if (target === undefined) return;
+    this.physics?.removeTarget(target.id);
     this.targets.splice(index, 1);
     target.destroy();
+  }
+
+  private bindToPhysics(target: Target): void {
+    if (this.physics === null) return;
+    target.physicsControlled = true;
+    const speed = PHYSICS_SPEED_MIN + Math.random() * PHYSICS_SPEED_RANGE;
+    const angle = Math.random() * Math.PI * 2;
+    this.physics.addTarget(
+      target,
+      Math.cos(angle) * speed,
+      Math.sin(angle) * speed,
+    );
+  }
+
+  private processStickyMerges(): void {
+    if (this.physics === null) return;
+    const pairs = this.physics.takeCollisions();
+    for (const [idA, idB] of pairs) {
+      const a = this.findSticky(idA);
+      const b = this.findSticky(idB);
+      if (a === null || b === null || a === b) continue;
+      if (!a.isInteractive || !b.isInteractive) continue;
+      const keep = a.cluster >= b.cluster ? a : b;
+      const gone = keep === a ? b : a;
+      const beforeRadius = keep.clusterRadius;
+      keep.absorb(gone);
+      this.physics.scaleBody(keep.id, keep.clusterRadius / beforeRadius);
+      this.removeTargetInstance(gone);
+      audioSystem.playSFX("hit_multi_partial");
+      this.vfx?.emitSubHit(keep.x, keep.y, keep.color);
+    }
+  }
+
+  private findSticky(id: string): StickyTarget | null {
+    for (const target of this.targets) {
+      if (target.id === id && target instanceof StickyTarget) return target;
+    }
+    return null;
+  }
+
+  private removeTargetInstance(target: Target): void {
+    const index = this.targets.indexOf(target);
+    if (index >= 0) this.removeTargetAt(index);
   }
 
   get fps(): number {
@@ -991,6 +1089,8 @@ export class Game {
       if (ctx !== null) this.ultimateSystem.forceCleanup(ctx);
       this.ultimateSystem = null;
     }
+    this.physics?.destroy();
+    this.physics = null;
     if (this.app === null) return;
     this.app.ticker.remove(this.tick);
     this.app.ticker.speed = 1;

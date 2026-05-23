@@ -37,7 +37,11 @@ const FRENZY_EXTRA_COUNT = 2;
 const CHAOS_RATE_MUL = 4;
 
 const KINDS = Object.keys(TARGET_CONFIG) as TargetKind[];
-const RANDOM_KINDS = KINDS.filter((k) => k !== "splitter");
+const RANDOM_KINDS = KINDS.filter((k) => k !== "splitter" && k !== "sticky");
+
+export const PHYSICS_KIND_POOL: readonly TargetKind[] = KINDS.filter(
+  (k) => k !== "splitter",
+);
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
@@ -55,8 +59,10 @@ export class SpawnSystem {
   private frenzyActive = false;
   private chaosActive = false;
   private extraRateMul = 1;
+  private intervalScale = 1;
   private waveDriven = false;
   private wavePlan: WaveDensity | null = null;
+  private kindPool: readonly TargetKind[] = RANDOM_KINDS;
 
   constructor(
     startTimeMs: number,
@@ -77,6 +83,14 @@ export class SpawnSystem {
   setWaveDriven(on: boolean): void {
     this.waveDriven = on;
     if (on) this.wavePlan = null;
+  }
+
+  setKindPool(pool: readonly TargetKind[]): void {
+    this.kindPool = pool;
+  }
+
+  setIntervalScale(scale: number): void {
+    this.intervalScale = scale > 0 ? scale : 1;
   }
 
   setWavePlan(plan: WaveDensity | null, currentTimeMs: number): void {
@@ -118,7 +132,8 @@ export class SpawnSystem {
       this.surgeMul(currentTimeMs) *
       (this.chaosActive ? CHAOS_RATE_MUL : 1) *
       this.extraRateMul;
-    this.nextSpawnAt = currentTimeMs + this.spawnIntervalMs / rateMul;
+    this.nextSpawnAt =
+      currentTimeMs + (this.spawnIntervalMs * this.intervalScale) / rateMul;
 
     this.targetCounter += 1;
     const forcedBomb =
@@ -206,15 +221,15 @@ export class SpawnSystem {
 
   private pickKind(): TargetKind {
     if (this.chaosActive) {
-      const idx = Math.floor(Math.random() * RANDOM_KINDS.length);
-      return RANDOM_KINDS[idx] ?? "regular";
+      const idx = Math.floor(Math.random() * this.kindPool.length);
+      return this.kindPool[idx] ?? "regular";
     }
 
     let total = 0;
-    for (const k of RANDOM_KINDS) total += this.weightOf(k);
+    for (const k of this.kindPool) total += this.weightOf(k);
 
     let roll = Math.random() * total;
-    for (const k of RANDOM_KINDS) {
+    for (const k of this.kindPool) {
       roll -= this.weightOf(k);
       if (roll < 0) return k;
     }
