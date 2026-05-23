@@ -1,10 +1,13 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { BASE_HP, DEFAULT_COMBO_CAP } from "../game/config/balance";
+import type { ModeId } from "../data/modes";
+import { DEFAULT_MODE } from "../data/modes";
 
 export type RunStatus = "idle" | "playing" | "gameOver";
 
 export interface StartRunOptions {
+  mode?: ModeId;
   startingHPAdd?: number;
   comboCap?: number;
 }
@@ -31,6 +34,7 @@ export interface RunResults {
 
 export interface RunState {
   status: RunStatus;
+  mode: ModeId;
   score: number;
   hp: number;
   maxHp: number;
@@ -65,6 +69,7 @@ export interface RunState {
 }
 
 const freshRun = {
+  mode: DEFAULT_MODE,
   score: 0,
   hp: BASE_HP,
   maxHp: BASE_HP,
@@ -117,6 +122,7 @@ export const useRunStore = create<RunState>()(
           {
             status: "playing",
             ...freshRun,
+            mode: opts?.mode ?? DEFAULT_MODE,
             hp: maxHp,
             maxHp,
             comboCap: cap,

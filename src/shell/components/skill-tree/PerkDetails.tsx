@@ -98,7 +98,7 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
   const reasonText: string | null = (() => {
     if (isSelected) return deselectBlockReason;
     if (!tierGateMet) {
-      return `Locked — need ${tier.requiresPointsInBranch} pts in ${branch.name}.`;
+      return `Locked - need ${tier.requiresPointsInBranch} pts in ${branch.name}.`;
     }
     if (!canAfford) {
       return `Need ${effectiveCost - currency} more.`;

@@ -35,7 +35,7 @@ const useAnimatedNumber = (target: number, durationMs: number): number => {
 
 export const CurrencyHeader = () => {
   const currency = useMetaStore((s) => s.currency);
-  const bestScore = useMetaStore((s) => s.bestScore);
+  const bestScore = useMetaStore((s) => s.bestScores.endless_hp ?? 0);
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
   const animatedCurrency = useAnimatedNumber(currency, 500);
 

@@ -5,7 +5,7 @@ export const MUTATION_BRANCH: SkillBranch = {
   id: "mutation",
   name: "Mutation",
   description:
-    "Distort the rules. Every perk gives both a cost and a reward — skill decides which dominates.",
+    "Distort the rules. Every perk gives both a cost and a reward - skill decides which dominates.",
   color: "#9d4edd",
   tiers: [
     {
@@ -34,7 +34,7 @@ export const MUTATION_BRANCH: SkillBranch = {
           id: "mutation-t1-convergent",
           name: "Convergent",
           description:
-            "All targets drift toward screen center at ~30 px/s. Tighter cluster — bombs too.",
+            "All targets drift toward screen center at ~30 px/s. Tighter cluster - bombs too.",
           icon: "🎯",
           cost: 100,
           effects: [{ kind: "convergentDriftSpeed", value: 30 }],
@@ -68,9 +68,7 @@ export const MUTATION_BRANCH: SkillBranch = {
             "Every hit leaves an 800 ms phantom. Clicking the phantom adds 30% bonus score without breaking combo.",
           icon: "🔁",
           cost: 300,
-          effects: [
-            { kind: "echoPhantomMs", duration: 800, bonusMul: 1.3 },
-          ],
+          effects: [{ kind: "echoPhantomMs", duration: 800, bonusMul: 1.3 }],
         },
         {
           id: "mutation-t2-magnet",

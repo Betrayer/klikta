@@ -40,7 +40,7 @@ export const InGameHUD = () => {
         style={{ pointerEvents: 'none', userSelect: 'none', zIndex: 10 }}
       >
         <Text ff="monospace" fz="lg" fw={700} c="#00f5d4">
-          {'♥'.repeat(hp) || '—'}
+          {'♥'.repeat(hp) || '-'}
         </Text>
       </Paper>
 

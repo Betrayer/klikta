@@ -78,7 +78,7 @@ export const SettingsOverlay = () => {
       >
         <Stack gap="lg">
           <Stack gap={4}>
-            <Text size="sm">Master — {toPercent(masterVolume)}%</Text>
+            <Text size="sm">Master - {toPercent(masterVolume)}%</Text>
             <Slider
               value={toPercent(masterVolume)}
               onChange={(v) => setMasterVolume(v / 100)}
@@ -88,7 +88,7 @@ export const SettingsOverlay = () => {
           </Stack>
 
           <Stack gap={4}>
-            <Text size="sm">SFX — {toPercent(sfxVolume)}%</Text>
+            <Text size="sm">SFX - {toPercent(sfxVolume)}%</Text>
             <Slider
               value={toPercent(sfxVolume)}
               onChange={(v) => setSFXVolume(v / 100)}
@@ -98,7 +98,7 @@ export const SettingsOverlay = () => {
           </Stack>
 
           <Stack gap={4}>
-            <Text size="sm">Music — {toPercent(musicVolume)}%</Text>
+            <Text size="sm">Music - {toPercent(musicVolume)}%</Text>
             <Slider
               value={toPercent(musicVolume)}
               onChange={(v) => setMusicVolume(v / 100)}

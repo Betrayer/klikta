@@ -725,8 +725,8 @@ export class Game {
     const achievementsTotal = achievements.reduce((s, a) => s + a.amount, 0);
     const endTotal = base + comboBonus + achievementsTotal;
     if (!disabled && endTotal > 0) meta.awardCurrency(endTotal);
-    const previousBestScore = meta.bestScore;
-    meta.recordRun(score);
+    const previousBestScore = meta.bestScores[run.mode] ?? 0;
+    meta.recordRun(run.mode, score);
 
     const breakdown: CurrencyBreakdown = {
       base,

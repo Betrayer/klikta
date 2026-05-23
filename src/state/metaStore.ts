@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+import type { ModeId } from "../data/modes";
 
 export interface MetaState {
   currency: number;
@@ -9,7 +10,7 @@ export interface MetaState {
 
   runsCompleted: number;
   totalRunScore: number;
-  bestScore: number;
+  bestScores: Partial<Record<ModeId, number>>;
   achievements: string[];
 
   awardCurrency: (amount: number) => void;
@@ -17,10 +18,24 @@ export interface MetaState {
   selectPerk: (tierKey: string, perkId: string) => void;
   unselectPerk: (tierKey: string) => void;
   unlockUltimate: (id: string) => void;
-  recordRun: (score: number) => void;
+  recordRun: (mode: ModeId, score: number) => void;
   unlockAchievement: (id: string) => boolean;
   resetAllProgress: () => void;
 }
+
+export const META_VERSION = 2;
+
+export const migrateMeta = (persisted: unknown, version: number): MetaState => {
+  const data: Record<string, unknown> = {
+    ...(persisted as Record<string, unknown> | null),
+  };
+  if (version < META_VERSION) {
+    const legacyBest = typeof data.bestScore === "number" ? data.bestScore : 0;
+    delete data.bestScore;
+    data.bestScores = legacyBest > 0 ? { endless_hp: legacyBest } : {};
+  }
+  return data as unknown as MetaState;
+};
 
 const initialMeta = {
   currency: 0,
@@ -29,7 +44,7 @@ const initialMeta = {
   unlockedUltimates: [] as string[],
   runsCompleted: 0,
   totalRunScore: 0,
-  bestScore: 0,
+  bestScores: {} as Partial<Record<ModeId, number>>,
   achievements: [] as string[],
 };
 
@@ -87,12 +102,15 @@ export const useMetaStore = create<MetaState>()(
             "unlockUltimate",
           ),
 
-        recordRun: (score) =>
+        recordRun: (mode, score) =>
           set(
             (s) => ({
               runsCompleted: s.runsCompleted + 1,
               totalRunScore: s.totalRunScore + score,
-              bestScore: Math.max(s.bestScore, score),
+              bestScores: {
+                ...s.bestScores,
+                [mode]: Math.max(s.bestScores[mode] ?? 0, score),
+              },
             }),
             false,
             "recordRun",
@@ -114,8 +132,8 @@ export const useMetaStore = create<MetaState>()(
       }),
       {
         name: "klikta-meta-v1",
-        version: 1,
-        migrate: (persistedState) => persistedState as MetaState,
+        version: META_VERSION,
+        migrate: migrateMeta,
         partialize: (state) => ({
           currency: state.currency,
           totalEarnedCurrency: state.totalEarnedCurrency,
@@ -123,7 +141,7 @@ export const useMetaStore = create<MetaState>()(
           unlockedUltimates: state.unlockedUltimates,
           runsCompleted: state.runsCompleted,
           totalRunScore: state.totalRunScore,
-          bestScore: state.bestScore,
+          bestScores: state.bestScores,
           achievements: state.achievements,
         }),
       },
