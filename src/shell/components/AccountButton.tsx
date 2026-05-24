@@ -1,13 +1,14 @@
 import { Button, Stack, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { useAuthStore } from "../../state/authStore";
+import { AuthModal } from "./AuthModal";
 
 export const AccountButton = () => {
   const status = useAuthStore((s) => s.status);
   const account = useAuthStore((s) => s.account);
   const busy = useAuthStore((s) => s.busy);
-  const error = useAuthStore((s) => s.error);
-  const signInWithGoogle = useAuthStore((s) => s.signInWithGoogle);
   const signOutAccount = useAuthStore((s) => s.signOutAccount);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const synced =
     status === "signed-in" && account !== null && !account.isAnonymous;
@@ -32,23 +33,18 @@ export const AccountButton = () => {
   }
 
   return (
-    <Stack gap={4} align="center" w="100%">
+    <>
       <Button
         size="md"
         radius="xl"
         variant="light"
         color="#00f0ff"
-        loading={busy}
-        onClick={() => void signInWithGoogle()}
+        onClick={open}
         fullWidth
       >
         Sign in to sync
       </Button>
-      {error !== null && (
-        <Text size="xs" c="red">
-          {error}
-        </Text>
-      )}
-    </Stack>
+      <AuthModal opened={opened} onClose={close} />
+    </>
   );
 };
