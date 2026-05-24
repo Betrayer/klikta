@@ -1,12 +1,16 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { BASE_HP, DEFAULT_COMBO_CAP } from "../game/config/balance";
+import type { ModeId } from "../data/modes";
+import { DEFAULT_MODE } from "../data/modes";
 
 export type RunStatus = "idle" | "playing" | "gameOver";
 
 export interface StartRunOptions {
+  mode?: ModeId;
   startingHPAdd?: number;
   comboCap?: number;
+  initialTimeMs?: number;
 }
 
 export interface AchievementAward {
@@ -19,6 +23,7 @@ export interface CurrencyBreakdown {
   comboBonus: number;
   bombBounty: number;
   comboCoin: number;
+  victoryBonus: number;
   achievements: AchievementAward[];
   total: number;
 }
@@ -31,6 +36,7 @@ export interface RunResults {
 
 export interface RunState {
   status: RunStatus;
+  mode: ModeId;
   score: number;
   hp: number;
   maxHp: number;
@@ -38,7 +44,9 @@ export interface RunState {
   maxCombo: number;
   comboCap: number;
   elapsedMs: number;
+  timeRemainingMs: number;
   paused: boolean;
+  victory: boolean;
   timePulseIncoming: boolean;
   bombClicksThisRun: number;
   currencyEarned: number;
@@ -50,21 +58,25 @@ export interface RunState {
   registerHit: (baseScore: number) => void;
   addScore: (amount: number) => void;
   resetCombo: () => void;
-  loseHP: () => void;
   loseHPBy: (amount: number) => void;
   healHP: (amount: number) => void;
   fullHeal: () => void;
+  addMaxHP: (amount: number) => void;
+  setComboCap: (cap: number) => void;
   tickElapsed: (ms: number) => void;
+  adjustTimeRemaining: (deltaMs: number) => void;
   setPaused: (paused: boolean) => void;
   setTimePulseIncoming: (incoming: boolean) => void;
   recordBombClick: () => void;
   recordRunResults: (results: RunResults) => void;
+  endRun: (victory?: boolean) => void;
   setUltimateCharges: (charges: Record<string, number>) => void;
   setActiveUltimate: (id: string | null) => void;
   reset: () => void;
 }
 
 const freshRun = {
+  mode: DEFAULT_MODE,
   score: 0,
   hp: BASE_HP,
   maxHp: BASE_HP,
@@ -72,7 +84,9 @@ const freshRun = {
   maxCombo: 0,
   comboCap: DEFAULT_COMBO_CAP,
   elapsedMs: 0,
+  timeRemainingMs: 0,
   paused: false,
+  victory: false,
   timePulseIncoming: false,
   bombClicksThisRun: 0,
   currencyEarned: 0,
@@ -117,9 +131,11 @@ export const useRunStore = create<RunState>()(
           {
             status: "playing",
             ...freshRun,
+            mode: opts?.mode ?? DEFAULT_MODE,
             hp: maxHp,
             maxHp,
             comboCap: cap,
+            timeRemainingMs: opts?.initialTimeMs ?? 0,
           },
           false,
           "startRun",
@@ -149,22 +165,11 @@ export const useRunStore = create<RunState>()(
         ),
       resetCombo: () =>
         set((s) => (s.combo === 0 ? s : { combo: 0 }), false, "resetCombo"),
-      loseHP: () =>
-        set(
-          (s) => {
-            if (s.hp <= 0) return s;
-            const hp = s.hp - 1;
-            return hp <= 0 ? { hp: 0, status: "gameOver" } : { hp };
-          },
-          false,
-          "loseHP",
-        ),
       loseHPBy: (amount) =>
         set(
           (s) => {
             if (s.hp <= 0 || amount <= 0) return s;
-            const hp = s.hp - amount;
-            return hp <= 0 ? { hp: 0, status: "gameOver" } : { hp };
+            return { hp: clampHP(s.hp - amount, s.maxHp) };
           },
           false,
           "loseHPBy",
@@ -181,8 +186,32 @@ export const useRunStore = create<RunState>()(
         ),
       fullHeal: () =>
         set((s) => (s.hp === s.maxHp ? s : { hp: s.maxHp }), false, "fullHeal"),
+      addMaxHP: (amount) =>
+        set(
+          (s) => {
+            if (amount <= 0) return s;
+            const maxHp = s.maxHp + amount;
+            return { maxHp, hp: clampHP(s.hp + amount, maxHp) };
+          },
+          false,
+          "addMaxHP",
+        ),
+      setComboCap: (cap) =>
+        set(
+          (s) => (s.comboCap === cap ? s : { comboCap: cap }),
+          false,
+          "setComboCap",
+        ),
       tickElapsed: (ms) =>
         set((s) => ({ elapsedMs: s.elapsedMs + ms }), false, "tickElapsed"),
+      adjustTimeRemaining: (deltaMs) =>
+        set(
+          (s) => ({
+            timeRemainingMs: Math.max(0, s.timeRemainingMs + deltaMs),
+          }),
+          false,
+          "adjustTimeRemaining",
+        ),
       setPaused: (paused) =>
         set((s) => (s.paused === paused ? s : { paused }), false, "setPaused"),
       setTimePulseIncoming: (incoming) =>
@@ -209,6 +238,13 @@ export const useRunStore = create<RunState>()(
           },
           false,
           "recordRunResults",
+        ),
+      endRun: (victory = false) =>
+        set(
+          (s) =>
+            s.status === "gameOver" ? s : { status: "gameOver", victory },
+          false,
+          "endRun",
         ),
       setUltimateCharges: (charges) =>
         set({ ultimateCharges: charges }, false, "setUltimateCharges"),

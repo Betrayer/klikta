@@ -1,6 +1,6 @@
 import { Button, Center, Stack, Title } from '@mantine/core';
-import { startNewRun } from '../../game/runLauncher';
 import { useAppStore } from '../../state/appStore';
+import { AccountButton } from '../components/AccountButton';
 
 export const MainMenu = () => {
   return (
@@ -9,15 +9,15 @@ export const MainMenu = () => {
         <Title order={1} fz={96} fw={900} c="#ff006e" lts={8}>
           KLIKTA
         </Title>
-        <Stack gap="sm" w={240}>
+        <Stack gap="sm" w={260}>
           <Button
-            size="xl"
+            size="lg"
             radius="xl"
             color="#ff006e"
-            onClick={startNewRun}
+            onClick={() => useAppStore.getState().setScreen('mode-select')}
             fullWidth
           >
-            Start
+            Play
           </Button>
           <Button
             size="md"
@@ -29,6 +29,7 @@ export const MainMenu = () => {
           >
             Skills
           </Button>
+          <AccountButton />
         </Stack>
       </Stack>
     </Center>

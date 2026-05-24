@@ -87,7 +87,7 @@ export const REACTION_BRANCH: SkillBranch = {
           id: "reaction-t3-slow-spawn",
           name: "Slow Spawn",
           description:
-            "Spawn animation is 50% slower — you see targets sooner.",
+            "Spawn animation is 50% slower - you see targets sooner.",
           icon: "👁️",
           cost: 700,
           effects: [{ kind: "spawnAnimMul", value: 1.5 }],

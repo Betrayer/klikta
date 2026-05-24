@@ -55,6 +55,7 @@ export abstract class Target {
   currentSize: number;
   phase: TargetPhase = "spawning";
   pairTarget: Target | null = null;
+  physicsControlled = false;
 
   protected readonly config: TargetTypeConfig;
   protected readonly initialSize: number;
@@ -197,6 +198,7 @@ export abstract class Target {
   }
 
   private applyDrift(deltaMs: number, ctx: TargetUpdateContext): void {
+    if (this.physicsControlled) return;
     if (!this.isInteractive) return;
     const conv = this.modifiers.convergentDriftSpeed;
     const mag = this.modifiers.magnetSpeed;

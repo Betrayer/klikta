@@ -1,4 +1,5 @@
 import { TARGET_CONFIG, type TargetKind } from "../../data/targetConfig";
+import type { WaveDensity } from "../../data/waves";
 import {
   DEFAULT_SPAWN_POLICY,
   DEFAULT_TARGET_MODIFIERS,
@@ -36,6 +37,11 @@ const FRENZY_EXTRA_COUNT = 2;
 const CHAOS_RATE_MUL = 4;
 
 const KINDS = Object.keys(TARGET_CONFIG) as TargetKind[];
+const RANDOM_KINDS = KINDS.filter((k) => k !== "splitter" && k !== "sticky");
+
+export const PHYSICS_KIND_POOL: readonly TargetKind[] = KINDS.filter(
+  (k) => k !== "splitter",
+);
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
@@ -45,14 +51,18 @@ export class SpawnSystem {
   private nextSpawnAt: number;
   private nextDecayAt: number;
   private readonly startTimeMs: number;
-  private readonly policy: SpawnPolicy;
-  private readonly baseModifiers: TargetSpawnModifiers;
-  private readonly goldenLifetimeMul: number;
-  private readonly multiClicksOverride: number | null;
+  private policy: SpawnPolicy;
+  private baseModifiers: TargetSpawnModifiers;
+  private goldenLifetimeMul: number;
+  private multiClicksOverride: number | null;
   private targetCounter = 0;
   private frenzyActive = false;
   private chaosActive = false;
   private extraRateMul = 1;
+  private intervalScale = 1;
+  private waveDriven = false;
+  private wavePlan: WaveDensity | null = null;
+  private kindPool: readonly TargetKind[] = RANDOM_KINDS;
 
   constructor(
     startTimeMs: number,
@@ -70,7 +80,45 @@ export class SpawnSystem {
     this.nextDecayAt = startTimeMs + DECAY_EVERY_MS;
   }
 
+  setWaveDriven(on: boolean): void {
+    this.waveDriven = on;
+    if (on) this.wavePlan = null;
+  }
+
+  setKindPool(pool: readonly TargetKind[]): void {
+    this.kindPool = pool;
+  }
+
+  setIntervalScale(scale: number): void {
+    this.intervalScale = scale > 0 ? scale : 1;
+  }
+
+  setWavePlan(plan: WaveDensity | null, currentTimeMs: number): void {
+    this.wavePlan = plan;
+    if (plan !== null) this.nextSpawnAt = currentTimeMs + plan.intervalMs;
+  }
+
+  reconfigure(
+    policy: SpawnPolicy,
+    baseModifiers: TargetSpawnModifiers,
+    goldenLifetimeMul: number,
+    multiClicksOverride: number | null,
+  ): void {
+    this.policy = policy;
+    this.baseModifiers = baseModifiers;
+    this.goldenLifetimeMul = goldenLifetimeMul;
+    this.multiClicksOverride = multiClicksOverride;
+  }
+
   tick(currentTimeMs: number, bounds: SpawnBounds): SpawnEvent[] {
+    if (this.waveDriven) {
+      const plan = this.wavePlan;
+      if (plan === null || currentTimeMs < this.nextSpawnAt) return [];
+      this.nextSpawnAt = currentTimeMs + plan.intervalMs;
+      const kind = this.pickWaveKind(plan.weights);
+      return [this.buildEvent(kind, bounds, false)];
+    }
+
     if (currentTimeMs >= this.nextDecayAt) {
       this.spawnIntervalMs = Math.max(
         this.spawnIntervalMs * DECAY_FACTOR,
@@ -84,7 +132,8 @@ export class SpawnSystem {
       this.surgeMul(currentTimeMs) *
       (this.chaosActive ? CHAOS_RATE_MUL : 1) *
       this.extraRateMul;
-    this.nextSpawnAt = currentTimeMs + this.spawnIntervalMs / rateMul;
+    this.nextSpawnAt =
+      currentTimeMs + (this.spawnIntervalMs * this.intervalScale) / rateMul;
 
     this.targetCounter += 1;
     const forcedBomb =
@@ -163,26 +212,40 @@ export class SpawnSystem {
     };
   }
 
+  private weightOf(kind: TargetKind): number {
+    const base = TARGET_CONFIG[kind].spawnWeight;
+    if (kind === "golden") return base * this.policy.goldenSpawnWeightMul;
+    if (kind === "bomb") return base * this.policy.bombSpawnWeightMul;
+    return base;
+  }
+
   private pickKind(): TargetKind {
     if (this.chaosActive) {
-      const idx = Math.floor(Math.random() * KINDS.length);
-      return KINDS[idx] ?? "regular";
+      const idx = Math.floor(Math.random() * this.kindPool.length);
+      return this.kindPool[idx] ?? "regular";
     }
-    const weights: Record<TargetKind, number> = {
-      regular: TARGET_CONFIG.regular.spawnWeight,
-      golden:
-        TARGET_CONFIG.golden.spawnWeight * this.policy.goldenSpawnWeightMul,
-      bomb: TARGET_CONFIG.bomb.spawnWeight * this.policy.bombSpawnWeightMul,
-      multi: TARGET_CONFIG.multi.spawnWeight,
-      shielded: TARGET_CONFIG.shielded.spawnWeight,
-    };
 
     let total = 0;
-    for (const k of KINDS) total += weights[k];
+    for (const k of this.kindPool) total += this.weightOf(k);
 
     let roll = Math.random() * total;
-    for (const k of KINDS) {
-      roll -= weights[k];
+    for (const k of this.kindPool) {
+      roll -= this.weightOf(k);
+      if (roll < 0) return k;
+    }
+    return "regular";
+  }
+
+  private pickWaveKind(
+    weights: Partial<Record<TargetKind, number>>,
+  ): TargetKind {
+    const entries = Object.entries(weights) as [TargetKind, number][];
+    let total = 0;
+    for (const [, w] of entries) total += w;
+    if (total <= 0) return "regular";
+    let roll = Math.random() * total;
+    for (const [k, w] of entries) {
+      roll -= w;
       if (roll < 0) return k;
     }
     return "regular";

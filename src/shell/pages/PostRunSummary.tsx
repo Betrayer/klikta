@@ -109,7 +109,8 @@ interface CurrencyLine {
 }
 
 const handlePlayAgain = (): void => {
-  startNewRun();
+  const mode = useRunStore.getState().mode;
+  startNewRun(mode);
 };
 
 const handleSkillTree = (): void => {
@@ -128,9 +129,12 @@ export const PostRunSummary = () => {
   const elapsedMs = useRunStore((s) => s.elapsedMs);
   const breakdown = useRunStore((s) => s.currencyBreakdown);
   const previousBest = useRunStore((s) => s.previousBestScore);
+  const victory = useRunStore((s) => s.victory);
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
 
   const isNewBest = score > 0 && score > previousBest;
+  const titleText = victory ? 'VICTORY' : 'RUN OVER';
+  const titleColor = victory ? '#ffd700' : '#ff006e';
   const displayedScore = useCountUp(score, SCORE_COUNTUP_MS, 0);
   const displayedCombo = useCountUp(maxCombo, SCORE_COUNTUP_MS, 100);
 
@@ -145,6 +149,14 @@ export const PostRunSummary = () => {
         key: 'combo',
         label: 'Combo Bonus',
         amount: breakdown.comboBonus,
+      });
+    }
+    if (breakdown.victoryBonus > 0) {
+      lines.push({
+        key: 'victory',
+        label: 'Victory Bonus',
+        amount: breakdown.victoryBonus,
+        highlight: true,
       });
     }
     if (breakdown.bombBounty > 0) {
@@ -189,8 +201,8 @@ export const PostRunSummary = () => {
         <Container size={720} w="100%">
           <Stack gap="lg">
             <Stack gap={4} align="center">
-              <Title order={1} fz={56} fw={900} c="#ff006e" lts={4}>
-                RUN OVER
+              <Title order={1} fz={56} fw={900} c={titleColor} lts={4}>
+                {titleText}
               </Title>
               {isNewBest && (
                 <Badge
