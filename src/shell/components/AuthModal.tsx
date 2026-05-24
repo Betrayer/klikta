@@ -23,6 +23,7 @@ const MESSAGES: Record<string, string> = {
   "auth/too-many-requests": "Too many attempts. Try again later.",
   "auth/operation-not-allowed": "Email sign-in is not enabled yet.",
   "auth/network-request-failed": "Network error. Check your connection.",
+  "auth/telegram-failed": "Telegram sign-in failed. Try again.",
   "auth/reset-email-sent": "Password reset link sent to your email.",
   "auth/unknown": "Something went wrong. Try again.",
 };
@@ -41,6 +42,7 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
   const error = useAuthStore((s) => s.error);
   const notice = useAuthStore((s) => s.notice);
   const signInWithGoogle = useAuthStore((s) => s.signInWithGoogle);
+  const signInWithTelegram = useAuthStore((s) => s.signInWithTelegram);
   const signUpWithEmail = useAuthStore((s) => s.signUpWithEmail);
   const signInWithEmail = useAuthStore((s) => s.signInWithEmail);
   const resetPassword = useAuthStore((s) => s.resetPassword);
@@ -51,6 +53,10 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
   const [nickname, setNickname] = useState("");
 
   const inTelegram = isTelegramEnvironment();
+
+  const onTelegram = async () => {
+    if (await signInWithTelegram()) onClose();
+  };
 
   const submit = async () => {
     const ok =
@@ -66,28 +72,31 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
     (mode === "signin" || nickname.trim().length > 0);
 
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title="Sync your progress"
-      centered
-    >
+    <Modal opened={opened} onClose={onClose} title="Sync your progress" centered>
       <Stack gap="md">
-        {!inTelegram && (
-          <>
-            <Button
-              variant="light"
-              color="#00f0ff"
-              radius="xl"
-              loading={busy}
-              onClick={() => void signInWithGoogle()}
-              fullWidth
-            >
-              Continue with Google
-            </Button>
-            <Divider label="or with email" />
-          </>
+        {inTelegram ? (
+          <Button
+            color="#229ed9"
+            radius="xl"
+            loading={busy}
+            onClick={() => void onTelegram()}
+            fullWidth
+          >
+            Continue with Telegram
+          </Button>
+        ) : (
+          <Button
+            variant="light"
+            color="#00f0ff"
+            radius="xl"
+            loading={busy}
+            onClick={() => void signInWithGoogle()}
+            fullWidth
+          >
+            Continue with Google
+          </Button>
         )}
+        <Divider label="or with email" />
 
         <SegmentedControl
           value={mode}
@@ -150,13 +159,6 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
         {notice !== null && (
           <Text size="sm" c="teal">
             {messageFor(notice)}
-          </Text>
-        )}
-
-        {inTelegram && (
-          <Text size="xs" c="dimmed">
-            Seamless Telegram sign-in is coming soon. Email works across web and
-            Telegram with the same account.
           </Text>
         )}
 

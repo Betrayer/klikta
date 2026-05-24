@@ -10,6 +10,7 @@ import {
   onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithCredential,
+  signInWithCustomToken,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -17,6 +18,9 @@ import {
   type User,
 } from "firebase/auth";
 import { auth } from "../services/firebase";
+import { retrieveRawInitData } from "@tma.js/sdk";
+import { getTelegramSession } from "../services/telegram";
+import { requestTelegramToken } from "../services/telegramAuth";
 
 export type AccountProvider = "anonymous" | "google" | "email" | "telegram";
 
@@ -42,6 +46,7 @@ export interface AuthState {
     nickname: string,
   ) => Promise<boolean>;
   signInWithEmail: (email: string, password: string) => Promise<boolean>;
+  signInWithTelegram: () => Promise<boolean>;
   resetPassword: (email: string) => Promise<void>;
   signOutAccount: () => Promise<void>;
 }
@@ -173,6 +178,41 @@ export const useAuthStore = create<AuthState>()(
             false,
             "signInWithEmail/error",
           );
+          return false;
+        }
+      },
+
+      signInWithTelegram: async () => {
+        set(
+          { busy: true, error: null, notice: null },
+          false,
+          "signInWithTelegram/start",
+        );
+        try {
+          const initData = retrieveRawInitData();
+          if (!initData) throw new Error("no-init-data");
+          const token = await requestTelegramToken(initData);
+          const result = await signInWithCustomToken(auth, token);
+          const tgName = getTelegramSession().firstName;
+          if (tgName !== null && result.user.displayName === null) {
+            await updateProfile(result.user, { displayName: tgName });
+          }
+          set(
+            {
+              busy: false,
+              status: "signed-in",
+              account: toAccount(result.user),
+            },
+            false,
+            "signInWithTelegram/done",
+          );
+          return true;
+        } catch (error) {
+          const code =
+            error instanceof FirebaseError
+              ? error.code
+              : "auth/telegram-failed";
+          set({ busy: false, error: code }, false, "signInWithTelegram/error");
           return false;
         }
       },
