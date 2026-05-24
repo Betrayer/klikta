@@ -29,6 +29,16 @@ export const MainMenu = () => {
           >
             Skills
           </Button>
+          <Button
+            size="md"
+            radius="xl"
+            variant="outline"
+            color="#ffd700"
+            onClick={() => useAppStore.getState().setScreen('leaderboard')}
+            fullWidth
+          >
+            Leaderboard
+          </Button>
           <AccountButton />
         </Stack>
       </Stack>

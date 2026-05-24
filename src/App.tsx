@@ -6,6 +6,7 @@ import { MainMenu } from './shell/pages/MainMenu';
 import { ModeSelect } from './shell/pages/ModeSelect';
 import { PostRunSummary } from './shell/pages/PostRunSummary';
 import { SkillTreeView } from './shell/pages/SkillTreeView';
+import { LeaderboardView } from './shell/pages/LeaderboardView';
 import { ClosedTest } from './shell/pages/ClosedTest';
 import { WebGate } from './shell/pages/WebGate';
 import { useRunStore } from './state/runStore';
@@ -40,5 +41,6 @@ export const App = () => {
   if (status === 'gameOver') return <PostRunSummary />;
   if (screen === 'mode-select') return <ModeSelect />;
   if (screen === 'skill-tree') return <SkillTreeView />;
+  if (screen === 'leaderboard') return <LeaderboardView />;
   return <MainMenu />;
 };
