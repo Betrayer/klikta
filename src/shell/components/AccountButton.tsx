@@ -1,5 +1,6 @@
 import { Button, Stack, Text } from "@mantine/core";
 import { useAuthStore } from "../../state/authStore";
+import { isTelegramEnvironment } from "../../services/telegram";
 
 export const AccountButton = () => {
   const status = useAuthStore((s) => s.status);
@@ -28,6 +29,15 @@ export const AccountButton = () => {
           Sign out
         </Button>
       </Stack>
+    );
+  }
+
+  if (isTelegramEnvironment()) {
+    return (
+      <Text size="sm" c="dimmed" ta="center">
+        Telegram sign-in is coming soon. Progress is saved on this device for
+        now.
+      </Text>
     );
   }
 

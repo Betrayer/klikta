@@ -36,6 +36,9 @@ let session: TelegramSession = browserSession;
 
 export const getTelegramSession = (): TelegramSession => session;
 
+export const isTelegramEnvironment = (): boolean =>
+  session.isTelegram || isTMA();
+
 export const isTelegramAccessAllowed = (): boolean => {
   if (!session.isTelegram) return true;
   if (TELEGRAM_USER_ALLOWLIST.length === 0) return true;
