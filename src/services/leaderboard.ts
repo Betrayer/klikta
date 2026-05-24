@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { auth, db, ensureAuth } from "./firebase";
 import { useAuthStore } from "../state/authStore";
+import { getTelegramSession } from "./telegram";
 import { MODE_BY_ID, type ModeId } from "../data/modes";
 
 export const SCORE_SCHEMA_VERSION = "p4";
@@ -84,10 +85,14 @@ interface Identity {
 
 const resolveIdentity = async (): Promise<Identity> => {
   const account = useAuthStore.getState().account;
-  if (account !== null) {
+  if (account !== null && !account.isAnonymous) {
     return { uid: account.uid, displayName: account.displayName };
   }
   const uid = await ensureAuth();
+  const telegramName = getTelegramSession().firstName;
+  if (telegramName !== null && telegramName.trim().length > 0) {
+    return { uid, displayName: sanitizeDisplayName(telegramName) };
+  }
   const name = auth.currentUser?.displayName ?? fallbackName(uid);
   return { uid, displayName: name };
 };
