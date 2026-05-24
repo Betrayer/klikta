@@ -8,5 +8,24 @@ service cloud.firestore {
         && request.auth.uid == uid
         && request.resource.data.updatedAt is number;
     }
+
+    match /leaderboards/{mode}/scores/{uid} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.uid == uid
+        && request.resource.data.mode == mode
+        && request.resource.data.value is number
+        && request.resource.data.value >= 0
+        && request.resource.data.value < 100000000;
+      allow update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.uid == uid
+        && request.resource.data.mode == mode
+        && request.resource.data.value is number
+        && request.resource.data.value > resource.data.value
+        && request.resource.data.value < 100000000;
+      allow delete: if false;
+    }
   }
 }

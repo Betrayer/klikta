@@ -24,6 +24,13 @@ import {
 import { useAppStore } from '../../state/appStore';
 import { useMetaStore } from '../../state/metaStore';
 import { useRunStore } from '../../state/runStore';
+import type { ModeId } from '../../data/modes';
+import {
+  getLeaderboardValue,
+  submitScore,
+  type ScoreMeta,
+  type SubmitResult,
+} from '../../services/leaderboard';
 
 const ACHIEVEMENT_NAMES: Readonly<Record<string, string>> = {
   'first-run': 'First Run',
@@ -108,6 +115,23 @@ interface CurrencyLine {
   highlight?: boolean;
 }
 
+let lastSubmitKey: string | null = null;
+let lastSubmitPromise: Promise<SubmitResult> | null = null;
+
+const submitRunOnce = (
+  key: string,
+  mode: ModeId,
+  value: number,
+  meta: ScoreMeta,
+): Promise<SubmitResult> => {
+  if (lastSubmitKey === key && lastSubmitPromise !== null) {
+    return lastSubmitPromise;
+  }
+  lastSubmitKey = key;
+  lastSubmitPromise = submitScore(mode, value, meta);
+  return lastSubmitPromise;
+};
+
 const handlePlayAgain = (): void => {
   const mode = useRunStore.getState().mode;
   startNewRun(mode);
@@ -116,6 +140,11 @@ const handlePlayAgain = (): void => {
 const handleSkillTree = (): void => {
   useRunStore.getState().reset();
   useAppStore.getState().setScreen('skill-tree');
+};
+
+const handleLeaderboard = (): void => {
+  useRunStore.getState().reset();
+  useAppStore.getState().setScreen('leaderboard');
 };
 
 const handleMainMenu = (): void => {
@@ -127,10 +156,33 @@ export const PostRunSummary = () => {
   const score = useRunStore((s) => s.score);
   const maxCombo = useRunStore((s) => s.maxCombo);
   const elapsedMs = useRunStore((s) => s.elapsedMs);
+  const mode = useRunStore((s) => s.mode);
   const breakdown = useRunStore((s) => s.currencyBreakdown);
   const previousBest = useRunStore((s) => s.previousBestScore);
   const victory = useRunStore((s) => s.victory);
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
+
+  const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null);
+  const [submitting, setSubmitting] = useState(true);
+
+  useEffect(() => {
+    const value = getLeaderboardValue(mode, { score, durationMs: elapsedMs });
+    const meta: ScoreMeta = {
+      durationMs: elapsedMs,
+      maxCombo,
+      build: Object.values(selectedPerks),
+    };
+    const key = `${mode}:${score}:${elapsedMs}`;
+    let cancelled = false;
+    submitRunOnce(key, mode, value, meta).then((result) => {
+      if (cancelled) return;
+      setSubmitting(false);
+      setSubmitResult(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, score, elapsedMs, maxCombo, selectedPerks]);
 
   const isNewBest = score > 0 && score > previousBest;
   const titleText = victory ? 'VICTORY' : 'RUN OVER';
@@ -218,6 +270,7 @@ export const PostRunSummary = () => {
                   NEW BEST
                 </Badge>
               )}
+              <RankLine submitting={submitting} result={submitResult} />
             </Stack>
 
             <Paper p="lg" bg="#0d0118" withBorder>
@@ -356,6 +409,15 @@ export const PostRunSummary = () => {
               <Button
                 size="md"
                 radius="xl"
+                variant="outline"
+                color="#ffd700"
+                onClick={handleLeaderboard}
+              >
+                Leaderboard
+              </Button>
+              <Button
+                size="md"
+                radius="xl"
                 variant="subtle"
                 color="gray"
                 onClick={handleMainMenu}
@@ -395,4 +457,42 @@ const CurrencyRow = ({
       </Text>
     </Group>
   );
+};
+
+interface RankLineProps {
+  submitting: boolean;
+  result: SubmitResult | null;
+}
+
+const RankLine = ({ submitting, result }: RankLineProps) => {
+  if (result === null) {
+    if (!submitting) return null;
+    return (
+      <Text size="sm" c="dimmed">
+        Submitting score...
+      </Text>
+    );
+  }
+  if (result.status === 'submitted' && result.rank !== null) {
+    return (
+      <Text size="sm" fw={700} c="#ffd700">
+        Ranked #{result.rank} globally
+      </Text>
+    );
+  }
+  if (result.status === 'not-best' && result.rank !== null) {
+    return (
+      <Text size="sm" c="dimmed">
+        Best rank #{result.rank} globally
+      </Text>
+    );
+  }
+  if (result.status === 'failed') {
+    return (
+      <Text size="xs" c="dimmed">
+        Leaderboard unavailable
+      </Text>
+    );
+  }
+  return null;
 };
