@@ -1,5 +1,6 @@
 import { Button, Center, Stack, Title } from '@mantine/core';
 import { useAppStore } from '../../state/appStore';
+import { AccountButton } from '../components/AccountButton';
 
 export const MainMenu = () => {
   return (
@@ -28,6 +29,7 @@ export const MainMenu = () => {
           >
             Skills
           </Button>
+          <AccountButton />
         </Stack>
       </Stack>
     </Center>

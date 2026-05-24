@@ -18,6 +18,8 @@ export interface TelegramSession {
   version: string | null;
   startParam: string | null;
   userId: number | null;
+  firstName: string | null;
+  username: string | null;
 }
 
 const browserSession: TelegramSession = {
@@ -26,6 +28,8 @@ const browserSession: TelegramSession = {
   version: null,
   startParam: null,
   userId: null,
+  firstName: null,
+  username: null,
 };
 
 let session: TelegramSession = browserSession;
@@ -43,12 +47,15 @@ export const isTelegramAccessAllowed = (): boolean => {
 const readLaunchParams = (): TelegramSession => {
   try {
     const launchParams = retrieveLaunchParams();
+    const user = launchParams.tgWebAppData?.user ?? null;
     return {
       isTelegram: true,
       platform: launchParams.tgWebAppPlatform,
       version: launchParams.tgWebAppVersion,
       startParam: launchParams.tgWebAppStartParam ?? null,
-      userId: launchParams.tgWebAppData?.user?.id ?? null,
+      userId: user?.id ?? null,
+      firstName: user?.first_name ?? null,
+      username: user?.username ?? null,
     };
   } catch {
     return {
@@ -57,6 +64,8 @@ const readLaunchParams = (): TelegramSession => {
       version: null,
       startParam: null,
       userId: null,
+      firstName: null,
+      username: null,
     };
   }
 };
