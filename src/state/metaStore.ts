@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import type { ModeId } from "../data/modes";
+import { DEFAULT_THEME_ID } from "../data/themes";
+import { DEFAULT_SOUND_PACK_ID } from "../data/sound";
 
 export interface MetaSnapshot {
   currency: number;
@@ -11,6 +13,9 @@ export interface MetaSnapshot {
   totalRunScore: number;
   bestScores: Partial<Record<ModeId, number>>;
   achievements: string[];
+  activeThemeId: string;
+  activeMusicPackId: string;
+  activeSfxPackId: string;
   updatedAt: number;
 }
 
@@ -24,6 +29,9 @@ export interface MetaState {
   totalRunScore: number;
   bestScores: Partial<Record<ModeId, number>>;
   achievements: string[];
+  activeThemeId: string;
+  activeMusicPackId: string;
+  activeSfxPackId: string;
   updatedAt: number;
 
   awardCurrency: (amount: number) => void;
@@ -33,21 +41,35 @@ export interface MetaState {
   unlockUltimate: (id: string) => void;
   recordRun: (mode: ModeId, score: number) => void;
   unlockAchievement: (id: string) => boolean;
+  setActiveTheme: (id: string) => void;
+  setActiveMusicPack: (id: string) => void;
+  setActiveSfxPack: (id: string) => void;
   resetAllProgress: () => void;
   hydrateFromCloud: (snapshot: MetaSnapshot) => void;
 }
 
-export const META_VERSION = 2;
+export const META_VERSION = 3;
 
 export const migrateMeta = (persisted: unknown, version: number): MetaState => {
   const data: Record<string, unknown> = {
     ...(persisted as Record<string, unknown> | null),
   };
-  if (version < META_VERSION) {
+  if (version < 2) {
     const legacyBest = typeof data.bestScore === "number" ? data.bestScore : 0;
     delete data.bestScore;
     data.bestScores = legacyBest > 0 ? { endless_hp: legacyBest } : {};
     data.updatedAt = Date.now();
+  }
+  if (version < 3) {
+    if (typeof data.activeThemeId !== "string") {
+      data.activeThemeId = DEFAULT_THEME_ID;
+    }
+    if (typeof data.activeMusicPackId !== "string") {
+      data.activeMusicPackId = DEFAULT_SOUND_PACK_ID;
+    }
+    if (typeof data.activeSfxPackId !== "string") {
+      data.activeSfxPackId = DEFAULT_SOUND_PACK_ID;
+    }
   }
   return data as unknown as MetaState;
 };
@@ -61,6 +83,9 @@ const initialMeta = {
   totalRunScore: 0,
   bestScores: {} as Partial<Record<ModeId, number>>,
   achievements: [] as string[],
+  activeThemeId: DEFAULT_THEME_ID,
+  activeMusicPackId: DEFAULT_SOUND_PACK_ID,
+  activeSfxPackId: DEFAULT_SOUND_PACK_ID,
   updatedAt: 0,
 };
 
@@ -73,6 +98,9 @@ export const selectMetaSnapshot = (state: MetaState): MetaSnapshot => ({
   totalRunScore: state.totalRunScore,
   bestScores: state.bestScores,
   achievements: state.achievements,
+  activeThemeId: state.activeThemeId,
+  activeMusicPackId: state.activeMusicPackId,
+  activeSfxPackId: state.activeSfxPackId,
   updatedAt: state.updatedAt,
 });
 
@@ -165,6 +193,27 @@ export const useMetaStore = create<MetaState>()(
           return true;
         },
 
+        setActiveTheme: (id) =>
+          set(
+            { activeThemeId: id, updatedAt: Date.now() },
+            false,
+            "setActiveTheme",
+          ),
+
+        setActiveMusicPack: (id) =>
+          set(
+            { activeMusicPackId: id, updatedAt: Date.now() },
+            false,
+            "setActiveMusicPack",
+          ),
+
+        setActiveSfxPack: (id) =>
+          set(
+            { activeSfxPackId: id, updatedAt: Date.now() },
+            false,
+            "setActiveSfxPack",
+          ),
+
         resetAllProgress: () =>
           set(
             { ...initialMeta, updatedAt: Date.now() },
@@ -183,6 +232,9 @@ export const useMetaStore = create<MetaState>()(
               totalRunScore: snapshot.totalRunScore,
               bestScores: snapshot.bestScores,
               achievements: snapshot.achievements,
+              activeThemeId: snapshot.activeThemeId,
+              activeMusicPackId: snapshot.activeMusicPackId,
+              activeSfxPackId: snapshot.activeSfxPackId,
               updatedAt: snapshot.updatedAt,
             },
             false,
@@ -202,6 +254,9 @@ export const useMetaStore = create<MetaState>()(
           totalRunScore: state.totalRunScore,
           bestScores: state.bestScores,
           achievements: state.achievements,
+          activeThemeId: state.activeThemeId,
+          activeMusicPackId: state.activeMusicPackId,
+          activeSfxPackId: state.activeSfxPackId,
           updatedAt: state.updatedAt,
         }),
       },
