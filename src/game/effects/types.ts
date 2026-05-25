@@ -8,7 +8,7 @@ export type SkillEffect =
   | { kind: "spawnAnimMul"; value: number }
   | { kind: "scoreMul"; value: number }
   | { kind: "comboNoResetOnBombClick" }
-  | { kind: "bombClickHPMul"; value: number; scoreBonus: number }
+  | { kind: "bombComboCashout"; scoreMul: number }
   | { kind: "goldenSpawnRateMul"; value: number }
   | { kind: "doubleTargetChance"; value: number }
   | { kind: "bombExpireCurrencyChance"; value: number }

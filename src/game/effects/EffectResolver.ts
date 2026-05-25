@@ -8,7 +8,7 @@ export interface RunModifiers {
   readonly currencyDisabled: boolean;
   readonly multiClicksOverride: number | null;
   readonly comboNoResetOnBombClick: boolean;
-  readonly bombClickHPMul: number;
+  readonly bombComboCashout: number;
   readonly bombClickFreeAfterFirst: boolean;
   readonly firstMissForgiven: boolean;
   readonly damageIframesMs: number;
@@ -65,7 +65,7 @@ export const DEFAULT_RUN_MODIFIERS: RunModifiers = {
   currencyDisabled: false,
   multiClicksOverride: null,
   comboNoResetOnBombClick: false,
-  bombClickHPMul: 1,
+  bombComboCashout: 0,
   bombClickFreeAfterFirst: false,
   firstMissForgiven: false,
   damageIframesMs: 0,
@@ -146,7 +146,7 @@ export class EffectResolver {
     let currencyDisabled = false;
     let multiClicksOverride: number | null = null;
     let comboNoResetOnBombClick = false;
-    let bombClickHPMul = 1;
+    let bombComboCashout = 0;
     let bombClickFreeAfterFirst = false;
     let firstMissForgiven = false;
     let damageIframesMs = 0;
@@ -179,9 +179,8 @@ export class EffectResolver {
         case "comboNoResetOnBombClick":
           comboNoResetOnBombClick = true;
           break;
-        case "bombClickHPMul":
-          bombClickHPMul = Math.max(bombClickHPMul, eff.value);
-          scoreMul *= 1 + eff.scoreBonus;
+        case "bombComboCashout":
+          bombComboCashout = Math.max(bombComboCashout, eff.scoreMul);
           break;
         case "bombClickFreeAfterFirst":
           bombClickFreeAfterFirst = true;
@@ -228,7 +227,7 @@ export class EffectResolver {
       currencyDisabled,
       multiClicksOverride,
       comboNoResetOnBombClick,
-      bombClickHPMul,
+      bombComboCashout,
       bombClickFreeAfterFirst,
       firstMissForgiven,
       damageIframesMs,

@@ -31,12 +31,10 @@ export const GREED_BRANCH: SkillBranch = {
           id: "greed-t1-high-stakes",
           name: "High Stakes",
           description:
-            "Clicking a bomb costs 2 HP but base score is +50% all run.",
+            "A bomb-click still triggers its penalty, but first cashes out your combo: 2x a regular target's score at your current multiplier. Your combo then resets.",
           icon: "🎲",
           cost: 100,
-          effects: [
-            { kind: "bombClickHPMul", value: 2, scoreBonus: 0.5 },
-          ],
+          effects: [{ kind: "bombComboCashout", scoreMul: 2 }],
         },
       ],
     },

@@ -56,7 +56,7 @@ export class PhantomTarget {
     this.elapsedMs += deltaMs;
     const t = Math.min(this.elapsedMs / this.lifetimeMs, 1);
     this.graphics.alpha = this.baseAlpha * (1 - t);
-    this.graphics.scale.set(1 + t * 0.5);
+    this.graphics.scale.set(1 - t);
   }
 
   collect(): void {
@@ -74,7 +74,8 @@ export class PhantomTarget {
     this.graphics
       .clear()
       .circle(0, 0, this.radius)
-      .stroke({ width: 3, color: this.color, alpha: 1 });
+      .fill(this.color)
+      .stroke({ width: 2, color: this.color, alpha: 1 });
     this.graphics.alpha = this.baseAlpha;
   }
 }
