@@ -62,27 +62,32 @@ const ensureAdmin = (): void => {
   });
 };
 
+const deny = (res: VercelResponse, status: number, error: string): void => {
+  console.error("telegram-auth", status, error);
+  res.status(status).json({ error });
+};
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ): Promise<void> {
   if (req.method !== "POST") {
-    res.status(405).json({ error: "method-not-allowed" });
+    deny(res, 405, "method-not-allowed");
     return;
   }
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   if (!botToken) {
-    res.status(500).json({ error: "server-misconfigured" });
+    deny(res, 500, "server-misconfigured");
     return;
   }
   const initData = readInitData(req.body);
   if (initData === null) {
-    res.status(400).json({ error: "missing-init-data" });
+    deny(res, 400, "missing-init-data");
     return;
   }
   const params = validateInitData(initData, botToken);
   if (params === null) {
-    res.status(401).json({ error: "invalid-init-data" });
+    deny(res, 401, "invalid-init-data");
     return;
   }
   const authDate = Number(params.get("auth_date"));
@@ -90,19 +95,20 @@ export default async function handler(
     !Number.isFinite(authDate) ||
     Date.now() / 1000 - authDate > MAX_AGE_SECONDS
   ) {
-    res.status(401).json({ error: "stale-init-data" });
+    deny(res, 401, "stale-init-data");
     return;
   }
   const telegramId = extractTelegramId(params);
   if (telegramId === null) {
-    res.status(401).json({ error: "no-user" });
+    deny(res, 401, "no-user");
     return;
   }
   try {
     ensureAdmin();
     const token = await getAuth().createCustomToken(`tg:${telegramId}`);
     res.status(200).json({ token });
-  } catch {
+  } catch (error) {
+    console.error("telegram-auth", 500, "token-failed", error);
     res.status(500).json({ error: "token-failed" });
   }
 }
