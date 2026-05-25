@@ -17,7 +17,13 @@ const validateInitData = (
 ): URLSearchParams | null => {
   const params = new URLSearchParams(initData);
   const hash = params.get("hash");
-  if (hash === null) return null;
+  if (hash === null) {
+    console.error("telegram-auth-nohash", {
+      initDataLen: initData.length,
+      keys: [...params.keys()],
+    });
+    return null;
+  }
   const pairs: string[] = [];
   for (const [key, value] of params.entries()) {
     if (key === "hash" || key === "signature") continue;
@@ -30,7 +36,19 @@ const validateInitData = (
   const computed = createHmac("sha256", secretKey)
     .update(pairs.join("\n"))
     .digest("hex");
-  return computed === hash ? params : null;
+  if (computed !== hash) {
+    console.error("telegram-auth-mismatch", {
+      botId: botToken.split(":")[0],
+      tokenLen: botToken.length,
+      keys: pairs.map((pair) => pair.slice(0, pair.indexOf("="))),
+      hasSignature: params.get("signature") !== null,
+      authDate: params.get("auth_date"),
+      hashPrefix: hash.slice(0, 8),
+      computedPrefix: computed.slice(0, 8),
+    });
+    return null;
+  }
+  return params;
 };
 
 const extractTelegramId = (params: URLSearchParams): number | null => {
@@ -75,7 +93,7 @@ export default async function handler(
     deny(res, 405, "method-not-allowed");
     return;
   }
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim();
   if (!botToken) {
     deny(res, 500, "server-misconfigured");
     return;
