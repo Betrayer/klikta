@@ -24,31 +24,35 @@ const validateInitData = (
     });
     return null;
   }
-  const pairs: string[] = [];
-  for (const [key, value] of params.entries()) {
-    if (key === "hash" || key === "signature") continue;
-    pairs.push(`${key}=${value}`);
-  }
-  pairs.sort();
   const secretKey = createHmac("sha256", "WebAppData")
     .update(botToken)
     .digest();
-  const computed = createHmac("sha256", secretKey)
-    .update(pairs.join("\n"))
-    .digest("hex");
-  if (computed !== hash) {
-    console.error("telegram-auth-mismatch", {
-      botId: botToken.split(":")[0],
-      tokenLen: botToken.length,
-      keys: pairs.map((pair) => pair.slice(0, pair.indexOf("="))),
-      hasSignature: params.get("signature") !== null,
-      authDate: params.get("auth_date"),
-      hashPrefix: hash.slice(0, 8),
-      computedPrefix: computed.slice(0, 8),
-    });
-    return null;
-  }
-  return params;
+  const checkString = (excludeSignature: boolean): string => {
+    const pairs: string[] = [];
+    for (const [key, value] of params.entries()) {
+      if (key === "hash") continue;
+      if (excludeSignature && key === "signature") continue;
+      pairs.push(`${key}=${value}`);
+    }
+    pairs.sort();
+    return pairs.join("\n");
+  };
+  const hmac = (data: string): string =>
+    createHmac("sha256", secretKey).update(data).digest("hex");
+  const withSignature = hmac(checkString(false));
+  const withoutSignature = hmac(checkString(true));
+  if (hash === withSignature || hash === withoutSignature) return params;
+  console.error("telegram-auth-mismatch", {
+    botId: botToken.split(":")[0],
+    tokenLen: botToken.length,
+    keys: [...params.keys()],
+    hasSignature: params.get("signature") !== null,
+    authDate: params.get("auth_date"),
+    hashPrefix: hash.slice(0, 8),
+    withSignaturePrefix: withSignature.slice(0, 8),
+    withoutSignaturePrefix: withoutSignature.slice(0, 8),
+  });
+  return null;
 };
 
 const extractTelegramId = (params: URLSearchParams): number | null => {
