@@ -211,7 +211,7 @@ export const useAuthStore = create<AuthState>()(
           const code =
             error instanceof FirebaseError
               ? error.code
-              : "auth/telegram-failed";
+              : `tg/${error instanceof Error ? error.message : "failed"}`;
           set({ busy: false, error: code }, false, "signInWithTelegram/error");
           return false;
         }

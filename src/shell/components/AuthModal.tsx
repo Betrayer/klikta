@@ -26,6 +26,15 @@ const MESSAGES: Record<string, string> = {
   "auth/telegram-failed": "Telegram sign-in failed. Try again.",
   "auth/reset-email-sent": "Password reset link sent to your email.",
   "auth/unknown": "Something went wrong. Try again.",
+  "tg/no-init-data": "No Telegram init data on the client.",
+  "tg/network": "Network error reaching /api/telegram-auth.",
+  "tg/server-misconfigured": "Server is missing the bot token (Vercel env).",
+  "tg/missing-init-data": "Server received no init data.",
+  "tg/invalid-init-data": "Signature check failed - wrong bot token.",
+  "tg/stale-init-data": "Telegram data expired. Reopen the app.",
+  "tg/no-user": "No Telegram user in init data.",
+  "tg/token-failed": "Server could not mint the Firebase token (admin creds).",
+  "tg/malformed": "Bad response from /api/telegram-auth.",
 };
 
 const messageFor = (code: string): string => MESSAGES[code] ?? code;
