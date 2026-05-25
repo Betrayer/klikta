@@ -59,6 +59,7 @@ import {
 import {
   useRunStore,
   COMBO_MILESTONES,
+  comboMultiplier,
   type CurrencyBreakdown,
   type AchievementAward,
 } from "../../state/runStore";
@@ -614,7 +615,7 @@ export class Game {
   private applyBombPenalty(): void {
     switch (this.mode.onBombClick(this.buildModeContext())) {
       case "hp":
-        this.applyDamage(this.runMods.bombClickHPMul);
+        this.applyDamage(1);
         break;
       case "none":
         break;
@@ -735,7 +736,8 @@ export class Game {
 
   private spawnEvents(events: SpawnEvent[]): void {
     if (this.targetLayer === null) return;
-    if (this.physics !== null && this.targets.length >= PHYSICS_BODY_CAP) return;
+    if (this.physics !== null && this.targets.length >= PHYSICS_BODY_CAP)
+      return;
     const spawned: Target[] = [];
     for (const event of events) {
       const target = this.createTarget(event);
@@ -771,7 +773,7 @@ export class Game {
 
     if (result.effects.includes("lose_hp")) {
       audioSystem.playSFX("bomb_click");
-      this.handleBombClick();
+      this.handleBombClick(target);
     }
 
     if (result.destroyed) {
@@ -885,9 +887,10 @@ export class Game {
     pair.beginPairKill();
   }
 
-  private handleBombClick(): void {
+  private handleBombClick(bomb: Target): void {
     const store = useRunStore.getState();
     store.recordBombClick();
+    this.awardBombCashout(bomb);
     const count = useRunStore.getState().bombClicksThisRun;
     const free = this.runMods.bombClickFreeAfterFirst && count > 1;
     if (!free) this.applyBombPenalty();
@@ -895,6 +898,23 @@ export class Game {
       useRunStore.getState().resetCombo();
       this.syncMusicToCombo();
     }
+  }
+
+  private awardBombCashout(bomb: Target): void {
+    const cashout = this.runMods.bombComboCashout;
+    if (cashout <= 0) return;
+    const combo = useRunStore.getState().combo;
+    const mult = comboMultiplier(combo, this.runMods.comboCap);
+    const points = Math.round(
+      TARGET_CONFIG.regular.score *
+        cashout *
+        mult *
+        this.runMods.scoreMul *
+        this.scoreMultiplier.current,
+    );
+    if (points <= 0) return;
+    useRunStore.getState().addScore(points);
+    this.vfx?.emitSubHit(bomb.x, bomb.y, TARGET_CONFIG.regular.color);
   }
 
   private tryAwardBombBounty(): void {
