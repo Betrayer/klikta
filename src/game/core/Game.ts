@@ -23,6 +23,11 @@ import type { PhysicsEngine } from "../systems/PhysicsEngine";
 import { VFXSystem } from "../systems/VFXSystem";
 import { CameraSystem } from "../systems/CameraSystem";
 import { audioSystem } from "../systems/AudioSystem";
+import {
+  areThemeAssetsLoaded,
+  loadThemeAssets,
+} from "../assets/loadThemeAssets";
+import { isSoundPackLoaded, loadSoundPack } from "../assets/loadSoundPack";
 import { UltimateSystem } from "../systems/UltimateSystem";
 import {
   setUltimateActivationHandler,
@@ -167,7 +172,7 @@ export class Game {
     this.targetMods = empty.buildBaseTargetModifiers();
   }
 
-  async start(): Promise<void> {
+  async start(onAssetsLoading?: (loading: boolean) => void): Promise<void> {
     this.resolver = getActiveResolver();
     this.runMods = this.resolver.buildRunModifiers();
     this.spawnPolicy = this.resolver.buildSpawnPolicy();
@@ -193,6 +198,21 @@ export class Game {
     );
     setUltimateActivationHandler(this.ultimateHandler);
     setRunPerkPickHandler(this.runPerkHandler);
+
+    const meta = useMetaStore.getState();
+    const themeId = meta.activeThemeId;
+    const musicPackId = meta.activeMusicPackId;
+    const sfxPackId = meta.activeSfxPackId;
+    const needsLoad =
+      !areThemeAssetsLoaded(themeId) ||
+      !isSoundPackLoaded(musicPackId) ||
+      !isSoundPackLoaded(sfxPackId);
+    if (needsLoad) onAssetsLoading?.(true);
+    await loadThemeAssets(themeId);
+    await loadSoundPack(musicPackId);
+    if (sfxPackId !== musicPackId) await loadSoundPack(sfxPackId);
+    if (needsLoad) onAssetsLoading?.(false);
+    if (this.destroyed) return;
 
     const app = new Application();
     await app.init({
