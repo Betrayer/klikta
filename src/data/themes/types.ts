@@ -82,4 +82,6 @@ export interface SoundPack {
   name: string;
   music: SoundPackMusic;
   sfx: Record<SfxName, string[]>;
+  gain?: number;
+  rate?: number;
 }

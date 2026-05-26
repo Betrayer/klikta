@@ -1,16 +1,15 @@
 import {
+  ActionIcon,
   Box,
   Button,
-  Container,
   Group,
   Modal,
-  ScrollArea,
-  SimpleGrid,
   Stack,
   Text,
   Title,
+  Tooltip,
 } from '@mantine/core';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type {
   BranchId,
   SkillOption,
@@ -19,9 +18,10 @@ import type {
 import { findPerk, SKILL_TREE, tierKey } from '../../data/skillTree';
 import { useAppStore } from '../../state/appStore';
 import { useMetaStore } from '../../state/metaStore';
-import { BranchColumn } from '../components/skill-tree/BranchColumn';
-import { CurrencyHeader } from '../components/skill-tree/CurrencyHeader';
 import { PerkDetails } from '../components/skill-tree/PerkDetails';
+import { SkillTreeCanvas } from '../components/skill-tree/SkillTreeCanvas';
+import { SKILL_TREE_LAYOUT } from '../components/skill-tree/layout';
+import { usePanZoom } from '../components/skill-tree/usePanZoom';
 
 interface PendingSelection {
   option: SkillOption;
@@ -82,6 +82,20 @@ export const SkillTreeView = () => {
   const [pending, setPending] = useState<PendingSelection | null>(null);
   const focusedPerkId = hoveredPerkId ?? pinnedPerkId;
 
+  const selectedPerks = useMetaStore((s) => s.selectedPerks);
+  const currency = useMetaStore((s) => s.currency);
+  const panZoom = usePanZoom(SKILL_TREE_LAYOUT.size);
+
+  const branchPoints = useMemo(() => {
+    const counts = {} as Record<BranchId, number>;
+    for (const branch of SKILL_TREE) {
+      counts[branch.id] = branch.tiers.filter(
+        (t) => selectedPerks[tierKey(branch.id, t.tier)] !== undefined,
+      ).length;
+    }
+    return counts;
+  }, [selectedPerks]);
+
   const handleTrySelect = useCallback(
     (option: SkillOption, branchId: BranchId, tier: TierLevel) => {
       if (tier === 4) {
@@ -103,6 +117,14 @@ export const SkillTreeView = () => {
     [],
   );
 
+  const handleNodeClick = useCallback(
+    (perkId: string) => {
+      if (panZoom.wasDragging()) return;
+      setPinnedPerkId(perkId);
+    },
+    [panZoom],
+  );
+
   const confirmPending = () => {
     if (pending === null) return;
     applySelection(pending.option, pending.branchId, pending.tier);
@@ -110,46 +132,126 @@ export const SkillTreeView = () => {
   };
 
   return (
-    <Box bg="background" mih="100vh">
-      <ScrollArea h="100vh" type="auto">
-        <Container size={1600} p="md">
-          <Stack gap="md">
-            <Group justify="space-between" align="center">
-              <Title order={1} fz={36} fw={900} c="primary" lts={4}>
-                SKILL TREE
-              </Title>
-              <Button
-                variant="subtle"
-                color="gray"
-                onClick={() => useAppStore.getState().setScreen('menu')}
-              >
-                Back to Menu
-              </Button>
-            </Group>
+    <Box bg="background" pos="relative" h="100vh" style={{ overflow: 'hidden' }}>
+      <SkillTreeCanvas
+        layout={SKILL_TREE_LAYOUT}
+        selectedPerks={selectedPerks}
+        branchPoints={branchPoints}
+        currency={currency}
+        focusedPerkId={focusedPerkId}
+        panZoom={panZoom}
+        onHover={setHoveredPerkId}
+        onNodeClick={handleNodeClick}
+      />
 
-            <CurrencyHeader />
+      <Group
+        justify="space-between"
+        align="center"
+        p="md"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10,
+          pointerEvents: 'none',
+        }}
+      >
+        <Title order={1} fz={28} fw={900} c="primary" lts={4}>
+          SKILL TREE
+        </Title>
+        <Button
+          variant="light"
+          color="gray"
+          style={{ pointerEvents: 'auto' }}
+          onClick={() => useAppStore.getState().setScreen('menu')}
+        >
+          Back to Menu
+        </Button>
+      </Group>
 
-            <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing="md">
-              {SKILL_TREE.map((branch) => (
-                <BranchColumn
-                  key={branch.id}
-                  branch={branch}
-                  focusedPerkId={focusedPerkId}
-                  pinnedPerkId={pinnedPerkId}
-                  onHover={setHoveredPerkId}
-                  onPin={setPinnedPerkId}
-                  onTrySelect={handleTrySelect}
-                />
-              ))}
-            </SimpleGrid>
+      <Stack
+        gap="xs"
+        style={{
+          position: 'absolute',
+          bottom: 16,
+          right: 16,
+          zIndex: 20,
+        }}
+      >
+        <Tooltip label="Zoom in" position="left">
+          <ActionIcon
+            variant="default"
+            size="lg"
+            onClick={() => panZoom.zoomBy(1.25)}
+            aria-label="Zoom in"
+          >
+            +
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label="Zoom out" position="left">
+          <ActionIcon
+            variant="default"
+            size="lg"
+            onClick={() => panZoom.zoomBy(0.8)}
+            aria-label="Zoom out"
+          >
+            -
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label="Reset view" position="left">
+          <ActionIcon
+            variant="default"
+            size="lg"
+            onClick={panZoom.reset}
+            aria-label="Reset view"
+          >
+            ⌂
+          </ActionIcon>
+        </Tooltip>
+      </Stack>
 
-            <PerkDetails
-              focusedPerkId={focusedPerkId}
-              onTrySelect={handleTrySelect}
-            />
-          </Stack>
-        </Container>
-      </ScrollArea>
+      {focusedPerkId === null && (
+        <Text
+          size="sm"
+          c="dimmed"
+          ta="center"
+          style={{
+            position: 'absolute',
+            bottom: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 10,
+            pointerEvents: 'none',
+          }}
+        >
+          Tap a perk to inspect - drag to pan, scroll or pinch to zoom.
+        </Text>
+      )}
+
+      <PerkDetails focusedPerkId={focusedPerkId} onTrySelect={handleTrySelect} />
+
+      <Group
+        gap="xs"
+        style={{ position: 'absolute', bottom: 16, left: 16, zIndex: 20 }}
+      >
+        <Button
+          size="xs"
+          variant="light"
+          color="teal"
+          onClick={grantTestCurrency}
+        >
+          test +{TEST_CURRENCY_GRANT}
+        </Button>
+        <Button
+          size="xs"
+          variant="subtle"
+          color="gray"
+          onClick={resetTestCurrency}
+        >
+          reset test
+        </Button>
+      </Group>
 
       <Modal
         opened={pending !== null}
@@ -178,25 +280,6 @@ export const SkillTreeView = () => {
           </Stack>
         )}
       </Modal>
-
-      <Group pos="fixed" bottom={12} left={12} gap="xs" style={{ zIndex: 100 }}>
-        <Button
-          size="xs"
-          variant="light"
-          color="teal"
-          onClick={grantTestCurrency}
-        >
-          test +{TEST_CURRENCY_GRANT}
-        </Button>
-        <Button
-          size="xs"
-          variant="subtle"
-          color="gray"
-          onClick={resetTestCurrency}
-        >
-          reset test
-        </Button>
-      </Group>
     </Box>
   );
 };

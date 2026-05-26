@@ -1,4 +1,4 @@
-import { Button, Group, Paper, Stack, Text } from '@mantine/core';
+import { Badge, Box, Button, Group, Paper, Stack, Text } from '@mantine/core';
 import { useMemo } from 'react';
 import type {
   BranchId,
@@ -18,8 +18,6 @@ export interface PerkDetailsProps {
   ) => void;
 }
 
-const EMPTY_HINT = 'Hover or click a perk to inspect it.';
-
 export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) => {
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
   const currency = useMetaStore((s) => s.currency);
@@ -31,13 +29,7 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
   );
 
   if (option === undefined || tierEntry === undefined) {
-    return (
-      <Paper p="md" mih={120} bg="surface" withBorder>
-        <Text c="dimmed" size="sm" ta="center" mt="md">
-          {EMPTY_HINT}
-        </Text>
-      </Paper>
-    );
+    return null;
   }
 
   const { branch, tier } = tierEntry;
@@ -108,60 +100,82 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
   })();
 
   return (
-    <Paper
-      p="md"
-      bg="surface"
-      withBorder
+    <Box
       style={{
-        borderColor: `color-mix(in srgb, ${branch.color} 50%, transparent)`,
-        borderTopWidth: 2,
+        position: 'absolute',
+        bottom: 16,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'min(560px, calc(100% - 24px))',
+        zIndex: 20,
       }}
     >
-      <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
-        <Stack gap={6} style={{ flex: 1, minWidth: 0 }}>
-          <Group gap="sm" wrap="nowrap">
-            <PerkIcon name={option.icon} size={30} color={branch.color} />
-            <Stack gap={0}>
-              <Text fw={700} fz="lg" c="white">
-                {option.name}
-              </Text>
-              <Text size="xs" c={branch.color} tt="uppercase" lts={1}>
-                {branch.name} · Tier {tier.tier}
-              </Text>
-            </Stack>
-          </Group>
-          <Text size="sm" c="gray.3">
-            {option.description}
-          </Text>
-        </Stack>
+      <Paper
+        p="md"
+        radius="md"
+        style={{
+          backgroundColor:
+            'color-mix(in srgb, var(--mantine-color-surface-filled) 88%, transparent)',
+          backdropFilter: 'blur(8px)',
+          border: `1px solid color-mix(in srgb, ${branch.color} 55%, transparent)`,
+          boxShadow: `0 8px 28px rgba(0, 0, 0, 0.45), 0 0 18px color-mix(in srgb, ${branch.color} 22%, transparent)`,
+        }}
+      >
+        <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
+          <Stack gap={6} style={{ flex: 1, minWidth: 0 }}>
+            <Group gap="sm" wrap="nowrap">
+              <PerkIcon name={option.icon} size={30} color={branch.color} />
+              <Stack gap={2} style={{ minWidth: 0 }}>
+                <Text fw={700} fz="lg" c="white" lineClamp={1}>
+                  {option.name}
+                </Text>
+                <Group gap={6} wrap="nowrap">
+                  <Badge
+                    size="xs"
+                    variant="light"
+                    style={{ backgroundColor: `color-mix(in srgb, ${branch.color} 22%, transparent)`, color: branch.color }}
+                  >
+                    {branch.name}
+                  </Badge>
+                  <Text size="xs" c="dimmed" tt="uppercase" lts={1}>
+                    Tier {tier.tier}
+                  </Text>
+                </Group>
+              </Stack>
+            </Group>
+            <Text size="sm" c="gray.3">
+              {option.description}
+            </Text>
+          </Stack>
 
-        <Stack gap={6} align="flex-end" miw={180}>
-          {!isSelected && (
-            <Text size="sm" c={canAfford ? 'gray.3' : 'red.5'} ff="monospace">
-              Cost {option.cost}
-              {swapHint}
-            </Text>
-          )}
-          {isSelected && (
-            <Text size="sm" c={branch.color} fw={600}>
-              Active
-            </Text>
-          )}
-          {reasonText !== null && (
-            <Text size="xs" c="red.5" ta="right">
-              {reasonText}
-            </Text>
-          )}
-          <Button
-            color={isSelected ? 'red' : branch.color}
-            variant={isSelected ? 'outline' : 'filled'}
-            disabled={actionDisabled}
-            onClick={handleAction}
-          >
-            {actionLabel}
-          </Button>
-        </Stack>
-      </Group>
-    </Paper>
+          <Stack gap={6} align="flex-end" miw={150}>
+            {isSelected ? (
+              <Text size="sm" c={branch.color} fw={600}>
+                Active
+              </Text>
+            ) : (
+              <Text size="sm" c={canAfford ? 'gray.3' : 'red.5'} ff="monospace">
+                Cost {option.cost}
+                {swapHint}
+              </Text>
+            )}
+            {reasonText !== null && (
+              <Text size="xs" c="red.5" ta="right">
+                {reasonText}
+              </Text>
+            )}
+            <Button
+              size="sm"
+              color={isSelected ? 'red' : branch.color}
+              variant={isSelected ? 'outline' : 'filled'}
+              disabled={actionDisabled}
+              onClick={handleAction}
+            >
+              {actionLabel}
+            </Button>
+          </Stack>
+        </Group>
+      </Paper>
+    </Box>
   );
 };

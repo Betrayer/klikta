@@ -37,6 +37,10 @@ class AudioSystem {
   private musicIntensity = 0;
   private musicPlaying = false;
   private wantMusic = false;
+  private sfxPackGain = 1;
+  private sfxPackRate = 1;
+  private musicPackGain = 1;
+  private musicPackRate = 1;
 
   private sfx = new Map<string, Howl[]>();
   private loadedSfxPackId: string | null = null;
@@ -94,6 +98,8 @@ class AudioSystem {
   }
 
   async loadSfxPack(pack: SoundPack): Promise<void> {
+    this.sfxPackGain = pack.gain ?? 1;
+    this.sfxPackRate = pack.rate ?? 1;
     let map = this.sfxCache.get(pack.id);
     if (map === undefined) {
       map = this.buildSfx(pack);
@@ -112,6 +118,8 @@ class AudioSystem {
   }
 
   async loadMusicPack(pack: SoundPack): Promise<void> {
+    this.musicPackGain = pack.gain ?? 1;
+    this.musicPackRate = pack.rate ?? 1;
     const ctx = this.ctx;
     if (ctx === null) {
       this.loadedMusicPackId = pack.id;
@@ -138,7 +146,8 @@ class AudioSystem {
     if (list === undefined || list.length === 0) return;
     const howl = list[Math.floor(Math.random() * list.length)];
     if (howl === undefined) return;
-    howl.volume(this.effectiveSfx());
+    howl.volume(this.effectiveSfx() * this.sfxPackGain);
+    howl.rate(this.sfxPackRate);
     howl.play();
   }
 
@@ -371,6 +380,7 @@ class AudioSystem {
     const source = ctx.createBufferSource();
     source.buffer = buffer;
     source.loop = true;
+    source.playbackRate.value = this.musicPackRate;
 
     const filter = ctx.createBiquadFilter();
     filter.type = "lowpass";
@@ -405,7 +415,7 @@ class AudioSystem {
   }
 
   private effectiveMusic(): number {
-    return this.masterVolume * this.musicVolume;
+    return this.masterVolume * this.musicVolume * this.musicPackGain;
   }
 }
 
