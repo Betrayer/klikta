@@ -4,8 +4,6 @@ export const linear: EasingFn = (t) => t;
 
 export const easeOutCubic: EasingFn = (t) => 1 - Math.pow(1 - t, 3);
 
-export const easeOutQuint: EasingFn = (t) => 1 - Math.pow(1 - t, 5);
-
 export const easeInOutQuad: EasingFn = (t) =>
   t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 

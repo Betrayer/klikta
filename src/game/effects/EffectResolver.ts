@@ -58,7 +58,7 @@ export interface SpawnPolicy {
   readonly timePulse: { periodMs: number; durationMs: number } | null;
 }
 
-export const DEFAULT_RUN_MODIFIERS: RunModifiers = {
+const DEFAULT_RUN_MODIFIERS: RunModifiers = {
   startingHPAdd: 0,
   comboCap: 5,
   scoreMul: 1,

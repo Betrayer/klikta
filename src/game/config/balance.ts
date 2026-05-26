@@ -5,7 +5,7 @@ export const DEFAULT_COMBO_CAP = 5;
 
 export const SCORE_PER_CURRENCY = 100;
 
-export const COMBO_BONUS_TIERS: readonly { minCombo: number; bonus: number }[] =
+const COMBO_BONUS_TIERS: readonly { minCombo: number; bonus: number }[] =
   [
     { minCombo: 100, bonus: 100 },
     { minCombo: 50, bonus: 40 },

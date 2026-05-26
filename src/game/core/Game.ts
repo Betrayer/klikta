@@ -27,7 +27,6 @@ import {
   areThemeAssetsLoaded,
   loadThemeAssets,
 } from "../assets/loadThemeAssets";
-import { isSoundPackLoaded, loadSoundPack } from "../assets/loadSoundPack";
 import { getActiveTheme } from "../../state/themeSelectors";
 import { UltimateSystem } from "../systems/UltimateSystem";
 import {
@@ -200,20 +199,16 @@ export class Game {
     setUltimateActivationHandler(this.ultimateHandler);
     setRunPerkPickHandler(this.runPerkHandler);
 
-    const meta = useMetaStore.getState();
-    const themeId = meta.activeThemeId;
-    const musicPackId = meta.activeMusicPackId;
-    const sfxPackId = meta.activeSfxPackId;
+    const themeId = useMetaStore.getState().activeThemeId;
     const needsLoad =
-      !areThemeAssetsLoaded(themeId) ||
-      !isSoundPackLoaded(musicPackId) ||
-      !isSoundPackLoaded(sfxPackId);
-    if (needsLoad) onAssetsLoading?.(true);
-    await loadThemeAssets(themeId);
-    await loadSoundPack(musicPackId);
-    if (sfxPackId !== musicPackId) await loadSoundPack(sfxPackId);
-    if (needsLoad) onAssetsLoading?.(false);
-    if (this.destroyed) return;
+      !areThemeAssetsLoaded(themeId) || !audioSystem.arePacksLoaded();
+    if (needsLoad) {
+      onAssetsLoading?.(true);
+      await loadThemeAssets(themeId);
+      await audioSystem.loadActivePacks();
+      onAssetsLoading?.(false);
+      if (this.destroyed) return;
+    }
 
     const app = new Application();
     await app.init({

@@ -48,7 +48,7 @@ export interface MetaState {
   hydrateFromCloud: (snapshot: MetaSnapshot) => void;
 }
 
-export const META_VERSION = 3;
+const META_VERSION = 3;
 
 export const migrateMeta = (persisted: unknown, version: number): MetaState => {
   const data: Record<string, unknown> = {
@@ -186,7 +186,10 @@ export const useMetaStore = create<MetaState>()(
           const state = get();
           if (state.achievements.includes(id)) return false;
           set(
-            { achievements: [...state.achievements, id], updatedAt: Date.now() },
+            {
+              achievements: [...state.achievements, id],
+              updatedAt: Date.now(),
+            },
             false,
             "unlockAchievement",
           );
