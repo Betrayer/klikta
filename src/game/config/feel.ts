@@ -31,5 +31,3 @@ export const FEEL = {
   flashInMs: 30,
   flashOutMs: 60,
 } as const;
-
-export const BOMB_PARTICLE_COLORS = [0xff1f3f, 0xff8c00] as const;

@@ -1,5 +1,7 @@
 import { Container, Graphics } from "pixi.js";
-import { BOMB_PARTICLE_COLORS, FEEL } from "../config/feel";
+import { FEEL } from "../config/feel";
+import { getActiveTheme } from "../../state/themeSelectors";
+import type { ParticlePalettes } from "../../data/themes/types";
 
 interface Particle {
   gfx: Graphics;
@@ -13,9 +15,11 @@ interface Particle {
 export class VFXSystem {
   private readonly layer: Container;
   private readonly pool: Particle[] = [];
+  private readonly palettes: ParticlePalettes;
 
   constructor(layer: Container) {
     this.layer = layer;
+    this.palettes = getActiveTheme().particles;
     this.layer.eventMode = "none";
 
     for (let i = 0; i < FEEL.particles.poolSize; i++) {
@@ -48,23 +52,34 @@ export class VFXSystem {
 
   emitGoldenHit(x: number, y: number): void {
     const { count, speed, lifeMs } = FEEL.particles.golden;
+    const pal = this.palettes.golden;
+    const accent = pal[0] ?? 0xffffff;
+    const main = pal[1] ?? 0xffd700;
     this.burst(x, y, count, speed, lifeMs, (i) =>
-      i % 3 === 0 ? 0xffffff : 0xffd700,
+      i % 3 === 0 ? accent : main,
     );
   }
 
   emitBombExplosion(x: number, y: number): void {
     const { count, speed, lifeMs } = FEEL.particles.bomb;
-    this.burst(x, y, count, speed, lifeMs, (i) => {
-      const picked = BOMB_PARTICLE_COLORS[i % BOMB_PARTICLE_COLORS.length];
-      return picked ?? 0xff1f3f;
-    });
+    const pal = this.palettes.bomb;
+    this.burst(
+      x,
+      y,
+      count,
+      speed,
+      lifeMs,
+      (i) => pal[i % pal.length] ?? 0xff1f3f,
+    );
   }
 
   emitMilestone(x: number, y: number): void {
     const { count, speed, lifeMs } = FEEL.particles.milestone;
+    const pal = this.palettes.milestone;
+    const accent = pal[0] ?? 0x00f5d4;
+    const main = pal[1] ?? 0xffffff;
     this.burst(x, y, count, speed, lifeMs, (i) =>
-      i % 2 === 0 ? 0x00f5d4 : 0xffffff,
+      i % 2 === 0 ? accent : main,
     );
   }
 

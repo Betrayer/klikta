@@ -28,6 +28,7 @@ import {
   loadThemeAssets,
 } from "../assets/loadThemeAssets";
 import { isSoundPackLoaded, loadSoundPack } from "../assets/loadSoundPack";
+import { getActiveTheme } from "../../state/themeSelectors";
 import { UltimateSystem } from "../systems/UltimateSystem";
 import {
   setUltimateActivationHandler,
@@ -217,7 +218,7 @@ export class Game {
     const app = new Application();
     await app.init({
       resizeTo: this.parent,
-      background: "#1a0033",
+      background: getActiveTheme().background.color ?? 0x1a0033,
       antialias: true,
       autoDensity: true,
       resolution: window.devicePixelRatio || 1,
