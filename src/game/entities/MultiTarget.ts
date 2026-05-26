@@ -23,12 +23,11 @@ export class MultiTarget extends Target {
   }
 
   render(): void {
-    this.graphics.clear();
-    this.graphics.circle(0, 0, this.initialSize).fill(this.config.color);
+    this.decoration.clear();
     const ratio = this.clicksRemaining / this.clicksRequired;
     const ringRadius = this.initialSize * 0.65 * ratio;
     if (ringRadius > 0) {
-      this.graphics
+      this.decoration
         .circle(0, 0, ringRadius)
         .stroke({ width: 6, color: 0xffffff });
     }

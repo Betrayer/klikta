@@ -35,18 +35,16 @@ export class ShieldedTarget extends Target {
   }
 
   render(): void {
-    this.graphics.clear();
-    this.graphics.circle(0, 0, this.initialSize).fill(this.config.color);
+    this.decoration.clear();
+    if (!this.shieldUp) return;
 
     const r = this.initialSize * 1.4;
-    if (this.shieldUp) {
-      const points: number[] = [];
-      for (let i = 0; i < 6; i++) {
-        const angle = -Math.PI / 2 + (i * Math.PI) / 3;
-        points.push(Math.cos(angle) * r, Math.sin(angle) * r);
-      }
-      this.graphics.poly(points).stroke({ width: 4, color: SHIELD_COLOR });
+    const points: number[] = [];
+    for (let i = 0; i < 6; i++) {
+      const angle = -Math.PI / 2 + (i * Math.PI) / 3;
+      points.push(Math.cos(angle) * r, Math.sin(angle) * r);
     }
+    this.decoration.poly(points).stroke({ width: 4, color: SHIELD_COLOR });
   }
 
   onClick(): ClickResult {
@@ -62,7 +60,7 @@ export class ShieldedTarget extends Target {
   }
 
   private spawnShards(): void {
-    const parent = this.graphics.parent;
+    const parent = this.view.parent;
     if (parent === null) return;
 
     const r = this.initialSize * 1.4;

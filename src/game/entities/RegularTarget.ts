@@ -13,11 +13,6 @@ export class RegularTarget extends Target {
     this.spawn();
   }
 
-  render(): void {
-    this.graphics.clear();
-    this.graphics.circle(0, 0, this.initialSize).fill(this.config.color);
-  }
-
   onClick(): ClickResult {
     return {
       destroyed: true,

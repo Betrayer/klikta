@@ -761,8 +761,8 @@ export class Game {
     const spawned: Target[] = [];
     for (const event of events) {
       const target = this.createTarget(event);
-      target.graphics.on("pointerdown", () => this.handleTargetClick(target));
-      this.targetLayer.addChild(target.graphics);
+      target.bindPointerDown(() => this.handleTargetClick(target));
+      this.targetLayer.addChild(target.view);
       this.targets.push(target);
       spawned.push(target);
       if (this.physics !== null) this.bindToPhysics(target);
@@ -864,10 +864,8 @@ export class Game {
         { x: x + Math.cos(angle) * dist, y: y + Math.sin(angle) * dist },
         modifiers,
       );
-      fragment.graphics.on("pointerdown", () =>
-        this.handleTargetClick(fragment),
-      );
-      this.targetLayer.addChild(fragment.graphics);
+      fragment.bindPointerDown(() => this.handleTargetClick(fragment));
+      this.targetLayer.addChild(fragment.view);
       this.targets.push(fragment);
     }
   }
