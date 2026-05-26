@@ -4,9 +4,9 @@ import { getTelegramSession } from '../../services/telegram';
 export const ClosedTest = () => {
   const { userId } = getTelegramSession();
   return (
-    <Center h="100vh" bg="#0a0014" p="md">
+    <Center h="100vh" bg="background" p="md">
       <Stack align="center" gap="sm" maw={420}>
-        <Title order={2} c="#ff006e">
+        <Title order={2} c="primary">
           Closed test
         </Title>
         <Text ta="center" c="dimmed">

@@ -26,7 +26,7 @@ export const FpsCounter = ({ getFps }: FpsCounterProps) => {
       bg="rgba(0, 0, 0, 0.4)"
       style={{ pointerEvents: 'none', userSelect: 'none', zIndex: 10 }}
     >
-      <Text ff="monospace" fz="sm" c="#00f5d4">
+      <Text ff="monospace" fz="sm" c="highlight">
         {fps} FPS
       </Text>
     </Paper>

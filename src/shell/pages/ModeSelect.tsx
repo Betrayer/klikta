@@ -20,12 +20,12 @@ export const ModeSelect = () => {
   const bestScores = useMetaStore((s) => s.bestScores);
 
   return (
-    <Box bg="#0a0014" mih="100vh">
+    <Box bg="background" mih="100vh">
       <ScrollArea h="100vh" type="auto">
         <Container size={900} p="md">
           <Stack gap="lg">
             <Group justify="space-between" align="center">
-              <Title order={1} fz={36} fw={900} c="#ff006e" lts={4}>
+              <Title order={1} fz={36} fw={900} c="primary" lts={4}>
                 SELECT MODE
               </Title>
               <Button
@@ -61,7 +61,7 @@ interface ModeCardProps {
 const ModeCard = ({ mode, best }: ModeCardProps) => {
   return (
     <Card
-      bg="#0d0118"
+      bg="surface"
       withBorder
       radius="md"
       padding="lg"
@@ -94,7 +94,7 @@ const ModeCard = ({ mode, best }: ModeCardProps) => {
           Best
         </Text>
         {best > 0 ? (
-          <Text ff="monospace" fz="lg" fw={700} c="#00f5d4">
+          <Text ff="monospace" fz="lg" fw={700} c="highlight">
             <NumberFormatter value={best} thousandSeparator />
           </Text>
         ) : (

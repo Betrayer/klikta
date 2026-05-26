@@ -1,7 +1,6 @@
 import {
   Application,
   Container,
-  Graphics,
   type FederatedPointerEvent,
   type Ticker,
 } from "pixi.js";
@@ -110,9 +109,7 @@ export class Game {
   private unsubPause: (() => void) | null = null;
   private vfx: VFXSystem | null = null;
   private camera: CameraSystem | null = null;
-  private flashGfx: Graphics | null = null;
   private hitFrameUntil = 0;
-  private flashStartMs = -1;
   private clockMs = 0;
   private destroyed = false;
   private mode: ModePolicy = new EndlessHPMode();
@@ -245,12 +242,6 @@ export class Game {
 
     this.camera = new CameraSystem(app.stage);
 
-    const flash = new Graphics();
-    flash.eventMode = "none";
-    flash.alpha = 0;
-    app.stage.addChild(flash);
-    this.flashGfx = flash;
-    this.drawFlash();
     app.renderer.on("resize", this.handleResize);
 
     app.stage.eventMode = "static";
@@ -373,13 +364,11 @@ export class Game {
 
     audioSystem.playSFX("miss");
 
-    if (this.runMods.backgroundClickIgnored) {
-      return;
-    }
-
     const skipHpLoss =
       this.runMods.shieldedMissNoHPLoss && this.hasActiveShield();
-    useRunStore.getState().resetCombo();
+    if (!this.runMods.backgroundClickIgnored) {
+      useRunStore.getState().resetCombo();
+    }
     if (!skipHpLoss) this.applyMissPenalty();
     this.syncMusicToCombo();
   };
@@ -412,21 +401,11 @@ export class Game {
   }
 
   private handleResize = (): void => {
-    this.drawFlash();
     if (this.physics !== null && this.app !== null) {
       const { width, height } = this.app.renderer.screen;
       this.physics.resize({ width, height });
     }
   };
-
-  private drawFlash(): void {
-    if (this.app === null || this.flashGfx === null) return;
-    const { width, height } = this.app.renderer.screen;
-    this.flashGfx
-      .clear()
-      .rect(-40, -40, width + 80, height + 80)
-      .fill(0xffffff);
-  }
 
   private triggerJuice(target: Target): void {
     if (this.app === null) return;
@@ -443,7 +422,6 @@ export class Game {
   private triggerHitFrame(): void {
     if (this.app === null) return;
     this.hitFrameUntil = performance.now() + FEEL.hitFrameMs;
-    this.flashStartMs = performance.now();
     this.updateTickerSpeed();
   }
 
@@ -453,18 +431,6 @@ export class Game {
     if (this.hitFrameUntil > 0 && now >= this.hitFrameUntil) {
       this.hitFrameUntil = 0;
       this.updateTickerSpeed();
-    }
-    if (this.flashGfx === null || this.flashStartMs < 0) return;
-    const elapsed = now - this.flashStartMs;
-    const inMs = FEEL.flashInMs;
-    const outMs = FEEL.flashOutMs;
-    if (elapsed <= inMs) {
-      this.flashGfx.alpha = FEEL.flashAlpha * (elapsed / inMs);
-    } else if (elapsed <= inMs + outMs) {
-      this.flashGfx.alpha = FEEL.flashAlpha * (1 - (elapsed - inMs) / outMs);
-    } else {
-      this.flashGfx.alpha = 0;
-      this.flashStartMs = -1;
     }
   }
 
@@ -1150,7 +1116,5 @@ export class Game {
     this.spawnSystem = null;
     this.vfx = null;
     this.camera = null;
-    this.flashGfx = null;
-    this.flashStartMs = -1;
   }
 }

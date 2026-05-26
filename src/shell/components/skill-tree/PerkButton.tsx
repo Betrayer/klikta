@@ -71,7 +71,7 @@ const PerkButtonImpl = ({
   return (
     <Paper
       p="xs"
-      bg="#11071a"
+      bg="surface"
       onClick={handleClick}
       onMouseEnter={() => onHover(option.id)}
       onMouseLeave={() => onHover(null)}

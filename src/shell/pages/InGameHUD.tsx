@@ -27,7 +27,7 @@ export const InGameHUD = () => {
         bg="rgba(0, 0, 0, 0.4)"
         style={{ pointerEvents: 'none', userSelect: 'none', zIndex: 10 }}
       >
-        <Text ff="monospace" fz="lg" fw={700} c="#ff006e">
+        <Text ff="monospace" fz="lg" fw={700} c="primary">
           {score}
         </Text>
       </Paper>
@@ -48,7 +48,7 @@ export const InGameHUD = () => {
             zIndex: 10,
           }}
         >
-          <Text ff="monospace" fz="sm" fw={700} c="#3a86ff" lts={1}>
+          <Text ff="monospace" fz="sm" fw={700} c="info" lts={1}>
             WAVE {currentWave} / {totalWaves}
           </Text>
         </Paper>
@@ -71,7 +71,7 @@ export const InGameHUD = () => {
           bg="rgba(0, 0, 0, 0.4)"
           style={{ pointerEvents: 'none', userSelect: 'none', zIndex: 10 }}
         >
-          <Text ff="monospace" fz="lg" fw={700} c="#00f5d4">
+          <Text ff="monospace" fz="lg" fw={700} c="highlight">
             {'♥'.repeat(hp) || '-'}
           </Text>
         </Paper>

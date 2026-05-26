@@ -23,12 +23,13 @@ export const WaveBreak = () => {
         alignItems: 'center',
         justifyContent: 'center',
         backdropFilter: 'blur(4px)',
-        backgroundColor: 'rgba(10, 0, 20, 0.82)',
+        backgroundColor:
+          'color-mix(in srgb, var(--mantine-color-background-filled) 82%, transparent)',
       }}
     >
       <Stack align="center" gap="xl" maw={900} px="md" w="100%">
         <Stack align="center" gap={4}>
-          <Title order={2} fz={40} fw={900} c="#3a86ff" lts={3}>
+          <Title order={2} fz={40} fw={900} c="info" lts={3}>
             WAVE CLEARED
           </Title>
           <Text c="dimmed" size="sm" tt="uppercase" lts={2}>
@@ -45,12 +46,15 @@ export const WaveBreak = () => {
               p="lg"
               radius="md"
               withBorder
-              bg="#0d0118"
-              style={{ cursor: 'pointer', borderColor: '#3a86ff' }}
+              bg="surface"
+              style={{
+                cursor: 'pointer',
+                borderColor: 'var(--mantine-color-info-filled)',
+              }}
               onClick={() => requestRunPerkPick(choice.id)}
             >
               <Stack gap="xs" h="100%" justify="space-between">
-                <Text fz="lg" fw={700} c="#00f0ff">
+                <Text fz="lg" fw={700} c="accent">
                   {choice.name}
                 </Text>
                 <Text size="sm" c="gray.3">

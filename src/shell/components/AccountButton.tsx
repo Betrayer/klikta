@@ -38,7 +38,7 @@ export const AccountButton = () => {
         size="md"
         radius="xl"
         variant="light"
-        color="#00f0ff"
+        color="accent"
         onClick={open}
         fullWidth
       >

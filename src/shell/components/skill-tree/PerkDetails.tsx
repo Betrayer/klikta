@@ -31,7 +31,7 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
 
   if (option === undefined || tierEntry === undefined) {
     return (
-      <Paper p="md" mih={120} bg="#0d0118" withBorder>
+      <Paper p="md" mih={120} bg="surface" withBorder>
         <Text c="dimmed" size="sm" ta="center" mt="md">
           {EMPTY_HINT}
         </Text>
@@ -109,7 +109,7 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
   return (
     <Paper
       p="md"
-      bg="#0d0118"
+      bg="surface"
       withBorder
       style={{
         borderColor: `color-mix(in srgb, ${branch.color} 50%, transparent)`,

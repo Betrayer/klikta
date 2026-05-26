@@ -44,8 +44,11 @@ export const GameCanvas = () => {
         <Box ref={containerRef} w="100%" h="100%" />
         <LoadingOverlay
           visible={loading}
-          overlayProps={{ color: '#0a0014', backgroundOpacity: 1 }}
-          loaderProps={{ color: '#ff006e' }}
+          overlayProps={{
+            color: 'var(--mantine-color-background-filled)',
+            backgroundOpacity: 1,
+          }}
+          loaderProps={{ color: 'primary' }}
         />
       </Box>
       <FpsCounter getFps={getFps} />

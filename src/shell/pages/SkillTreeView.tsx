@@ -110,12 +110,12 @@ export const SkillTreeView = () => {
   };
 
   return (
-    <Box bg="#0a0014" mih="100vh">
+    <Box bg="background" mih="100vh">
       <ScrollArea h="100vh" type="auto">
         <Container size={1600} p="md">
           <Stack gap="md">
             <Group justify="space-between" align="center">
-              <Title order={1} fz={36} fw={900} c="#ff006e" lts={4}>
+              <Title order={1} fz={36} fw={900} c="primary" lts={4}>
                 SKILL TREE
               </Title>
               <Button
@@ -171,7 +171,7 @@ export const SkillTreeView = () => {
               <Button variant="default" onClick={() => setPending(null)}>
                 Cancel
               </Button>
-              <Button color="#ff006e" onClick={confirmPending}>
+              <Button color="primary" onClick={confirmPending}>
                 Bind
               </Button>
             </Group>

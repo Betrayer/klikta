@@ -15,9 +15,9 @@ export const WebGate = ({ onUnlock }: { onUnlock: () => void }) => {
   };
 
   return (
-    <Center h="100vh" bg="#0a0014" p="md">
+    <Center h="100vh" bg="background" p="md">
       <Stack align="center" gap="md" w={300}>
-        <Title order={1} c="#ff006e" lts={4}>
+        <Title order={1} c="primary" lts={4}>
           KLIKTA
         </Title>
         <Text ta="center" c="dimmed" size="sm">
@@ -36,7 +36,7 @@ export const WebGate = ({ onUnlock }: { onUnlock: () => void }) => {
             if (event.key === 'Enter') submit();
           }}
         />
-        <Button color="#ff006e" radius="xl" fullWidth onClick={submit}>
+        <Button color="primary" radius="xl" fullWidth onClick={submit}>
           Enter
         </Button>
       </Stack>

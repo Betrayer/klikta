@@ -47,7 +47,7 @@ export const BranchColumn = ({
       p="sm"
       withBorder
       style={{
-        backgroundColor: `color-mix(in srgb, ${branch.color} 8%, #0a0014)`,
+        backgroundColor: `color-mix(in srgb, ${branch.color} 8%, var(--mantine-color-background-filled))`,
         borderColor: `color-mix(in srgb, ${branch.color} 35%, transparent)`,
       }}
     >

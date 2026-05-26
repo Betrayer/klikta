@@ -110,7 +110,7 @@ export const SettingsOverlay = () => {
             />
           </Stack>
 
-          <Button fullWidth color="#ff006e" onClick={() => setPaused(false)}>
+          <Button fullWidth color="primary" onClick={() => setPaused(false)}>
             Resume
           </Button>
           <Button

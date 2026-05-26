@@ -6,8 +6,13 @@ export const synthwaveTheme: Theme = {
   ui: {
     primary: "#ff006e",
     accent: "#00f0ff",
+    highlight: "#00f5d4",
+    gold: "#ffd700",
+    info: "#3a86ff",
+    danger: "#ff2d55",
     background: "#0a0014",
     surface: "#0d0118",
+    border: "#1f0a33",
     text: "#e9ecef",
   },
   targets: {

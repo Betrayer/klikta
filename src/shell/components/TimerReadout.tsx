@@ -7,8 +7,8 @@ import {
   TIMER_LOW_WARNING_MS,
 } from '../../game/config/balance';
 
-const NORMAL_COLOR = '#00f5d4';
-const LOW_COLOR = '#ff2d55';
+const NORMAL_COLOR = 'highlight';
+const LOW_COLOR = 'danger';
 
 export const TimerReadout = () => {
   const timeRemainingMs = useRunStore((s) => s.timeRemainingMs);

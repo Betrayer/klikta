@@ -47,8 +47,13 @@ export interface ParticlePalettes {
 export interface ThemeUiColors {
   primary: string;
   accent: string;
+  highlight: string;
+  gold: string;
+  info: string;
+  danger: string;
   background: string;
   surface: string;
+  border: string;
   text: string;
 }
 

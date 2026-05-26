@@ -27,7 +27,4 @@ export const FEEL = {
   },
   hitFrameMs: 50,
   hitFrameSlow: 0.1,
-  flashAlpha: 0.22,
-  flashInMs: 30,
-  flashOutMs: 60,
 } as const;

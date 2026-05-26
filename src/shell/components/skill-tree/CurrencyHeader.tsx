@@ -54,13 +54,13 @@ export const CurrencyHeader = () => {
   );
 
   return (
-    <Paper p="md" bg="#0d0118" withBorder>
+    <Paper p="md" bg="surface" withBorder>
       <Group justify="space-between" align="center" wrap="wrap" gap="md">
         <Stack gap={2}>
           <Text size="xs" c="dimmed" tt="uppercase">
             Currency
           </Text>
-          <Title order={2} c="#ffd700" ff="monospace">
+          <Title order={2} c="gold" ff="monospace">
             {animatedCurrency}
           </Title>
         </Stack>
@@ -82,7 +82,7 @@ export const CurrencyHeader = () => {
           <Text size="xs" c="dimmed" tt="uppercase">
             Best Score
           </Text>
-          <Title order={3} c="#00f5d4" ff="monospace">
+          <Title order={3} c="highlight" ff="monospace">
             {bestScore}
           </Title>
         </Stack>

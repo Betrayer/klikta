@@ -186,7 +186,7 @@ export const PostRunSummary = () => {
 
   const isNewBest = score > 0 && score > previousBest;
   const titleText = victory ? 'VICTORY' : 'RUN OVER';
-  const titleColor = victory ? '#ffd700' : '#ff006e';
+  const titleColor = victory ? 'gold' : 'primary';
   const displayedScore = useCountUp(score, SCORE_COUNTUP_MS, 0);
   const displayedCombo = useCountUp(maxCombo, SCORE_COUNTUP_MS, 100);
 
@@ -248,7 +248,7 @@ export const PostRunSummary = () => {
   const displayedTotal = useCountUp(totalEarned, CURRENCY_LINE_MS, totalDelay);
 
   return (
-    <Box bg="#0a0014" mih="100vh">
+    <Box bg="background" mih="100vh">
       <Center mih="100vh" p="md">
         <Container size={720} w="100%">
           <Stack gap="lg">
@@ -258,13 +258,14 @@ export const PostRunSummary = () => {
               </Title>
               {isNewBest && (
                 <Badge
-                  color="#ffd700"
+                  color="gold"
                   variant="filled"
                   size="lg"
                   radius="sm"
                   style={{
-                    color: '#0a0014',
-                    boxShadow: '0 0 24px rgba(255, 215, 0, 0.6)',
+                    color: 'var(--mantine-color-background-filled)',
+                    boxShadow:
+                      '0 0 24px color-mix(in srgb, var(--mantine-color-gold-filled) 60%, transparent)',
                   }}
                 >
                   NEW BEST
@@ -273,13 +274,13 @@ export const PostRunSummary = () => {
               <RankLine submitting={submitting} result={submitResult} />
             </Stack>
 
-            <Paper p="lg" bg="#0d0118" withBorder>
+            <Paper p="lg" bg="surface" withBorder>
               <Stack gap="md">
                 <Group justify="space-between" align="baseline">
                   <Text size="sm" c="dimmed" tt="uppercase" lts={1}>
                     Score
                   </Text>
-                  <Text ff="monospace" fz={36} fw={700} c="#00f5d4">
+                  <Text ff="monospace" fz={36} fw={700} c="highlight">
                     <NumberFormatter
                       value={displayedScore}
                       thousandSeparator
@@ -290,7 +291,7 @@ export const PostRunSummary = () => {
                   <Text size="sm" c="dimmed" tt="uppercase" lts={1}>
                     Max Combo
                   </Text>
-                  <Text ff="monospace" fz="xl" c="#00f0ff">
+                  <Text ff="monospace" fz="xl" c="accent">
                     {displayedCombo}
                   </Text>
                 </Group>
@@ -318,7 +319,7 @@ export const PostRunSummary = () => {
               </Stack>
             </Paper>
 
-            <Paper p="lg" bg="#0d0118" withBorder>
+            <Paper p="lg" bg="surface" withBorder>
               <Stack gap="sm">
                 <Text size="sm" c="dimmed" tt="uppercase" lts={1}>
                   Currency Earned
@@ -339,12 +340,12 @@ export const PostRunSummary = () => {
                 ))}
                 {totalEarned > 0 && (
                   <>
-                    <Divider color="#1f0a33" />
+                    <Divider color="border" />
                     <Group justify="space-between" align="baseline">
-                      <Text size="sm" fw={700} c="#ffd700" tt="uppercase" lts={1}>
+                      <Text size="sm" fw={700} c="gold" tt="uppercase" lts={1}>
                         Total
                       </Text>
-                      <Text ff="monospace" fz="xl" fw={700} c="#ffd700">
+                      <Text ff="monospace" fz="xl" fw={700} c="gold">
                         +{displayedTotal}
                       </Text>
                     </Group>
@@ -354,7 +355,7 @@ export const PostRunSummary = () => {
             </Paper>
 
             {activePerks.length > 0 && (
-              <Paper p="lg" bg="#0d0118" withBorder>
+              <Paper p="lg" bg="surface" withBorder>
                 <Stack gap="sm">
                   <Text size="sm" c="dimmed" tt="uppercase" lts={1}>
                     Active Perks
@@ -392,7 +393,7 @@ export const PostRunSummary = () => {
               <Button
                 size="lg"
                 radius="xl"
-                color="#ff006e"
+                color="primary"
                 onClick={handlePlayAgain}
               >
                 Play Again
@@ -401,7 +402,7 @@ export const PostRunSummary = () => {
                 size="md"
                 radius="xl"
                 variant="outline"
-                color="#00f0ff"
+                color="accent"
                 onClick={handleSkillTree}
               >
                 Skill Tree
@@ -410,7 +411,7 @@ export const PostRunSummary = () => {
                 size="md"
                 radius="xl"
                 variant="outline"
-                color="#ffd700"
+                color="gold"
                 onClick={handleLeaderboard}
               >
                 Leaderboard
@@ -446,10 +447,10 @@ const CurrencyRow = ({
   highlight,
 }: CurrencyRowProps) => {
   const displayed = useCountUp(amount, CURRENCY_LINE_MS, delayMs);
-  const color = highlight ? '#ffd700' : 'gray.3';
+  const color = highlight ? 'gold' : 'gray.3';
   return (
     <Group justify="space-between" align="baseline">
-      <Text size="sm" c={highlight ? '#ffd700' : 'gray.4'}>
+      <Text size="sm" c={highlight ? 'gold' : 'gray.4'}>
         {label}
       </Text>
       <Text ff="monospace" size="sm" c={color}>
@@ -475,7 +476,7 @@ const RankLine = ({ submitting, result }: RankLineProps) => {
   }
   if (result.status === 'submitted' && result.rank !== null) {
     return (
-      <Text size="sm" fw={700} c="#ffd700">
+      <Text size="sm" fw={700} c="gold">
         Ranked #{result.rank} globally
       </Text>
     );
