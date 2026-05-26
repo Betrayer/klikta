@@ -7,6 +7,7 @@ import type {
 } from '../../../data/skillTree';
 import { findPerk, findTierForPerk, tierKey } from '../../../data/skillTree';
 import { useMetaStore } from '../../../state/metaStore';
+import { PerkIcon } from '../icons/PerkIcon';
 
 export interface PerkDetailsProps {
   focusedPerkId: string | null;
@@ -119,9 +120,7 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
       <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
         <Stack gap={6} style={{ flex: 1, minWidth: 0 }}>
           <Group gap="sm" wrap="nowrap">
-            <Text fz={28} lh={1}>
-              {option.icon}
-            </Text>
+            <PerkIcon name={option.icon} size={30} color={branch.color} />
             <Stack gap={0}>
               <Text fw={700} fz="lg" c="white">
                 {option.name}

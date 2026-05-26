@@ -15,7 +15,7 @@ export const WILD_BRANCH: SkillBranch = {
           id: "wild-t1-volatile-time",
           name: "Volatile Time",
           description: "Each target's lifetime varies randomly by ±50%.",
-          icon: "🎰",
+          icon: "shuffle",
           cost: 50,
           effects: [{ kind: "lifetimeJitterPct", value: 0.5 }],
         },
@@ -24,7 +24,7 @@ export const WILD_BRANCH: SkillBranch = {
           name: "Concentrated",
           description:
             "Bomb spawn weight halved, but every 5th target is guaranteed a bomb.",
-          icon: "💣",
+          icon: "bomb",
           cost: 80,
           effects: [{ kind: "bombWeightHalvedEveryFifthBomb" }],
         },
@@ -33,7 +33,7 @@ export const WILD_BRANCH: SkillBranch = {
           name: "Lucky Big",
           description:
             "5% chance a target spawns at 2× size and awards 2× score.",
-          icon: "🍀",
+          icon: "clover",
           cost: 100,
           effects: [
             { kind: "oversizeChance", value: 0.05, sizeMul: 2, scoreMul: 2 },
@@ -49,7 +49,7 @@ export const WILD_BRANCH: SkillBranch = {
           id: "wild-t2-decoy-gold",
           name: "Decoy Gold",
           description: "15% of bombs disguise themselves as golden targets.",
-          icon: "🎭",
+          icon: "mask",
           cost: 250,
           effects: [{ kind: "bombDecoyChance", value: 0.15 }],
         },
@@ -57,7 +57,7 @@ export const WILD_BRANCH: SkillBranch = {
           id: "wild-t2-rush-pulse",
           name: "Rush Pulse",
           description: "Every 30 seconds, spawn rate triples for 5 seconds.",
-          icon: "🌊",
+          icon: "wave",
           cost: 300,
           effects: [
             {
@@ -78,7 +78,7 @@ export const WILD_BRANCH: SkillBranch = {
           id: "wild-t3-mortgage",
           name: "Mortgage",
           description: "All scores ×2 this run, but you earn no currency.",
-          icon: "🏦",
+          icon: "bank",
           cost: 600,
           effects: [{ kind: "scoreDoubledNoCurrency" }],
         },
@@ -87,7 +87,7 @@ export const WILD_BRANCH: SkillBranch = {
           name: "Cursor Magnet",
           description:
             "Targets drift toward your cursor at ~25 px/s - stronger than mutation magnet.",
-          icon: "🧲",
+          icon: "magnet",
           cost: 700,
           effects: [{ kind: "targetsFollowCursorSpeed", value: 25 }],
         },
@@ -102,7 +102,7 @@ export const WILD_BRANCH: SkillBranch = {
           name: "Chaos Storm",
           description:
             "Ultimate: 4 seconds of ×4 spawn rate, fully randomized target types, glitch shader.",
-          icon: "🌀",
+          icon: "cyclone",
           cost: 2600,
           effects: [{ kind: "ultimateUnlock", id: "chaos-storm" }],
         },

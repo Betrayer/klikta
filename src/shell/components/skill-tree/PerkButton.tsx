@@ -1,6 +1,7 @@
 import { Group, Paper, Stack, Text } from '@mantine/core';
 import { memo } from 'react';
 import type { BranchId, SkillOption, TierLevel } from '../../../data/skillTree';
+import { PerkIcon } from '../icons/PerkIcon';
 
 export interface PerkButtonProps {
   option: SkillOption;
@@ -87,9 +88,11 @@ const PerkButtonImpl = ({
       }}
     >
       <Group gap="xs" wrap="nowrap" align="flex-start">
-        <Text fz="xl" lh={1}>
-          {isLocked ? '🔒' : option.icon}
-        </Text>
+        <PerkIcon
+          name={isLocked ? 'locked' : option.icon}
+          size={22}
+          color={branchColor}
+        />
         <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
           <Text size="sm" fw={600} c="white" lineClamp={1}>
             {option.name}
