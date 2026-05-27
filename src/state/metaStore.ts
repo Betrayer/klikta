@@ -38,6 +38,7 @@ export interface MetaState {
   spendCurrency: (amount: number) => boolean;
   selectPerk: (tierKey: string, perkId: string) => void;
   unselectPerk: (tierKey: string) => void;
+  clearPerks: () => void;
   unlockUltimate: (id: string) => void;
   recordRun: (mode: ModeId, score: number) => void;
   unlockAchievement: (id: string) => boolean;
@@ -152,6 +153,16 @@ export const useMetaStore = create<MetaState>()(
             },
             false,
             "unselectPerk",
+          ),
+
+        clearPerks: () =>
+          set(
+            (s) =>
+              Object.keys(s.selectedPerks).length === 0
+                ? s
+                : { selectedPerks: {}, updatedAt: Date.now() },
+            false,
+            "clearPerks",
           ),
 
         unlockUltimate: (id) =>

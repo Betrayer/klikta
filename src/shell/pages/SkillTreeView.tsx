@@ -80,6 +80,7 @@ export const SkillTreeView = () => {
   const [hoveredPerkId, setHoveredPerkId] = useState<string | null>(null);
   const [pinnedPerkId, setPinnedPerkId] = useState<string | null>(null);
   const [pending, setPending] = useState<PendingSelection | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
   const focusedPerkId = hoveredPerkId ?? pinnedPerkId;
 
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
@@ -131,6 +132,27 @@ export const SkillTreeView = () => {
     setPending(null);
   };
 
+  const selectedCount = Object.keys(selectedPerks).length;
+  const refundTotal = useMemo(
+    () =>
+      Object.values(selectedPerks).reduce(
+        (sum, id) => sum + (findPerk(id)?.cost ?? 0),
+        0,
+      ),
+    [selectedPerks],
+  );
+
+  const resetAllPerks = () => {
+    const meta = useMetaStore.getState();
+    let refund = 0;
+    for (const id of Object.values(meta.selectedPerks)) {
+      refund += findPerk(id)?.cost ?? 0;
+    }
+    if (refund > 0) meta.awardCurrency(refund);
+    meta.clearPerks();
+    setConfirmReset(false);
+  };
+
   return (
     <Box bg="background" pos="relative" h="100vh" style={{ overflow: 'hidden' }}>
       <SkillTreeCanvas
@@ -160,14 +182,23 @@ export const SkillTreeView = () => {
         <Title order={1} fz={28} fw={900} c="primary" lts={4}>
           SKILL TREE
         </Title>
-        <Button
-          variant="light"
-          color="gray"
-          style={{ pointerEvents: 'auto' }}
-          onClick={() => useAppStore.getState().setScreen('menu')}
-        >
-          Back to Menu
-        </Button>
+        <Group gap="xs" style={{ pointerEvents: 'auto' }}>
+          <Button
+            variant="outline"
+            color="red"
+            disabled={selectedCount === 0}
+            onClick={() => setConfirmReset(true)}
+          >
+            Reset Perks
+          </Button>
+          <Button
+            variant="light"
+            color="gray"
+            onClick={() => useAppStore.getState().setScreen('menu')}
+          >
+            Back to Menu
+          </Button>
+        </Group>
       </Group>
 
       <Stack
@@ -252,6 +283,32 @@ export const SkillTreeView = () => {
           reset test
         </Button>
       </Group>
+
+      <Modal
+        opened={confirmReset}
+        onClose={() => setConfirmReset(false)}
+        title="Reset all perks?"
+        centered
+        overlayProps={{ backgroundOpacity: 0.7, blur: 2 }}
+      >
+        <Stack>
+          <Text size="sm">
+            Deselects all {selectedCount} perks and refunds{' '}
+            <Text component="span" fw={700}>
+              {refundTotal}
+            </Text>{' '}
+            currency. You can re-select them anytime.
+          </Text>
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setConfirmReset(false)}>
+              Cancel
+            </Button>
+            <Button color="red" onClick={resetAllPerks}>
+              Reset Perks
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
 
       <Modal
         opened={pending !== null}

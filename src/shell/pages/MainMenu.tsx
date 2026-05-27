@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { Button, Center, Stack, Title } from '@mantine/core';
 import { useAppStore } from '../../state/appStore';
 import { AccountButton } from '../components/AccountButton';
-import { ThemePicker } from '../components/ThemePicker';
+import { CustomizeModal } from '../components/CustomizeModal';
 
 export const MainMenu = () => {
+  const [customizeOpen, setCustomizeOpen] = useState(false);
+
   return (
     <Center h="100vh" bg="background">
       <Stack align="center" gap={32}>
@@ -41,9 +44,22 @@ export const MainMenu = () => {
             Leaderboard
           </Button>
           <AccountButton />
+          <Button
+            size="md"
+            radius="xl"
+            variant="subtle"
+            color="highlight"
+            onClick={() => setCustomizeOpen(true)}
+            fullWidth
+          >
+            Customize
+          </Button>
         </Stack>
-        <ThemePicker />
       </Stack>
+      <CustomizeModal
+        opened={customizeOpen}
+        onClose={() => setCustomizeOpen(false)}
+      />
     </Center>
   );
 };
