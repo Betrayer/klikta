@@ -1,5 +1,6 @@
-import { TARGET_CONFIG } from "../../data/targetConfig";
 import { Target, type ClickResult, type TargetSpawn } from "./Target";
+import type { TargetVisual } from "../../data/themes/types";
+import { getActiveTheme } from "../../state/themeSelectors";
 import { tweenManager } from "../util/TweenManager";
 import { easeOutCubic, linear } from "../util/easings";
 import { FEEL } from "../config/feel";
@@ -8,9 +9,6 @@ import {
   type TargetSpawnModifiers,
 } from "../effects/EffectResolver";
 import { bloomState, BLOOM_BOMB_MAX_SCALE } from "../ultimates/BloomState";
-
-const SPIKES = 6;
-const DECOY_GOLDEN_COLOR = TARGET_CONFIG.golden.color;
 
 export class BombTarget extends Target {
   readonly appearAsGolden: boolean;
@@ -25,26 +23,22 @@ export class BombTarget extends Target {
     this.spawn();
   }
 
+  protected override resolveVisual(): TargetVisual {
+    const theme = getActiveTheme();
+    return this.appearAsGolden ? theme.targets.golden : theme.targets.bomb;
+  }
+
+  protected override baseSize(): number {
+    return this.appearAsGolden ? this.initialSize * 0.8 : this.initialSize;
+  }
+
   render(): void {
-    this.graphics.clear();
+    this.decoration.clear();
     if (this.appearAsGolden) {
-      this.graphics
-        .circle(0, 0, this.initialSize * 0.8)
-        .fill(DECOY_GOLDEN_COLOR);
-      this.graphics
+      this.decoration
         .circle(0, 0, this.initialSize * 0.44)
         .stroke({ width: 4, color: 0xffffff });
-      return;
     }
-    const outer = this.initialSize;
-    const inner = this.initialSize * 0.5;
-    const points: number[] = [];
-    for (let i = 0; i < SPIKES * 2; i++) {
-      const radius = i % 2 === 0 ? outer : inner;
-      const angle = -Math.PI / 2 + (i * Math.PI) / SPIKES;
-      points.push(Math.cos(angle) * radius, Math.sin(angle) * radius);
-    }
-    this.graphics.poly(points).fill(this.config.color);
   }
 
   protected override updateLifeAndAlpha(): void {
@@ -55,7 +49,7 @@ export class BombTarget extends Target {
       this.lifeScale = 1 + (BLOOM_BOMB_MAX_SCALE - 1) * t;
       this.currentSize = this.initialSize * this.lifeScale;
       this.applyScale();
-      this.graphics.alpha = 1;
+      this.view.alpha = 1;
       return;
     }
 
@@ -65,7 +59,7 @@ export class BombTarget extends Target {
       this.lifeScale = 1 + (beacon - 1) * t;
       this.currentSize = this.initialSize * this.lifeScale;
       this.applyScale();
-      this.graphics.alpha = 1;
+      this.view.alpha = 1;
       return;
     }
 
@@ -81,15 +75,15 @@ export class BombTarget extends Target {
       periodMs *= 0.5;
     }
     const visible = Math.floor(this.elapsedMs / periodMs) % 2 === 0;
-    this.graphics.alpha = visible ? 1 : 0.3;
+    this.view.alpha = visible ? 1 : 0.3;
   }
 
   beginHitExit(): void {
     if (this.phase === "exiting" || this.phase === "dead") return;
     this.cancelTweens();
     this.phase = "exiting";
-    this.graphics.eventMode = "none";
-    this.graphics.alpha = 1;
+    this.base.eventMode = "none";
+    this.view.alpha = 1;
 
     const peak = FEEL.bombHitScale;
     const half = FEEL.bombHitMs * 0.5;
@@ -129,7 +123,7 @@ export class BombTarget extends Target {
         0,
         FEEL.bombHitMs,
         (a) => {
-          this.graphics.alpha = a;
+          this.view.alpha = a;
         },
         linear,
       ),

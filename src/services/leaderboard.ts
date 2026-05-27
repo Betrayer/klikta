@@ -16,7 +16,7 @@ import { useAuthStore } from "../state/authStore";
 import { getTelegramSession } from "./telegram";
 import { MODE_BY_ID, type ModeId } from "../data/modes";
 
-export const SCORE_SCHEMA_VERSION = "p4";
+const SCORE_SCHEMA_VERSION = "p4";
 
 const TOP_LIMIT = 50;
 const CACHE_TTL_MS = 60000;
@@ -127,7 +127,7 @@ const parseEntry = (uid: string, data: unknown): LeaderboardEntry => {
   };
 };
 
-export const getPlayerRank = async (
+const getPlayerRank = async (
   mode: ModeId,
   value: number,
 ): Promise<number> => {

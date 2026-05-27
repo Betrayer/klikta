@@ -1,26 +1,22 @@
 import { Howl, Howler } from "howler";
-import musicUrl from "../../assets/audio/music/music_synthwave_loop_1.mp3";
 import {
   useSettingsStore,
   type SettingsState,
 } from "../../state/settingsStore";
+import { useMetaStore } from "../../state/metaStore";
+import {
+  getActiveMusicPack,
+  getActiveSfxPack,
+} from "../../state/themeSelectors";
+import { DEFAULT_SOUND_PACK } from "../../data/sound";
+import type { SoundPack } from "../../data/themes/types";
 
 const clamp01 = (v: number): number => Math.min(Math.max(v, 0), 1);
 
-const sfxUrls = import.meta.glob("../../assets/audio/sfx/*.ogg", {
-  eager: true,
-  query: "?url",
-  import: "default",
-}) as Record<string, string>;
-
-const baseName = (path: string): string => {
-  const file = path.split("/").pop() ?? path;
-  return file.replace(/\.ogg$/, "");
-};
-
-const variantGroup = (name: string): string => {
-  const match = /^(.*)_\d+$/.exec(name);
-  return match !== null && match[1] !== undefined ? match[1] : name;
+const formatOf = (src: string): string[] | undefined => {
+  const clean = src.split("?")[0] ?? src;
+  const ext = clean.split(".").pop();
+  return ext !== undefined && ext.length > 0 ? [ext] : undefined;
 };
 
 const FILTER_MIN_HZ = 500;
@@ -31,6 +27,8 @@ const GAMEOVER_FADE_S = 1;
 const GAMEOVER_GAIN_MUL = 0.4;
 const SWELL_S = 0.2;
 const SWELL_GAIN_MUL = 1.25;
+const MUSIC_CROSSFADE_S = 0.8;
+const SILENT_GAIN = 0.0001;
 
 class AudioSystem {
   private masterVolume = 1;
@@ -39,24 +37,27 @@ class AudioSystem {
   private musicIntensity = 0;
   private musicPlaying = false;
   private wantMusic = false;
+  private sfxPackGain = 1;
+  private sfxPackRate = 1;
+  private musicPackGain = 1;
+  private musicPackRate = 1;
 
-  private readonly sfx = new Map<string, Howl[]>();
+  private sfx = new Map<string, Howl[]>();
+  private loadedSfxPackId: string | null = null;
+  private readonly sfxCache = new Map<string, Map<string, Howl[]>>();
+
   private readonly ctx: AudioContext | null;
   private musicBuffer: AudioBuffer | null = null;
+  private loadedMusicPackId: string | null = null;
+  private readonly musicBufferCache = new Map<string, AudioBuffer>();
+  private readonly musicDecodes = new Map<string, Promise<AudioBuffer>>();
   private musicSource: AudioBufferSourceNode | null = null;
   private musicFilter: BiquadFilterNode | null = null;
   private musicGain: GainNode | null = null;
 
   constructor() {
-    for (const [path, url] of Object.entries(sfxUrls)) {
-      const group = variantGroup(baseName(path));
-      const howl = new Howl({ src: [url], format: ["ogg"] });
-      const existing = this.sfx.get(group);
-      if (existing !== undefined) existing.push(howl);
-      else this.sfx.set(group, [howl]);
-    }
-
     Howler.autoSuspend = false;
+    void this.loadSfxPack(getActiveSfxPack());
     this.ctx = Howler.ctx ?? null;
 
     const applySettings = (s: SettingsState): void => {
@@ -67,7 +68,71 @@ class AudioSystem {
     applySettings(useSettingsStore.getState());
     useSettingsStore.subscribe(applySettings);
 
-    void this.loadMusic();
+    void this.loadMusicPack(getActiveMusicPack());
+
+    useMetaStore.subscribe((state, prev) => {
+      if (state.activeSfxPackId !== prev.activeSfxPackId) {
+        void this.loadSfxPack(getActiveSfxPack());
+      }
+      if (state.activeMusicPackId !== prev.activeMusicPackId) {
+        void this.loadMusicPack(getActiveMusicPack());
+      }
+    });
+  }
+
+  async loadActivePacks(): Promise<void> {
+    await Promise.all([
+      this.loadSfxPack(getActiveSfxPack()),
+      this.loadMusicPack(getActiveMusicPack()),
+    ]);
+  }
+
+  arePacksLoaded(): boolean {
+    const sfx = getActiveSfxPack();
+    const music = getActiveMusicPack();
+    const sfxReady =
+      sfx.id === DEFAULT_SOUND_PACK.id || this.loadedSfxPackId === sfx.id;
+    const musicReady =
+      music.id === DEFAULT_SOUND_PACK.id || this.loadedMusicPackId === music.id;
+    return sfxReady && musicReady;
+  }
+
+  async loadSfxPack(pack: SoundPack): Promise<void> {
+    this.sfxPackGain = pack.gain ?? 1;
+    this.sfxPackRate = pack.rate ?? 1;
+    let map = this.sfxCache.get(pack.id);
+    if (map === undefined) {
+      map = this.buildSfx(pack);
+      this.sfxCache.set(pack.id, map);
+    }
+    this.sfx = map;
+    this.loadedSfxPackId = pack.id;
+    try {
+      await this.awaitSfxMap(map);
+    } catch {
+      if (pack.id !== DEFAULT_SOUND_PACK.id) {
+        this.sfxCache.delete(pack.id);
+        await this.loadSfxPack(DEFAULT_SOUND_PACK);
+      }
+    }
+  }
+
+  async loadMusicPack(pack: SoundPack): Promise<void> {
+    this.musicPackGain = pack.gain ?? 1;
+    this.musicPackRate = pack.rate ?? 1;
+    const ctx = this.ctx;
+    if (ctx === null) {
+      this.loadedMusicPackId = pack.id;
+      return;
+    }
+    try {
+      const buffer = await this.decodeMusic(pack, ctx);
+      this.applyMusicBuffer(buffer, pack.id);
+    } catch {
+      if (pack.id !== DEFAULT_SOUND_PACK.id) {
+        await this.loadMusicPack(DEFAULT_SOUND_PACK);
+      }
+    }
   }
 
   setPaused(paused: boolean): void {
@@ -76,20 +141,13 @@ class AudioSystem {
     else void this.ctx.resume();
   }
 
-  private async loadMusic(): Promise<void> {
-    if (this.ctx === null) return;
-    const response = await fetch(musicUrl);
-    const encoded = await response.arrayBuffer();
-    this.musicBuffer = await this.ctx.decodeAudioData(encoded);
-    if (this.wantMusic && !this.musicPlaying) this.playMusicNow();
-  }
-
   playSFX(name: string): void {
     const list = this.sfx.get(name);
     if (list === undefined || list.length === 0) return;
     const howl = list[Math.floor(Math.random() * list.length)];
     if (howl === undefined) return;
-    howl.volume(this.effectiveSfx());
+    howl.volume(this.effectiveSfx() * this.sfxPackGain);
+    howl.rate(this.sfxPackRate);
     howl.play();
   }
 
@@ -113,7 +171,7 @@ class AudioSystem {
   startMusic(): void {
     this.wantMusic = true;
     if (this.musicPlaying) return;
-    this.playMusicNow();
+    if (this.musicBuffer !== null) this.playMusicNow();
   }
 
   stopMusic(): void {
@@ -199,28 +257,141 @@ class AudioSystem {
     this.applyMusicGain();
   }
 
+  private buildSfx(pack: SoundPack): Map<string, Howl[]> {
+    const map = new Map<string, Howl[]>();
+    for (const [name, srcs] of Object.entries(pack.sfx)) {
+      map.set(
+        name,
+        srcs.map((src) => new Howl({ src: [src], format: formatOf(src) })),
+      );
+    }
+    return map;
+  }
+
+  private async awaitSfxMap(map: Map<string, Howl[]>): Promise<void> {
+    const pending: Promise<void>[] = [];
+    for (const howls of map.values()) {
+      for (const howl of howls) pending.push(this.awaitHowl(howl));
+    }
+    await Promise.all(pending);
+  }
+
+  private awaitHowl(howl: Howl): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (howl.state() === "loaded") {
+        resolve();
+        return;
+      }
+      howl.once("load", () => resolve());
+      howl.once("loaderror", (_id, error) => {
+        reject(error instanceof Error ? error : new Error(String(error)));
+      });
+    });
+  }
+
+  private decodeMusic(
+    pack: SoundPack,
+    ctx: AudioContext,
+  ): Promise<AudioBuffer> {
+    const cached = this.musicBufferCache.get(pack.id);
+    if (cached !== undefined) return Promise.resolve(cached);
+    const inflight = this.musicDecodes.get(pack.id);
+    if (inflight !== undefined) return inflight;
+    const decode = (async (): Promise<AudioBuffer> => {
+      try {
+        const response = await fetch(pack.music.src);
+        const encoded = await response.arrayBuffer();
+        const buffer = await ctx.decodeAudioData(encoded);
+        this.musicBufferCache.set(pack.id, buffer);
+        return buffer;
+      } finally {
+        this.musicDecodes.delete(pack.id);
+      }
+    })();
+    this.musicDecodes.set(pack.id, decode);
+    return decode;
+  }
+
+  private applyMusicBuffer(buffer: AudioBuffer, packId: string): void {
+    this.musicBuffer = buffer;
+    this.loadedMusicPackId = packId;
+    if (this.musicPlaying) this.crossfadeTo(buffer);
+    else if (this.wantMusic) this.playMusicNow();
+  }
+
   private playMusicNow(): void {
     if (this.ctx === null || this.musicBuffer === null) return;
-    const ctx = this.ctx;
+    const chain = this.buildMusicChain(
+      this.ctx,
+      this.musicBuffer,
+      this.effectiveMusic(),
+    );
+    this.musicSource = chain.source;
+    this.musicFilter = chain.filter;
+    this.musicGain = chain.gain;
+    this.musicPlaying = true;
+  }
 
+  private crossfadeTo(buffer: AudioBuffer): void {
+    if (this.ctx === null) return;
+    const ctx = this.ctx;
+    const oldSource = this.musicSource;
+    const oldFilter = this.musicFilter;
+    const oldGain = this.musicGain;
+
+    const chain = this.buildMusicChain(ctx, buffer, SILENT_GAIN);
+    this.musicSource = chain.source;
+    this.musicFilter = chain.filter;
+    this.musicGain = chain.gain;
+
+    const now = ctx.currentTime;
+    chain.gain.gain.linearRampToValueAtTime(
+      this.effectiveMusic(),
+      now + MUSIC_CROSSFADE_S,
+    );
+    if (oldGain !== null) {
+      oldGain.gain.cancelScheduledValues(now);
+      oldGain.gain.setValueAtTime(oldGain.gain.value, now);
+      oldGain.gain.linearRampToValueAtTime(
+        SILENT_GAIN,
+        now + MUSIC_CROSSFADE_S,
+      );
+    }
+    window.setTimeout(
+      () => {
+        oldSource?.stop();
+        oldSource?.disconnect();
+        oldFilter?.disconnect();
+        oldGain?.disconnect();
+      },
+      MUSIC_CROSSFADE_S * 1000 + 60,
+    );
+  }
+
+  private buildMusicChain(
+    ctx: AudioContext,
+    buffer: AudioBuffer,
+    gainValue: number,
+  ): {
+    source: AudioBufferSourceNode;
+    filter: BiquadFilterNode;
+    gain: GainNode;
+  } {
     const source = ctx.createBufferSource();
-    source.buffer = this.musicBuffer;
+    source.buffer = buffer;
     source.loop = true;
+    source.playbackRate.value = this.musicPackRate;
 
     const filter = ctx.createBiquadFilter();
     filter.type = "lowpass";
     filter.frequency.value = this.filterFreq();
 
     const gain = ctx.createGain();
-    gain.gain.value = this.effectiveMusic();
+    gain.gain.value = gainValue;
 
     source.connect(filter).connect(gain).connect(ctx.destination);
     source.start();
-
-    this.musicSource = source;
-    this.musicFilter = filter;
-    this.musicGain = gain;
-    this.musicPlaying = true;
+    return { source, filter, gain };
   }
 
   private applyMusicGain(): void {
@@ -244,7 +415,7 @@ class AudioSystem {
   }
 
   private effectiveMusic(): number {
-    return this.masterVolume * this.musicVolume;
+    return this.masterVolume * this.musicVolume * this.musicPackGain;
   }
 }
 

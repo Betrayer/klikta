@@ -1,6 +1,8 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "./firebase";
 import { MODES, type ModeId } from "../data/modes";
+import { DEFAULT_THEME_ID } from "../data/themes";
+import { DEFAULT_SOUND_PACK_ID } from "../data/sound";
 import type { MetaSnapshot } from "../state/metaStore";
 
 const MODE_ID_SET = new Set<string>(MODES.map((m) => m.id));
@@ -14,6 +16,9 @@ const toStringArray = (value: unknown): string[] =>
   Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
     : [];
+
+const toStringOr = (value: unknown, fallback: string): string =>
+  typeof value === "string" && value.length > 0 ? value : fallback;
 
 const toStringRecord = (value: unknown): Record<string, string> => {
   if (typeof value !== "object" || value === null) return {};
@@ -49,6 +54,9 @@ const parseSnapshot = (value: unknown): MetaSnapshot => {
     totalRunScore: toNumber(data.totalRunScore),
     bestScores: toScoreRecord(data.bestScores),
     achievements: toStringArray(data.achievements),
+    activeThemeId: toStringOr(data.activeThemeId, DEFAULT_THEME_ID),
+    activeMusicPackId: toStringOr(data.activeMusicPackId, DEFAULT_SOUND_PACK_ID),
+    activeSfxPackId: toStringOr(data.activeSfxPackId, DEFAULT_SOUND_PACK_ID),
     updatedAt: toNumber(data.updatedAt),
   };
 };

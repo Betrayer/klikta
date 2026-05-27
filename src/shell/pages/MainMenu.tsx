@@ -1,19 +1,23 @@
+import { useState } from 'react';
 import { Button, Center, Stack, Title } from '@mantine/core';
 import { useAppStore } from '../../state/appStore';
 import { AccountButton } from '../components/AccountButton';
+import { CustomizeModal } from '../components/CustomizeModal';
 
 export const MainMenu = () => {
+  const [customizeOpen, setCustomizeOpen] = useState(false);
+
   return (
-    <Center h="100vh" bg="#0a0014">
+    <Center h="100vh" bg="background">
       <Stack align="center" gap={32}>
-        <Title order={1} fz={96} fw={900} c="#ff006e" lts={8}>
+        <Title order={1} fz={96} fw={900} c="primary" lts={8}>
           KLIKTA
         </Title>
         <Stack gap="sm" w={260}>
           <Button
             size="lg"
             radius="xl"
-            color="#ff006e"
+            color="primary"
             onClick={() => useAppStore.getState().setScreen('mode-select')}
             fullWidth
           >
@@ -23,7 +27,7 @@ export const MainMenu = () => {
             size="md"
             radius="xl"
             variant="outline"
-            color="#00f0ff"
+            color="accent"
             onClick={() => useAppStore.getState().setScreen('skill-tree')}
             fullWidth
           >
@@ -33,15 +37,29 @@ export const MainMenu = () => {
             size="md"
             radius="xl"
             variant="outline"
-            color="#ffd700"
+            color="gold"
             onClick={() => useAppStore.getState().setScreen('leaderboard')}
             fullWidth
           >
             Leaderboard
           </Button>
           <AccountButton />
+          <Button
+            size="md"
+            radius="xl"
+            variant="subtle"
+            color="highlight"
+            onClick={() => setCustomizeOpen(true)}
+            fullWidth
+          >
+            Customize
+          </Button>
         </Stack>
       </Stack>
+      <CustomizeModal
+        opened={customizeOpen}
+        onClose={() => setCustomizeOpen(false)}
+      />
     </Center>
   );
 };

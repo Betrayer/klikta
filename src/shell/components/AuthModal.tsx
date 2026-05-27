@@ -85,7 +85,7 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
       <Stack gap="md">
         {inTelegram ? (
           <Button
-            color="#229ed9"
+            color="telegram"
             radius="xl"
             loading={busy}
             onClick={() => void onTelegram()}
@@ -96,7 +96,7 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
         ) : (
           <Button
             variant="light"
-            color="#00f0ff"
+            color="accent"
             radius="xl"
             loading={busy}
             onClick={() => void signInWithGoogle()}
@@ -140,7 +140,7 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
         />
 
         <Button
-          color="#ff006e"
+          color="primary"
           radius="xl"
           loading={busy}
           disabled={!canSubmit}

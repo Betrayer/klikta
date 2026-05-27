@@ -36,7 +36,7 @@ export const ComboCounter = () => {
         ff="monospace"
         fz={34}
         fw={900}
-        c="#00f5d4"
+        c="highlight"
         style={{
           display: 'inline-block',
           transform: bump ? 'scale(1.25)' : 'scale(1)',

@@ -54,6 +54,31 @@ describe("migrateMeta", () => {
     ).toEqual({ endless_hp: 9000, campaign: 30 });
   });
 
+  it("backfills theme/sound selection on v2 without clobbering bestScores", () => {
+    const r = migrateMeta({ bestScores: { endless_hp: 9000 } }, 2);
+    expect(r.bestScores).toEqual({ endless_hp: 9000 });
+    expect(r.activeThemeId).toBe("synthwave");
+    expect(r.activeMusicPackId).toBe("default");
+    expect(r.activeSfxPackId).toBe("default");
+  });
+
+  it("preserves an existing theme/sound selection across migration", () => {
+    const r = migrateMeta(
+      { activeThemeId: "flowers", activeMusicPackId: "lofi" },
+      2,
+    );
+    expect(r.activeThemeId).toBe("flowers");
+    expect(r.activeMusicPackId).toBe("lofi");
+    expect(r.activeSfxPackId).toBe("default");
+  });
+
+  it("does not bump updatedAt when only backfilling v2 to v3", () => {
+    const r = migrateMeta({ bestScores: {}, updatedAt: 1234 }, 2) as unknown as {
+      updatedAt: number;
+    };
+    expect(r.updatedAt).toBe(1234);
+  });
+
   it("never throws on null or undefined persisted input", () => {
     expect(migrateMeta(null, 1).bestScores).toEqual({});
     expect(migrateMeta(undefined, 0).bestScores).toEqual({});

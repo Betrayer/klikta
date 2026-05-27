@@ -63,12 +63,12 @@ export const LeaderboardView = () => {
   const isDuration = mode.leaderboardSort === 'duration_desc';
 
   return (
-    <Box bg="#0a0014" mih="100vh">
+    <Box bg="background" mih="100vh">
       <ScrollArea h="100vh" type="auto">
         <Container size={720} p="md">
           <Stack gap="lg">
             <Group justify="space-between" align="center">
-              <Title order={1} fz={36} fw={900} c="#ff006e" lts={4}>
+              <Title order={1} fz={36} fw={900} c="primary" lts={4}>
                 LEADERBOARD
               </Title>
               <Button
@@ -146,7 +146,11 @@ export const LeaderboardView = () => {
                     return (
                       <Table.Tr
                         key={entry.uid}
-                        bg={isOwn ? 'rgba(0, 245, 212, 0.12)' : undefined}
+                        bg={
+                          isOwn
+                            ? 'color-mix(in srgb, var(--mantine-color-highlight-filled) 12%, transparent)'
+                            : undefined
+                        }
                       >
                         <Table.Td>
                           <Text ff="monospace" c="dimmed">
@@ -156,7 +160,7 @@ export const LeaderboardView = () => {
                         <Table.Td>
                           <Text
                             fw={isOwn ? 700 : 400}
-                            c={isOwn ? '#00f5d4' : 'gray.2'}
+                            c={isOwn ? 'highlight' : 'gray.2'}
                           >
                             {entry.displayName}
                             {isOwn ? ' (you)' : ''}

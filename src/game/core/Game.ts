@@ -1,7 +1,6 @@
 import {
   Application,
   Container,
-  Graphics,
   type FederatedPointerEvent,
   type Ticker,
 } from "pixi.js";
@@ -23,6 +22,11 @@ import type { PhysicsEngine } from "../systems/PhysicsEngine";
 import { VFXSystem } from "../systems/VFXSystem";
 import { CameraSystem } from "../systems/CameraSystem";
 import { audioSystem } from "../systems/AudioSystem";
+import {
+  areThemeAssetsLoaded,
+  loadThemeAssets,
+} from "../assets/loadThemeAssets";
+import { getActiveTheme } from "../../state/themeSelectors";
 import { UltimateSystem } from "../systems/UltimateSystem";
 import {
   setUltimateActivationHandler,
@@ -105,9 +109,7 @@ export class Game {
   private unsubPause: (() => void) | null = null;
   private vfx: VFXSystem | null = null;
   private camera: CameraSystem | null = null;
-  private flashGfx: Graphics | null = null;
   private hitFrameUntil = 0;
-  private flashStartMs = -1;
   private clockMs = 0;
   private destroyed = false;
   private mode: ModePolicy = new EndlessHPMode();
@@ -167,7 +169,7 @@ export class Game {
     this.targetMods = empty.buildBaseTargetModifiers();
   }
 
-  async start(): Promise<void> {
+  async start(onAssetsLoading?: (loading: boolean) => void): Promise<void> {
     this.resolver = getActiveResolver();
     this.runMods = this.resolver.buildRunModifiers();
     this.spawnPolicy = this.resolver.buildSpawnPolicy();
@@ -194,10 +196,21 @@ export class Game {
     setUltimateActivationHandler(this.ultimateHandler);
     setRunPerkPickHandler(this.runPerkHandler);
 
+    const themeId = useMetaStore.getState().activeThemeId;
+    const needsLoad =
+      !areThemeAssetsLoaded(themeId) || !audioSystem.arePacksLoaded();
+    if (needsLoad) {
+      onAssetsLoading?.(true);
+      await loadThemeAssets(themeId);
+      await audioSystem.loadActivePacks();
+      onAssetsLoading?.(false);
+      if (this.destroyed) return;
+    }
+
     const app = new Application();
     await app.init({
       resizeTo: this.parent,
-      background: "#1a0033",
+      background: getActiveTheme().background.color ?? 0x1a0033,
       antialias: true,
       autoDensity: true,
       resolution: window.devicePixelRatio || 1,
@@ -229,12 +242,6 @@ export class Game {
 
     this.camera = new CameraSystem(app.stage);
 
-    const flash = new Graphics();
-    flash.eventMode = "none";
-    flash.alpha = 0;
-    app.stage.addChild(flash);
-    this.flashGfx = flash;
-    this.drawFlash();
     app.renderer.on("resize", this.handleResize);
 
     app.stage.eventMode = "static";
@@ -357,13 +364,11 @@ export class Game {
 
     audioSystem.playSFX("miss");
 
-    if (this.runMods.backgroundClickIgnored) {
-      return;
-    }
-
     const skipHpLoss =
       this.runMods.shieldedMissNoHPLoss && this.hasActiveShield();
-    useRunStore.getState().resetCombo();
+    if (!this.runMods.backgroundClickIgnored) {
+      useRunStore.getState().resetCombo();
+    }
     if (!skipHpLoss) this.applyMissPenalty();
     this.syncMusicToCombo();
   };
@@ -396,21 +401,11 @@ export class Game {
   }
 
   private handleResize = (): void => {
-    this.drawFlash();
     if (this.physics !== null && this.app !== null) {
       const { width, height } = this.app.renderer.screen;
       this.physics.resize({ width, height });
     }
   };
-
-  private drawFlash(): void {
-    if (this.app === null || this.flashGfx === null) return;
-    const { width, height } = this.app.renderer.screen;
-    this.flashGfx
-      .clear()
-      .rect(-40, -40, width + 80, height + 80)
-      .fill(0xffffff);
-  }
 
   private triggerJuice(target: Target): void {
     if (this.app === null) return;
@@ -427,7 +422,6 @@ export class Game {
   private triggerHitFrame(): void {
     if (this.app === null) return;
     this.hitFrameUntil = performance.now() + FEEL.hitFrameMs;
-    this.flashStartMs = performance.now();
     this.updateTickerSpeed();
   }
 
@@ -437,18 +431,6 @@ export class Game {
     if (this.hitFrameUntil > 0 && now >= this.hitFrameUntil) {
       this.hitFrameUntil = 0;
       this.updateTickerSpeed();
-    }
-    if (this.flashGfx === null || this.flashStartMs < 0) return;
-    const elapsed = now - this.flashStartMs;
-    const inMs = FEEL.flashInMs;
-    const outMs = FEEL.flashOutMs;
-    if (elapsed <= inMs) {
-      this.flashGfx.alpha = FEEL.flashAlpha * (elapsed / inMs);
-    } else if (elapsed <= inMs + outMs) {
-      this.flashGfx.alpha = FEEL.flashAlpha * (1 - (elapsed - inMs) / outMs);
-    } else {
-      this.flashGfx.alpha = 0;
-      this.flashStartMs = -1;
     }
   }
 
@@ -741,8 +723,8 @@ export class Game {
     const spawned: Target[] = [];
     for (const event of events) {
       const target = this.createTarget(event);
-      target.graphics.on("pointerdown", () => this.handleTargetClick(target));
-      this.targetLayer.addChild(target.graphics);
+      target.bindPointerDown(() => this.handleTargetClick(target));
+      this.targetLayer.addChild(target.view);
       this.targets.push(target);
       spawned.push(target);
       if (this.physics !== null) this.bindToPhysics(target);
@@ -844,10 +826,8 @@ export class Game {
         { x: x + Math.cos(angle) * dist, y: y + Math.sin(angle) * dist },
         modifiers,
       );
-      fragment.graphics.on("pointerdown", () =>
-        this.handleTargetClick(fragment),
-      );
-      this.targetLayer.addChild(fragment.graphics);
+      fragment.bindPointerDown(() => this.handleTargetClick(fragment));
+      this.targetLayer.addChild(fragment.view);
       this.targets.push(fragment);
     }
   }
@@ -1136,7 +1116,5 @@ export class Game {
     this.spawnSystem = null;
     this.vfx = null;
     this.camera = null;
-    this.flashGfx = null;
-    this.flashStartMs = -1;
   }
 }

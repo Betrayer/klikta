@@ -140,7 +140,7 @@ export class PhysicsEngine {
       if (m === undefined) continue;
       target.x = m.prevX + (m.curX - m.prevX) * alpha;
       target.y = m.prevY + (m.curY - m.prevY) * alpha;
-      target.graphics.rotation =
+      target.view.rotation =
         m.prevAngle + (m.curAngle - m.prevAngle) * alpha;
     }
   }

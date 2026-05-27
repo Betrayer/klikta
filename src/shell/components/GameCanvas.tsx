@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { Box } from '@mantine/core';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Box, LoadingOverlay } from '@mantine/core';
 import { Game } from '../../game/core/Game';
 import { FpsCounter } from './FpsCounter';
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Game | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -15,7 +16,11 @@ export const GameCanvas = () => {
     gameRef.current = game;
     let disposed = false;
 
-    game.start().then(
+    const onAssetsLoading = (value: boolean): void => {
+      if (!disposed) setLoading(value);
+    };
+
+    game.start(onAssetsLoading).then(
       () => {
         if (disposed) game.destroy();
       },
@@ -35,7 +40,17 @@ export const GameCanvas = () => {
 
   return (
     <>
-      <Box ref={containerRef} w="100vw" h="100vh" style={{ overflow: 'hidden' }} />
+      <Box pos="relative" w="100vw" h="100vh" style={{ overflow: 'hidden' }}>
+        <Box ref={containerRef} w="100%" h="100%" />
+        <LoadingOverlay
+          visible={loading}
+          overlayProps={{
+            color: 'var(--mantine-color-background-filled)',
+            backgroundOpacity: 1,
+          }}
+          loaderProps={{ color: 'primary' }}
+        />
+      </Box>
       <FpsCounter getFps={getFps} />
     </>
   );

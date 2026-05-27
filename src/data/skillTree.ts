@@ -68,23 +68,6 @@ export const findTierForPerk = (
   return undefined;
 };
 
-export const findBranchForUltimate = (
-  ultimateId: string,
-): SkillBranch | undefined => {
-  for (const branch of SKILL_TREE) {
-    for (const tier of branch.tiers) {
-      for (const option of tier.options) {
-        for (const effect of option.effects) {
-          if (effect.kind === "ultimateUnlock" && effect.id === ultimateId) {
-            return branch;
-          }
-        }
-      }
-    }
-  }
-  return undefined;
-};
-
 export const findUltimateForBranch = (
   branchId: BranchId,
 ): { id: string; name: string } | undefined => {

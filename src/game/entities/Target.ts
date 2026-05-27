@@ -1,9 +1,12 @@
-import { Graphics } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import {
   TARGET_CONFIG,
   type TargetKind,
   type TargetTypeConfig,
 } from "../../data/targetConfig";
+import type { TargetVisual } from "../../data/themes/types";
+import { getActiveTheme } from "../../state/themeSelectors";
+import { rendererFor } from "./render/TargetRenderer";
 import { Tween } from "../util/Tween";
 import { tweenManager } from "../util/TweenManager";
 import {
@@ -46,7 +49,7 @@ export abstract class Target {
   readonly kind: TargetKind;
   readonly spawnTime: number;
   readonly lifetimeMs: number;
-  readonly graphics: Graphics;
+  readonly view: Container;
   readonly scoreMul: number;
   readonly modifiers: TargetSpawnModifiers;
 
@@ -58,6 +61,9 @@ export abstract class Target {
   physicsControlled = false;
 
   protected readonly config: TargetTypeConfig;
+  protected readonly decoration: Graphics;
+  protected base!: Container;
+  protected visual: TargetVisual;
   protected readonly initialSize: number;
   protected elapsedMs = 0;
   protected lifeScale = 1;
@@ -66,6 +72,7 @@ export abstract class Target {
 
   private readonly tweens: Tween[] = [];
   private exitedByMiss = false;
+  private pointerDownHandler: (() => void) | null = null;
 
   constructor(
     kind: TargetKind,
@@ -84,15 +91,25 @@ export abstract class Target {
     this.initialSize = config.radius * modifiers.sizeMul;
     this.currentSize = this.initialSize;
     this.scoreMul = modifiers.scoreMul;
+    this.visual = { mode: "vector", shape: "circle", color: config.color };
 
-    this.graphics = new Graphics();
-    this.graphics.position.set(this.x, this.y);
-    this.graphics.eventMode = "static";
-    this.graphics.cursor = "pointer";
+    this.view = new Container();
+    this.view.position.set(this.x, this.y);
+    this.view.eventMode = "passive";
+
+    this.decoration = new Graphics();
+    this.decoration.eventMode = "none";
+    this.view.addChild(this.decoration);
   }
 
-  abstract render(): void;
   abstract onClick(): ClickResult;
+
+  render(): void {}
+
+  bindPointerDown(handler: () => void): void {
+    this.pointerDownHandler = handler;
+    this.base.on("pointerdown", handler);
+  }
 
   get isDead(): boolean {
     return this.phase === "dead";
@@ -103,7 +120,7 @@ export abstract class Target {
   }
 
   get color(): number {
-    return this.config.color;
+    return this.visual.color ?? this.config.color;
   }
 
   get expiredUnclicked(): boolean {
@@ -114,7 +131,37 @@ export abstract class Target {
     return this.phaseInvisible;
   }
 
+  protected resolveVisual(): TargetVisual {
+    return getActiveTheme().targets[this.kind];
+  }
+
+  protected baseSize(): number {
+    return this.initialSize;
+  }
+
+  protected buildBase(): void {
+    this.visual = this.resolveVisual();
+    this.attachBase(this.baseSize());
+  }
+
+  protected rebuildBase(size: number): void {
+    this.base.removeFromParent();
+    this.base.destroy();
+    this.attachBase(size);
+  }
+
+  private attachBase(size: number): void {
+    this.base = rendererFor(this.visual.mode).build(this.visual, size);
+    this.base.eventMode = "static";
+    this.base.cursor = "pointer";
+    if (this.pointerDownHandler !== null) {
+      this.base.on("pointerdown", this.pointerDownHandler);
+    }
+    this.view.addChildAt(this.base, 0);
+  }
+
   protected spawn(): void {
+    this.buildBase();
     this.render();
     this.phase = "spawning";
     if (this.modifiers.slowBloomPhaseMs > 0 && this.config.shrinks) {
@@ -147,7 +194,7 @@ export abstract class Target {
     this.elapsedMs += deltaMs;
     this.applyDrift(deltaMs, ctx);
     this.updateLifeAndAlpha();
-    this.graphics.position.set(this.x, this.y);
+    this.view.position.set(this.x, this.y);
 
     if (
       (this.phase === "spawning" || this.phase === "active") &&
@@ -194,7 +241,7 @@ export abstract class Target {
     const visibleMs = pf.periodMs - pf.invisibleMs;
     const invisible = cycle >= visibleMs;
     this.phaseInvisible = invisible;
-    this.graphics.alpha = invisible ? 0.1 : 1;
+    this.view.alpha = invisible ? 0.1 : 1;
   }
 
   private applyDrift(deltaMs: number, ctx: TargetUpdateContext): void {
@@ -362,12 +409,12 @@ export abstract class Target {
     this.phase = "dead";
     this.cancelTweens();
     this.pairTarget = null;
-    this.graphics.removeFromParent();
-    this.graphics.destroy();
+    this.view.removeFromParent();
+    this.view.destroy({ children: true });
   }
 
   protected applyScale(): void {
-    this.graphics.scale.set(this.lifeScale * this.animScale);
+    this.view.scale.set(this.lifeScale * this.animScale);
   }
 
   protected track(tween: Tween): Tween {
@@ -383,17 +430,17 @@ export abstract class Target {
   private startExit(): void {
     this.cancelTweens();
     this.phase = "exiting";
-    this.graphics.eventMode = "none";
+    this.base.eventMode = "none";
   }
 
   private fadeOut(durationMs: number): void {
     this.track(
       tweenManager.to(
-        this.graphics.alpha,
+        this.view.alpha,
         0,
         durationMs,
         (a) => {
-          this.graphics.alpha = a;
+          this.view.alpha = a;
         },
         linear,
       ),

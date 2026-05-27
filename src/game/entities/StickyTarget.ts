@@ -41,28 +41,27 @@ export class StickyTarget extends Target {
     this.clicksRemaining = merged;
     this.radius = this.initialSize * Math.sqrt(merged);
     this.currentSize = this.radius;
+    this.rebuildBase(this.radius);
     this.render();
     this.pulse();
   }
 
   render(): void {
-    this.graphics.clear();
-    const r = this.radius;
-    this.graphics.circle(0, 0, r).fill(this.config.color);
+    this.decoration.clear();
+    if (this.clusterSize <= 1) return;
 
-    if (this.clusterSize > 1) {
-      for (let i = 0; i < this.clusterSize; i++) {
-        const angle = (Math.PI * 2 * i) / this.clusterSize;
-        this.graphics
-          .circle(Math.cos(angle) * r * 0.5, Math.sin(angle) * r * 0.5, r * 0.4)
-          .fill(CORE_COLOR);
-      }
-      const ratio = this.clicksRemaining / this.clusterSize;
-      if (ratio > 0) {
-        this.graphics
-          .circle(0, 0, r * 0.55 * ratio)
-          .stroke({ width: 5, color: 0xffffff });
-      }
+    const r = this.radius;
+    for (let i = 0; i < this.clusterSize; i++) {
+      const angle = (Math.PI * 2 * i) / this.clusterSize;
+      this.decoration
+        .circle(Math.cos(angle) * r * 0.5, Math.sin(angle) * r * 0.5, r * 0.4)
+        .fill(CORE_COLOR);
+    }
+    const ratio = this.clicksRemaining / this.clusterSize;
+    if (ratio > 0) {
+      this.decoration
+        .circle(0, 0, r * 0.55 * ratio)
+        .stroke({ width: 5, color: 0xffffff });
     }
   }
 

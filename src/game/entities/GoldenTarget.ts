@@ -14,9 +14,8 @@ export class GoldenTarget extends Target {
   }
 
   render(): void {
-    this.graphics.clear();
-    this.graphics.circle(0, 0, this.initialSize).fill(this.config.color);
-    this.graphics
+    this.decoration.clear();
+    this.decoration
       .circle(0, 0, this.initialSize * 0.55)
       .stroke({ width: 4, color: 0xffffff });
   }
