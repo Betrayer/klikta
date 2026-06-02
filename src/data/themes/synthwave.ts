@@ -1,4 +1,5 @@
 import type { Theme } from "./types";
+import { DEFAULT_HUD_SPEC } from "./defaults";
 
 export const synthwaveTheme: Theme = {
   id: "synthwave",
@@ -32,4 +33,5 @@ export const synthwaveTheme: Theme = {
   background: { kind: "solid", color: 0x1a0033 },
   fonts: { display: "monospace", body: "system-ui, sans-serif" },
   defaultSoundPack: "default",
+  hud: DEFAULT_HUD_SPEC,
 };

@@ -1,4 +1,5 @@
 import type { Theme } from "./types";
+import { DEFAULT_HUD_SPEC } from "./defaults";
 import { AURORA_SOUND_PACK_ID } from "../sound/auroraPack";
 
 export const auroraTheme: Theme = {
@@ -33,4 +34,5 @@ export const auroraTheme: Theme = {
   background: { kind: "solid", color: 0x04121a },
   fonts: { display: "monospace", body: "system-ui, sans-serif" },
   defaultSoundPack: AURORA_SOUND_PACK_ID,
+  hud: DEFAULT_HUD_SPEC,
 };
