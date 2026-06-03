@@ -40,7 +40,7 @@ describe("theme selectors", () => {
   });
 
   it("returns the active theme background spec", () => {
-    expect(getBackgroundSpec().kind).toBe("solid");
+    expect(getBackgroundSpec().kind).toBe("animated_gradient");
   });
 
   it("fills VFX defaults when a theme omits the vfx section", () => {

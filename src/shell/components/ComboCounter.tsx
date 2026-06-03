@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Box, Text } from '@mantine/core';
 import { useRunStore } from '../../state/runStore';
 
-export const ComboCounter = () => {
+export const ComboCounter = memo(() => {
   const combo = useRunStore((s) => s.combo);
   const [bump, setBump] = useState(false);
   const prev = useRef(0);
@@ -47,4 +47,4 @@ export const ComboCounter = () => {
       </Text>
     </Box>
   );
-};
+});

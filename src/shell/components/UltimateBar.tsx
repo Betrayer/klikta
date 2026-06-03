@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Box, Paper, Progress, Text, UnstyledButton } from '@mantine/core';
 import { useMetaStore } from '../../state/metaStore';
 import { useRunStore } from '../../state/runStore';
@@ -17,7 +17,7 @@ interface UltimateSlot {
   color: string;
 }
 
-export const UltimateBar = () => {
+export const UltimateBar = memo(() => {
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
   const charges = useRunStore((s) => s.ultimateCharges);
   const activeUltimate = useRunStore((s) => s.activeUltimate);
@@ -68,7 +68,7 @@ export const UltimateBar = () => {
       ))}
     </Box>
   );
-};
+});
 
 interface UltimateCardProps {
   slot: UltimateSlot;
