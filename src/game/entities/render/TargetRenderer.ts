@@ -7,7 +7,7 @@ import { VectorRenderer } from "./VectorRenderer";
 import { SpriteRenderer } from "./SpriteRenderer";
 
 export interface TargetRenderer {
-  build(visual: TargetVisual, size: number): Container;
+  build(visual: TargetVisual, size: number, state?: string | null): Container;
 }
 
 const vectorRenderer = new VectorRenderer();
