@@ -36,3 +36,22 @@ body,
     opacity: 1;
   }
 }
+
+@keyframes klikta-screen-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes klikta-screen-slide {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes klikta-screen-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+}

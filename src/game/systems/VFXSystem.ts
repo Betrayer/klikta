@@ -1,7 +1,10 @@
 import { Container, Graphics } from "pixi.js";
 import { FEEL } from "../config/feel";
-import { getActiveTheme } from "../../state/themeSelectors";
-import type { ParticlePalettes } from "../../data/themes/types";
+import { getActiveTheme, getVfxStyle } from "../../state/themeSelectors";
+import type {
+  HitParticleShape,
+  ParticlePalettes,
+} from "../../data/themes/types";
 
 interface Particle {
   gfx: Graphics;
@@ -12,20 +15,44 @@ interface Particle {
   active: boolean;
 }
 
+const drawParticleShape = (
+  gfx: Graphics,
+  shape: HitParticleShape,
+  radius: number,
+): void => {
+  switch (shape) {
+    case "circle":
+      gfx.circle(0, 0, radius);
+      break;
+    case "square":
+      gfx.rect(-radius, -radius, radius * 2, radius * 2);
+      break;
+    case "star":
+      gfx.star(0, 0, 5, radius, radius * 0.5);
+      break;
+    case "petal":
+      gfx.ellipse(0, 0, radius * 0.6, radius * 1.1);
+      break;
+  }
+  gfx.fill(0xffffff);
+};
+
 export class VFXSystem {
   private readonly layer: Container;
   private readonly pool: Particle[] = [];
   private readonly palettes: ParticlePalettes;
+  private readonly scaleBase: number;
 
   constructor(layer: Container) {
     this.layer = layer;
     this.palettes = getActiveTheme().particles;
+    const vfx = getVfxStyle();
+    this.scaleBase = vfx.hitParticleScale;
     this.layer.eventMode = "none";
 
     for (let i = 0; i < FEEL.particles.poolSize; i++) {
-      const gfx = new Graphics()
-        .circle(0, 0, FEEL.particles.baseRadius)
-        .fill(0xffffff);
+      const gfx = new Graphics();
+      drawParticleShape(gfx, vfx.hitParticleShape, FEEL.particles.baseRadius);
       gfx.eventMode = "none";
       gfx.visible = false;
       this.layer.addChild(gfx);
@@ -96,7 +123,7 @@ export class VFXSystem {
       p.gfx.x += p.vx * deltaMs;
       p.gfx.y += p.vy * deltaMs;
       p.gfx.alpha = t;
-      p.gfx.scale.set(0.4 + 0.6 * t);
+      p.gfx.scale.set((0.4 + 0.6 * t) * this.scaleBase);
     }
   }
 
@@ -126,7 +153,7 @@ export class VFXSystem {
       p.active = true;
       p.gfx.tint = colorFor(i);
       p.gfx.position.set(x, y);
-      p.gfx.scale.set(1);
+      p.gfx.scale.set(this.scaleBase);
       p.gfx.alpha = 1;
       p.gfx.visible = true;
     }
