@@ -6,11 +6,10 @@ import {
   TIMER_INITIAL_MS,
   TIMER_LOW_WARNING_MS,
 } from '../../game/config/balance';
-
-const NORMAL_COLOR = 'highlight';
-const LOW_COLOR = 'danger';
+import { useHudSpec } from './hud/useHudSpec';
 
 export const TimerReadout = memo(() => {
+  const hud = useHudSpec();
   const deciRemaining = useRunStore((s) => Math.max(0, Math.ceil(s.timeRemainingMs / 100)));
   const remainingMs = deciRemaining * 100;
   const low = remainingMs <= TIMER_LOW_WARNING_MS;
@@ -28,7 +27,7 @@ export const TimerReadout = memo(() => {
   }, [tickSecond]);
 
   const pct = Math.min(100, (remainingMs / TIMER_INITIAL_MS) * 100);
-  const color = low ? LOW_COLOR : NORMAL_COLOR;
+  const color = low ? hud.timer.lowAccent : hud.timer.accent;
 
   return (
     <Paper
@@ -38,7 +37,7 @@ export const TimerReadout = memo(() => {
       px="sm"
       py={4}
       radius="sm"
-      bg="rgba(0, 0, 0, 0.4)"
+      bg={hud.surface}
       w={120}
       style={{ pointerEvents: 'none', userSelect: 'none', zIndex: 10 }}
     >
