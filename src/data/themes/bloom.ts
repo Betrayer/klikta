@@ -1,5 +1,5 @@
 import type { Theme } from "./types";
-import { DEFAULT_SOUND_PACK_ID } from "../sound";
+import { BLOOM_SOUND_PACK_ID } from "../sound/bloomPack";
 
 export const bloomTheme: Theme = {
   id: "bloom",
@@ -58,7 +58,7 @@ export const bloomTheme: Theme = {
     display: '"Trebuchet MS", "Segoe UI", system-ui, sans-serif',
     body: '"Trebuchet MS", "Segoe UI", system-ui, sans-serif',
   },
-  defaultSoundPack: DEFAULT_SOUND_PACK_ID,
+  defaultSoundPack: BLOOM_SOUND_PACK_ID,
   hud: {
     style: "ringed",
     surface: "rgba(40, 12, 28, 0.42)",

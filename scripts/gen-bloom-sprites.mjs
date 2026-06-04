@@ -109,7 +109,13 @@ const softFlower = (px, py, geo, petal, center) => {
   return { rgb: flowerShade(px, py, geo, petal, center), a };
 };
 
-const BUD = { petals: 5, petalDist: 0.16, petalR: 0.4, centerR: 0.3, outerR: 0.56 };
+const BUD = {
+  petals: 5,
+  petalDist: 0.16,
+  petalR: 0.4,
+  centerR: 0.3,
+  outerR: 0.56,
+};
 const OPENING = {
   petals: 5,
   petalDist: 0.36,
