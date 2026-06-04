@@ -15,6 +15,7 @@ export class GoldenTarget extends Target {
 
   render(): void {
     this.decoration.clear();
+    if (this.spriteDecorationSuppressed()) return;
     this.decoration
       .circle(0, 0, this.initialSize * 0.55)
       .stroke({ width: 4, color: 0xffffff });

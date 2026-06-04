@@ -7,6 +7,7 @@ import {
 import type { TargetVisual } from "../../data/themes/types";
 import { getActiveTheme } from "../../state/themeSelectors";
 import { rendererFor } from "./render/TargetRenderer";
+import { resolveStateTexture } from "./render/SpriteRenderer";
 import { Tween } from "../util/Tween";
 import { tweenManager } from "../util/TweenManager";
 import {
@@ -106,6 +107,26 @@ export abstract class Target {
 
   render(): void {}
 
+  protected currentVisualState(): string | null {
+    return null;
+  }
+
+  protected currentStateTexture(): string | undefined {
+    if (this.visual.mode !== "sprite") return undefined;
+    const state = this.currentVisualState();
+    if (state === null) return undefined;
+    return resolveStateTexture(this.visual.states, state);
+  }
+
+  protected spriteDecorationSuppressed(): boolean {
+    return this.visual.mode === "sprite" && this.visual.texture !== undefined;
+  }
+
+  protected refreshVisualState(): void {
+    if (this.visual.mode !== "sprite" || this.visual.states === undefined) return;
+    this.rebuildBase(this.baseSize());
+  }
+
   bindPointerDown(handler: () => void): void {
     this.pointerDownHandler = handler;
     this.base.on("pointerdown", handler);
@@ -151,7 +172,11 @@ export abstract class Target {
   }
 
   private attachBase(size: number): void {
-    this.base = rendererFor(this.visual.mode).build(this.visual, size);
+    this.base = rendererFor(this.visual.mode).build(
+      this.visual,
+      size,
+      this.currentVisualState(),
+    );
     this.base.eventMode = "static";
     this.base.cursor = "pointer";
     if (this.pointerDownHandler !== null) {

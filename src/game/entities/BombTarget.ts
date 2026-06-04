@@ -34,7 +34,7 @@ export class BombTarget extends Target {
 
   render(): void {
     this.decoration.clear();
-    if (this.appearAsGolden) {
+    if (this.appearAsGolden && !this.spriteDecorationSuppressed()) {
       this.decoration
         .circle(0, 0, this.initialSize * 0.44)
         .stroke({ width: 4, color: 0xffffff });

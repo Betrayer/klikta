@@ -25,9 +25,23 @@ export class ShieldedTarget extends Target {
     return this.shieldUp;
   }
 
+  protected override currentVisualState(): string | null {
+    return this.shieldUp ? "shield_up" : "shield_down";
+  }
+
+  private hasShieldStateArt(): boolean {
+    const states = this.visual.states;
+    return (
+      this.visual.mode === "sprite" &&
+      states?.shield_up !== undefined &&
+      states?.shield_down !== undefined
+    );
+  }
+
   breakShield(): boolean {
     if (!this.shieldUp || !this.isInteractive) return false;
     this.shieldUp = false;
+    this.refreshVisualState();
     this.render();
     this.spawnShards();
     this.pulse();
@@ -36,6 +50,7 @@ export class ShieldedTarget extends Target {
 
   render(): void {
     this.decoration.clear();
+    if (this.hasShieldStateArt()) return;
     if (!this.shieldUp) return;
 
     const r = this.initialSize * 1.4;

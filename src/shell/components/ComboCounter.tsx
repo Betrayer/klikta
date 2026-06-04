@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Box, Text } from '@mantine/core';
 import { useRunStore } from '../../state/runStore';
+import { useHudSpec } from './hud/useHudSpec';
 
-export const ComboCounter = () => {
+export const ComboCounter = memo(() => {
   const combo = useRunStore((s) => s.combo);
+  const { accent, bumpScale } = useHudSpec().combo;
   const [bump, setBump] = useState(false);
   const prev = useRef(0);
 
@@ -36,10 +38,10 @@ export const ComboCounter = () => {
         ff="monospace"
         fz={34}
         fw={900}
-        c="highlight"
+        c={accent}
         style={{
           display: 'inline-block',
-          transform: bump ? 'scale(1.25)' : 'scale(1)',
+          transform: bump ? `scale(${bumpScale})` : 'scale(1)',
           transition: 'transform 110ms ease-out',
         }}
       >
@@ -47,4 +49,4 @@ export const ComboCounter = () => {
       </Text>
     </Box>
   );
-};
+});

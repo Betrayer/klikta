@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { Paper, Progress, Text } from '@mantine/core';
 import { useRunStore } from '../../state/runStore';
 import { audioSystem } from '../../game/systems/AudioSystem';
@@ -6,15 +6,14 @@ import {
   TIMER_INITIAL_MS,
   TIMER_LOW_WARNING_MS,
 } from '../../game/config/balance';
+import { useHudSpec } from './hud/useHudSpec';
 
-const NORMAL_COLOR = 'highlight';
-const LOW_COLOR = 'danger';
-
-export const TimerReadout = () => {
-  const timeRemainingMs = useRunStore((s) => s.timeRemainingMs);
-  const low = timeRemainingMs <= TIMER_LOW_WARNING_MS;
-  const tickSecond =
-    low && timeRemainingMs > 0 ? Math.ceil(timeRemainingMs / 1000) : 0;
+export const TimerReadout = memo(() => {
+  const hud = useHudSpec();
+  const deciRemaining = useRunStore((s) => Math.max(0, Math.ceil(s.timeRemainingMs / 100)));
+  const remainingMs = deciRemaining * 100;
+  const low = remainingMs <= TIMER_LOW_WARNING_MS;
+  const tickSecond = low && remainingMs > 0 ? Math.ceil(remainingMs / 1000) : 0;
   const lastTickSecond = useRef(0);
 
   useEffect(() => {
@@ -27,8 +26,8 @@ export const TimerReadout = () => {
     audioSystem.playTimerTick();
   }, [tickSecond]);
 
-  const pct = Math.min(100, (timeRemainingMs / TIMER_INITIAL_MS) * 100);
-  const color = low ? LOW_COLOR : NORMAL_COLOR;
+  const pct = Math.min(100, (remainingMs / TIMER_INITIAL_MS) * 100);
+  const color = low ? hud.timer.lowAccent : hud.timer.accent;
 
   return (
     <Paper
@@ -38,7 +37,7 @@ export const TimerReadout = () => {
       px="sm"
       py={4}
       radius="sm"
-      bg="rgba(0, 0, 0, 0.4)"
+      bg={hud.surface}
       w={120}
       style={{ pointerEvents: 'none', userSelect: 'none', zIndex: 10 }}
     >
@@ -54,7 +53,7 @@ export const TimerReadout = () => {
             : undefined
         }
       >
-        {(Math.max(0, timeRemainingMs) / 1000).toFixed(1)}s
+        {(remainingMs / 1000).toFixed(1)}s
       </Text>
       <Progress
         value={pct}
@@ -65,4 +64,4 @@ export const TimerReadout = () => {
       />
     </Paper>
   );
-};
+});

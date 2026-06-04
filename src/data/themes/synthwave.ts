@@ -1,4 +1,5 @@
 import type { Theme } from "./types";
+import { DEFAULT_HUD_SPEC } from "./defaults";
 
 export const synthwaveTheme: Theme = {
   id: "synthwave",
@@ -29,7 +30,13 @@ export const synthwaveTheme: Theme = {
     bomb: [0xff1f3f, 0xff8c00],
     milestone: [0x00f5d4, 0xffffff],
   },
-  background: { kind: "solid", color: 0x1a0033 },
+  background: {
+    kind: "animated_gradient",
+    color: 0x1a0033,
+    colorStops: [0x1a0033, 0x2a0a3e, 0x0d1b4c, 0x0a2a3a],
+    animationSpeedSec: 5,
+  },
   fonts: { display: "monospace", body: "system-ui, sans-serif" },
   defaultSoundPack: "default",
+  hud: DEFAULT_HUD_SPEC,
 };

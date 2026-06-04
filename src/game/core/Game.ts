@@ -26,7 +26,8 @@ import {
   areThemeAssetsLoaded,
   loadThemeAssets,
 } from "../assets/loadThemeAssets";
-import { getActiveTheme } from "../../state/themeSelectors";
+import { BackgroundLayer } from "../background/BackgroundLayer";
+import { getActiveTheme, getBackgroundSpec } from "../../state/themeSelectors";
 import { UltimateSystem } from "../systems/UltimateSystem";
 import {
   setUltimateActivationHandler,
@@ -107,8 +108,10 @@ export class Game {
   private readonly phantoms: PhantomTarget[] = [];
   private spawnSystem: SpawnSystem | null = null;
   private unsubPause: (() => void) | null = null;
+  private unsubTheme: (() => void) | null = null;
   private vfx: VFXSystem | null = null;
   private camera: CameraSystem | null = null;
+  private background: BackgroundLayer | null = null;
   private hitFrameUntil = 0;
   private clockMs = 0;
   private destroyed = false;
@@ -214,6 +217,7 @@ export class Game {
       antialias: true,
       autoDensity: true,
       resolution: window.devicePixelRatio || 1,
+      preference: "webgl",
     });
 
     if (this.destroyed) {
@@ -223,6 +227,13 @@ export class Game {
 
     this.app = app;
     this.parent.appendChild(app.canvas);
+
+    const background = new BackgroundLayer(getBackgroundSpec(), {
+      w: app.renderer.screen.width,
+      h: app.renderer.screen.height,
+    });
+    this.background = background;
+    app.stage.addChild(background.view);
 
     const phantomLayer = new Container();
     this.phantomLayer = phantomLayer;
@@ -301,6 +312,12 @@ export class Game {
 
     this.unsubPause = useRunStore.subscribe((state, prev) => {
       if (state.paused !== prev.paused) this.applyPaused(state.paused);
+    });
+
+    this.unsubTheme = useMetaStore.subscribe((state, prev) => {
+      if (state.activeThemeId !== prev.activeThemeId) {
+        this.background?.applySpec(getBackgroundSpec());
+      }
     });
   }
 
@@ -401,8 +418,10 @@ export class Game {
   }
 
   private handleResize = (): void => {
-    if (this.physics !== null && this.app !== null) {
-      const { width, height } = this.app.renderer.screen;
+    if (this.app === null) return;
+    const { width, height } = this.app.renderer.screen;
+    this.background?.resize(width, height);
+    if (this.physics !== null) {
       this.physics.resize({ width, height });
     }
   };
@@ -490,6 +509,7 @@ export class Game {
     this.clockMs += deltaMs;
     useRunStore.getState().tickElapsed(deltaMs);
     tweenManager.update(deltaMs);
+    this.background?.update(deltaMs);
     this.vfx?.update(deltaMs);
     this.camera?.update(deltaMs);
     this.updateHitFrame();
@@ -901,7 +921,6 @@ export class Game {
     const chance = this.runMods.bombExpireCurrencyChance;
     if (chance <= 0 || this.runMods.currencyDisabled) return;
     if (Math.random() >= chance) return;
-    useMetaStore.getState().awardCurrency(1);
     this.bombBountyEarned += 1;
   }
 
@@ -910,7 +929,6 @@ export class Game {
     if (cfg === null || this.runMods.currencyDisabled) return;
     const combo = useRunStore.getState().combo;
     if (combo < cfg.combo) return;
-    useMetaStore.getState().awardCurrency(cfg.amount);
     this.comboCoinEarned += cfg.amount;
   }
 
@@ -966,7 +984,9 @@ export class Game {
     const achievementsTotal = achievements.reduce((s, a) => s + a.amount, 0);
     const victoryBonus = !disabled && victory ? VICTORY_BONUS_CURRENCY : 0;
     const endTotal = base + comboBonus + achievementsTotal + victoryBonus;
-    if (!disabled && endTotal > 0) meta.awardCurrency(endTotal);
+    const sessionTotal =
+      endTotal + this.bombBountyEarned + this.comboCoinEarned;
+    if (!disabled && sessionTotal > 0) meta.awardCurrency(sessionTotal);
     const previousBestScore = meta.bestScores[run.mode] ?? 0;
     meta.recordRun(run.mode, score);
 
@@ -977,7 +997,7 @@ export class Game {
       comboCoin: this.comboCoinEarned,
       victoryBonus,
       achievements,
-      total: endTotal + this.bombBountyEarned + this.comboCoinEarned,
+      total: sessionTotal,
     };
     run.recordRunResults({
       currencyEarned: breakdown.total,
@@ -1082,6 +1102,8 @@ export class Game {
   destroy(): void {
     this.destroyed = true;
     window.removeEventListener("keydown", this.handleKeydown);
+    this.unsubTheme?.();
+    this.unsubTheme = null;
     clearUltimateActivationHandler(this.ultimateHandler);
     clearRunPerkPickHandler(this.runPerkHandler);
     if (this.ultimateSystem !== null) {
@@ -1107,6 +1129,11 @@ export class Game {
     this.targets.length = 0;
     for (const phantom of this.phantoms) phantom.destroy();
     this.phantoms.length = 0;
+    if (this.background !== null) {
+      this.app.stage.removeChild(this.background.view);
+      this.background.destroy();
+      this.background = null;
+    }
     this.app.destroy(true, { children: true });
     this.app = null;
     this.targetLayer = null;

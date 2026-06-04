@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Box, Paper, Progress, Text, UnstyledButton } from '@mantine/core';
 import { useMetaStore } from '../../state/metaStore';
 import { useRunStore } from '../../state/runStore';
@@ -8,6 +8,7 @@ import {
   type BranchId,
 } from '../../data/skillTree';
 import { requestUltimateActivation } from '../../game/systems/ultimateActivation';
+import { useHudSpec } from './hud/useHudSpec';
 
 interface UltimateSlot {
   hotkey: number;
@@ -17,10 +18,11 @@ interface UltimateSlot {
   color: string;
 }
 
-export const UltimateBar = () => {
+export const UltimateBar = memo(() => {
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
   const charges = useRunStore((s) => s.ultimateCharges);
   const activeUltimate = useRunStore((s) => s.activeUltimate);
+  const surface = useHudSpec().ultimate.surface;
 
   const slots = useMemo<UltimateSlot[]>(() => {
     const out: UltimateSlot[] = [];
@@ -64,17 +66,19 @@ export const UltimateBar = () => {
           charge={charges[slot.ultimateId] ?? 0}
           isActive={activeUltimate === slot.ultimateId}
           isBlocked={someoneBlocking && activeUltimate !== slot.ultimateId}
+          surface={surface}
         />
       ))}
     </Box>
   );
-};
+});
 
 interface UltimateCardProps {
   slot: UltimateSlot;
   charge: number;
   isActive: boolean;
   isBlocked: boolean;
+  surface: string;
 }
 
 const UltimateCard = ({
@@ -82,6 +86,7 @@ const UltimateCard = ({
   charge,
   isActive,
   isBlocked,
+  surface,
 }: UltimateCardProps) => {
   const ready = charge >= 100 && !isActive && !isBlocked;
   const canClick = ready;
@@ -104,7 +109,7 @@ const UltimateCard = ({
         px="sm"
         py="xs"
         radius="md"
-        bg="rgba(0, 0, 0, 0.55)"
+        bg={surface}
         style={{
           width: 96,
           border: `1px solid ${isActive ? slot.color : 'rgba(255,255,255,0.08)'}`,

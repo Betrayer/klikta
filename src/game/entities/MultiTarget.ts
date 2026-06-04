@@ -22,8 +22,13 @@ export class MultiTarget extends Target {
     this.spawn();
   }
 
+  protected override currentVisualState(): string | null {
+    return `multi_${this.clicksRemaining}`;
+  }
+
   render(): void {
     this.decoration.clear();
+    if (this.currentStateTexture() !== undefined) return;
     const ratio = this.clicksRemaining / this.clicksRequired;
     const ringRadius = this.initialSize * 0.65 * ratio;
     if (ringRadius > 0) {
@@ -36,6 +41,7 @@ export class MultiTarget extends Target {
   onClick(): ClickResult {
     this.clicksRemaining -= 1;
     if (this.clicksRemaining > 0) {
+      this.refreshVisualState();
       this.render();
       this.pulse();
       return { destroyed: false, score: 0, effects: [] };
