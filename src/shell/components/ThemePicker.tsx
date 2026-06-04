@@ -1,15 +1,12 @@
-import { Card, Group, Stack, Text } from '@mantine/core';
+import { Badge, Card, Group, Stack, Text } from '@mantine/core';
 import { THEMES } from '../../data/themes';
-import type { ThemeUiColors } from '../../data/themes/types';
 import { useMetaStore } from '../../state/metaStore';
+import { ThemePreview } from './ThemePreview';
 
-const SWATCH_KEYS: (keyof ThemeUiColors)[] = [
-  'primary',
-  'accent',
-  'gold',
-  'highlight',
-  'info',
-];
+const titleCase = (value: string): string =>
+  value.charAt(0).toUpperCase() + value.slice(1);
+
+const bgLabel = (kind: string): string => titleCase(kind.replace(/_/g, ' '));
 
 export const ThemePicker = () => {
   const activeThemeId = useMetaStore((s) => s.activeThemeId);
@@ -42,26 +39,14 @@ export const ThemePicker = () => {
               onClick={() => apply(theme.id)}
               style={{
                 cursor: 'pointer',
-                minWidth: 140,
+                width: 180,
                 background: theme.ui.surface,
                 borderColor: active ? theme.ui.primary : theme.ui.border,
                 borderWidth: active ? 2 : 1,
               }}
             >
-              <Stack gap={10}>
-                <Group gap={6}>
-                  {SWATCH_KEYS.map((key) => (
-                    <span
-                      key={key}
-                      style={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: 5,
-                        background: theme.ui[key],
-                      }}
-                    />
-                  ))}
-                </Group>
+              <Stack gap={8}>
+                <ThemePreview theme={theme} />
                 <Text
                   size="sm"
                   fw={active ? 700 : 500}
@@ -70,6 +55,14 @@ export const ThemePicker = () => {
                   {theme.name}
                   {active ? ' ✓' : ''}
                 </Text>
+                <Group gap={6}>
+                  <Badge size="xs" variant="light" color="gray">
+                    {titleCase(theme.hud.style)}
+                  </Badge>
+                  <Badge size="xs" variant="light" color="gray">
+                    {bgLabel(theme.background.kind)}
+                  </Badge>
+                </Group>
               </Stack>
             </Card>
           );
