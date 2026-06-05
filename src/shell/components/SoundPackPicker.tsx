@@ -1,6 +1,7 @@
 import { Button, Group, Stack, Text } from '@mantine/core';
 import { SOUND_PACKS } from '../../data/sound';
 import { useMetaStore } from '../../state/metaStore';
+import { isTouchDevice } from '../../game/util/device';
 
 interface PackRowProps {
   label: string;
@@ -17,7 +18,7 @@ const PackRow = ({ label, activeId, onSelect }: PackRowProps) => (
       {Object.values(SOUND_PACKS).map((pack) => (
         <Button
           key={pack.id}
-          size="xs"
+          size={isTouchDevice() ? 'md' : 'xs'}
           radius="xl"
           color="accent"
           variant={pack.id === activeId ? 'filled' : 'outline'}

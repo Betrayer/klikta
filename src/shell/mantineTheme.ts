@@ -7,14 +7,20 @@ import { useMemo } from "react";
 import { useMetaStore } from "../state/metaStore";
 import { DEFAULT_THEME, THEMES } from "../data/themes";
 import type { Theme } from "../data/themes/types";
+import { isTouchDevice } from "../game/util/device";
 
 export const TELEGRAM_BRAND = "#229ed9";
+
+const touchComponents: MantineThemeOverride["components"] = {
+  Button: { defaultProps: { size: "md" } },
+};
 
 export const buildMantineTheme = (theme: Theme): MantineThemeOverride =>
   createTheme({
     primaryColor: "primary",
     fontFamily: theme.fonts.body,
     fontFamilyMonospace: theme.fonts.display,
+    components: isTouchDevice() ? touchComponents : undefined,
     colors: {
       primary: colorsTuple(theme.ui.primary),
       accent: colorsTuple(theme.ui.accent),

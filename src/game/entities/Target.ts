@@ -10,6 +10,7 @@ import { rendererFor } from "./render/TargetRenderer";
 import { resolveStateTexture } from "./render/SpriteRenderer";
 import { Tween } from "../util/Tween";
 import { tweenManager } from "../util/TweenManager";
+import { touchRadiusMul } from "../util/device";
 import {
   easeInOutQuad,
   easeOutBack,
@@ -89,7 +90,7 @@ export abstract class Target {
     this.y = spawn.y;
     this.lifetimeMs = config.lifetimeMs * modifiers.lifetimeMul;
     this.spawnTime = performance.now();
-    this.initialSize = config.radius * modifiers.sizeMul;
+    this.initialSize = config.radius * modifiers.sizeMul * touchRadiusMul();
     this.currentSize = this.initialSize;
     this.scoreMul = modifiers.scoreMul;
     this.visual = { mode: "vector", shape: "circle", color: config.color };

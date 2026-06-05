@@ -3,6 +3,7 @@ import { findPerk, tierKey } from "../../../data/skillTree";
 import type { PanZoomController } from "./usePanZoom";
 import type { BranchLayout, SkillTreeLayout } from "./layout";
 import { PerkNode } from "./PerkNode";
+import { touchRadiusMul } from "../../../game/util/device";
 
 export interface SkillTreeCanvasProps {
   layout: SkillTreeLayout;
@@ -88,6 +89,7 @@ export const SkillTreeCanvas = ({
 }: SkillTreeCanvasProps) => {
   const { containerRef, transform, onPointerDown, onPointerMove, onPointerUp } =
     panZoom;
+  const nodeRadius = layout.nodeRadius * touchRadiusMul();
   const totalSelected = layout.branches.reduce(
     (sum, branch) => sum + (branchPoints[branch.id] ?? 0),
     0,
@@ -247,7 +249,7 @@ export const SkillTreeCanvas = ({
                   key={node.perkId}
                   perkId={node.perkId}
                   pos={node.pos}
-                  radius={layout.nodeRadius}
+                  radius={nodeRadius}
                   icon={option.icon}
                   branchColor={branch.color}
                   costLabel={isSelected || isLocked ? "" : String(effectiveCost)}

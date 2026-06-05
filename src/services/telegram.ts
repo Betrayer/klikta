@@ -8,9 +8,7 @@ import {
 
 const THEME_COLOR = "#1a0033";
 
-const TELEGRAM_USER_ALLOWLIST: readonly number[] = [
-  350491423, 382691713, 382136679,
-];
+const TELEGRAM_USER_ALLOWLIST: readonly number[] = [];
 
 export interface TelegramSession {
   isTelegram: boolean;

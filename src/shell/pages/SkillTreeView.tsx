@@ -22,6 +22,7 @@ import { PerkDetails } from '../components/skill-tree/PerkDetails';
 import { SkillTreeCanvas } from '../components/skill-tree/SkillTreeCanvas';
 import { SKILL_TREE_LAYOUT } from '../components/skill-tree/layout';
 import { usePanZoom } from '../components/skill-tree/usePanZoom';
+import { isTouchDevice } from '../../game/util/device';
 
 interface PendingSelection {
   option: SkillOption;
@@ -86,6 +87,7 @@ export const SkillTreeView = () => {
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
   const currency = useMetaStore((s) => s.currency);
   const panZoom = usePanZoom(SKILL_TREE_LAYOUT.size);
+  const zoomIconSize = isTouchDevice() ? 'xl' : 'lg';
 
   const branchPoints = useMemo(() => {
     const counts = {} as Record<BranchId, number>;
@@ -213,7 +215,7 @@ export const SkillTreeView = () => {
         <Tooltip label="Zoom in" position="left">
           <ActionIcon
             variant="default"
-            size="lg"
+            size={zoomIconSize}
             onClick={() => panZoom.zoomBy(1.25)}
             aria-label="Zoom in"
           >
@@ -223,7 +225,7 @@ export const SkillTreeView = () => {
         <Tooltip label="Zoom out" position="left">
           <ActionIcon
             variant="default"
-            size="lg"
+            size={zoomIconSize}
             onClick={() => panZoom.zoomBy(0.8)}
             aria-label="Zoom out"
           >
@@ -233,7 +235,7 @@ export const SkillTreeView = () => {
         <Tooltip label="Reset view" position="left">
           <ActionIcon
             variant="default"
-            size="lg"
+            size={zoomIconSize}
             onClick={panZoom.reset}
             aria-label="Reset view"
           >
@@ -262,27 +264,29 @@ export const SkillTreeView = () => {
 
       <PerkDetails focusedPerkId={focusedPerkId} onTrySelect={handleTrySelect} />
 
-      <Group
-        gap="xs"
-        style={{ position: 'absolute', bottom: 16, left: 16, zIndex: 20 }}
-      >
-        <Button
-          size="xs"
-          variant="light"
-          color="teal"
-          onClick={grantTestCurrency}
+      {import.meta.env.DEV && (
+        <Group
+          gap="xs"
+          style={{ position: 'absolute', bottom: 16, left: 16, zIndex: 20 }}
         >
-          test +{TEST_CURRENCY_GRANT}
-        </Button>
-        <Button
-          size="xs"
-          variant="subtle"
-          color="gray"
-          onClick={resetTestCurrency}
-        >
-          reset test
-        </Button>
-      </Group>
+          <Button
+            size="xs"
+            variant="light"
+            color="teal"
+            onClick={grantTestCurrency}
+          >
+            test +{TEST_CURRENCY_GRANT}
+          </Button>
+          <Button
+            size="xs"
+            variant="subtle"
+            color="gray"
+            onClick={resetTestCurrency}
+          >
+            reset test
+          </Button>
+        </Group>
+      )}
 
       <Modal
         opened={confirmReset}

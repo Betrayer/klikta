@@ -13,6 +13,7 @@ import { useSettingsStore } from '../../state/settingsStore';
 import { useMetaStore } from '../../state/metaStore';
 import { useCampaignStore } from '../../state/campaignStore';
 import { audioSystem } from '../../game/systems/AudioSystem';
+import { isTouchDevice } from '../../game/util/device';
 
 const toPercent = (v: number): number => Math.round(v * 100);
 
@@ -59,7 +60,7 @@ export const SettingsOverlay = () => {
         <ActionIcon
           variant="subtle"
           color="gray"
-          size="lg"
+          size={isTouchDevice() ? 'xl' : 'lg'}
           aria-label="Settings"
           pos="fixed"
           bottom={8}

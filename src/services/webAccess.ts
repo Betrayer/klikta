@@ -1,4 +1,4 @@
-const WEB_GATE_PASSWORD = "hubbabubba";
+const WEB_GATE_PASSWORD = "";
 const UNLOCK_KEY = "klikta-web-unlocked";
 
 export const isWebGateEnabled = (): boolean => WEB_GATE_PASSWORD.length > 0;
