@@ -36,11 +36,11 @@ export const ComboCounter = memo(() => {
     >
       <Text
         ff="monospace"
-        fz={34}
         fw={900}
         c={accent}
         style={{
           display: 'inline-block',
+          fontSize: 'clamp(1.375rem, 6vw, 2.125rem)',
           transform: bump ? `scale(${bumpScale})` : 'scale(1)',
           transition: 'transform 110ms ease-out',
         }}

@@ -1,10 +1,15 @@
 import {
+  backButton,
+  closingBehavior,
+  hapticFeedback,
   init,
   isTMA,
   miniApp,
   retrieveLaunchParams,
+  themeParams,
   viewport,
 } from "@tma.js/sdk";
+import { useSettingsStore } from "../state/settingsStore";
 
 const THEME_COLOR = "#1a0033";
 
@@ -88,6 +93,92 @@ const setupMiniApp = (): void => {
   miniApp.bindCssVars.ifAvailable();
   miniApp.setBgColor.ifAvailable(THEME_COLOR);
   miniApp.ready.ifAvailable();
+  backButton.mount.ifAvailable();
+  closingBehavior.mount.ifAvailable();
+  themeParams.mount.ifAvailable();
+};
+
+export const getTelegramAccentColor = (): string | undefined => {
+  if (!session.isTelegram) return undefined;
+  try {
+    return themeParams.buttonColor() ?? undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+export type GameHapticEvent =
+  | "hit"
+  | "golden"
+  | "bomb"
+  | "milestone"
+  | "ultimate"
+  | "gameOver";
+
+export const haptic = (event: GameHapticEvent): void => {
+  if (!session.isTelegram) return;
+  if (!useSettingsStore.getState().hapticsEnabled) return;
+  switch (event) {
+    case "hit":
+      hapticFeedback.impactOccurred.ifAvailable("light");
+      return;
+    case "golden":
+      hapticFeedback.impactOccurred.ifAvailable("medium");
+      return;
+    case "milestone":
+      hapticFeedback.impactOccurred.ifAvailable("medium");
+      return;
+    case "bomb":
+      hapticFeedback.impactOccurred.ifAvailable("heavy");
+      hapticFeedback.notificationOccurred.ifAvailable("error");
+      return;
+    case "ultimate":
+      hapticFeedback.notificationOccurred.ifAvailable("success");
+      return;
+    case "gameOver":
+      hapticFeedback.notificationOccurred.ifAvailable("warning");
+      return;
+  }
+};
+
+export const showBackButton = (): void => {
+  backButton.show.ifAvailable();
+};
+
+export const hideBackButton = (): void => {
+  backButton.hide.ifAvailable();
+};
+
+export const onBackButton = (handler: () => void): (() => void) => {
+  const result = backButton.onClick.ifAvailable(handler);
+  return result.ok ? result.data : () => {};
+};
+
+export const enableRunCloseGuard = (): void => {
+  closingBehavior.enableConfirmation.ifAvailable();
+};
+
+export const disableRunCloseGuard = (): void => {
+  closingBehavior.disableConfirmation.ifAvailable();
+};
+
+export const isFullscreenSupported = (): boolean =>
+  viewport.requestFullscreen.isAvailable();
+
+export const isFullscreenActive = (): boolean => {
+  try {
+    return viewport.isFullscreen();
+  } catch {
+    return false;
+  }
+};
+
+export const enterFullscreen = (): void => {
+  viewport.requestFullscreen.ifAvailable();
+};
+
+export const exitFullscreen = (): void => {
+  viewport.exitFullscreen.ifAvailable();
 };
 
 export const initTelegram = async (): Promise<TelegramSession> => {

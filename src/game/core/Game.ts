@@ -22,12 +22,16 @@ import type { PhysicsEngine } from "../systems/PhysicsEngine";
 import { VFXSystem } from "../systems/VFXSystem";
 import { CameraSystem } from "../systems/CameraSystem";
 import { audioSystem } from "../systems/AudioSystem";
+import { haptic } from "../../services/telegram";
 import {
   areThemeAssetsLoaded,
   loadThemeAssets,
 } from "../assets/loadThemeAssets";
 import { BackgroundLayer } from "../background/BackgroundLayer";
 import { getActiveTheme, getBackgroundSpec } from "../../state/themeSelectors";
+import { useSettingsStore } from "../../state/settingsStore";
+import { FpsMonitor, reduceBackgroundSpec } from "../util/performance";
+import type { BackgroundSpec } from "../../data/themes/types";
 import { UltimateSystem } from "../systems/UltimateSystem";
 import {
   setUltimateActivationHandler,
@@ -109,6 +113,9 @@ export class Game {
   private spawnSystem: SpawnSystem | null = null;
   private unsubPause: (() => void) | null = null;
   private unsubTheme: (() => void) | null = null;
+  private unsubReduceMotion: (() => void) | null = null;
+  private readonly fpsMonitor = new FpsMonitor();
+  private autoReduceMotion = false;
   private vfx: VFXSystem | null = null;
   private camera: CameraSystem | null = null;
   private background: BackgroundLayer | null = null;
@@ -228,7 +235,9 @@ export class Game {
     this.app = app;
     this.parent.appendChild(app.canvas);
 
-    const background = new BackgroundLayer(getBackgroundSpec(), {
+    this.autoReduceMotion = false;
+    this.fpsMonitor.reset();
+    const background = new BackgroundLayer(this.currentBackgroundSpec(), {
       w: app.renderer.screen.width,
       h: app.renderer.screen.height,
     });
@@ -316,7 +325,13 @@ export class Game {
 
     this.unsubTheme = useMetaStore.subscribe((state, prev) => {
       if (state.activeThemeId !== prev.activeThemeId) {
-        this.background?.applySpec(getBackgroundSpec());
+        this.refreshBackground();
+      }
+    });
+
+    this.unsubReduceMotion = useSettingsStore.subscribe((state, prev) => {
+      if (state.reduceMotion !== prev.reduceMotion) {
+        this.refreshBackground();
       }
     });
   }
@@ -345,6 +360,7 @@ export class Game {
     const ctx = this.buildUltimateContext();
     if (ctx === null) return;
     this.ultimateSystem.activate(id, this.clockMs, ctx);
+    haptic("ultimate");
   }
 
   private applyPaused(paused: boolean): void {
@@ -496,6 +512,19 @@ export class Game {
     this.app.ticker.speed = base * this.ultimateTimeScale;
   }
 
+  private reduceMotionActive(): boolean {
+    return this.autoReduceMotion || useSettingsStore.getState().reduceMotion;
+  }
+
+  private currentBackgroundSpec(): BackgroundSpec {
+    const spec = getBackgroundSpec();
+    return this.reduceMotionActive() ? reduceBackgroundSpec(spec) : spec;
+  }
+
+  private refreshBackground(): void {
+    this.background?.applySpec(this.currentBackgroundSpec());
+  }
+
   private tick = (ticker: Ticker): void => {
     if (
       this.app === null ||
@@ -510,6 +539,10 @@ export class Game {
     useRunStore.getState().tickElapsed(deltaMs);
     tweenManager.update(deltaMs);
     this.background?.update(deltaMs);
+    if (!this.reduceMotionActive() && this.fpsMonitor.sample(deltaMs)) {
+      this.autoReduceMotion = true;
+      this.refreshBackground();
+    }
     this.vfx?.update(deltaMs);
     this.camera?.update(deltaMs);
     this.updateHitFrame();
@@ -708,6 +741,7 @@ export class Game {
     const victory = this.mode.isVictory(this.buildModeContext());
     useRunStore.getState().endRun(victory);
     audioSystem.playSFX("game_over");
+    haptic("gameOver");
     audioSystem.musicGameOver();
     this.awardRunRewards(victory);
   }
@@ -775,6 +809,7 @@ export class Game {
 
     if (result.effects.includes("lose_hp")) {
       audioSystem.playSFX("bomb_click");
+      haptic("bomb");
       this.handleBombClick(target);
     }
 
@@ -800,6 +835,7 @@ export class Game {
         this.ultimateSystem?.addCharge(CHARGE_PER_HIT[target.kind]);
         this.syncMusicToCombo();
         audioSystem.playSFX(this.hitSfx(target.kind));
+        haptic(target.kind === "golden" ? "golden" : "hit");
         this.handleComboMilestone();
         this.spawnFrenzyBurst(target.x, target.y);
       }
@@ -1022,6 +1058,7 @@ export class Game {
     const combo = useRunStore.getState().combo;
     if (!COMBO_MILESTONES.includes(combo)) return;
     audioSystem.playSFX("combo_milestone");
+    haptic("milestone");
     audioSystem.musicSwell();
     this.camera?.shake(FEEL.shake.comboIntensity, FEEL.shake.comboMs);
     this.ultimateSystem?.addCharge(CHARGE_PER_COMBO_MILESTONE);
@@ -1104,6 +1141,8 @@ export class Game {
     window.removeEventListener("keydown", this.handleKeydown);
     this.unsubTheme?.();
     this.unsubTheme = null;
+    this.unsubReduceMotion?.();
+    this.unsubReduceMotion = null;
     clearUltimateActivationHandler(this.ultimateHandler);
     clearRunPerkPickHandler(this.runPerkHandler);
     if (this.ultimateSystem !== null) {

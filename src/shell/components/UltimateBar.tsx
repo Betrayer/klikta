@@ -56,7 +56,9 @@ export const UltimateBar = memo(() => {
         transform: 'translateX(-50%)',
         zIndex: 10,
         display: 'flex',
-        gap: 8,
+        gap: 'clamp(4px, 1.5vw, 8px)',
+        maxWidth: '100vw',
+        padding: '0 8px',
       }}
     >
       {slots.map((slot) => (
@@ -111,7 +113,7 @@ const UltimateCard = ({
         radius="md"
         bg={surface}
         style={{
-          width: 96,
+          width: 'clamp(64px, 18vw, 96px)',
           border: `1px solid ${isActive ? slot.color : 'rgba(255,255,255,0.08)'}`,
           boxShadow: ready
             ? `0 0 16px ${slot.color}`

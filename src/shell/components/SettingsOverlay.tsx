@@ -6,6 +6,7 @@ import {
   Modal,
   Slider,
   Stack,
+  Switch,
   Text,
 } from '@mantine/core';
 import { useRunStore } from '../../state/runStore';
@@ -14,6 +15,13 @@ import { useMetaStore } from '../../state/metaStore';
 import { useCampaignStore } from '../../state/campaignStore';
 import { audioSystem } from '../../game/systems/AudioSystem';
 import { isTouchDevice } from '../../game/util/device';
+import {
+  enterFullscreen,
+  exitFullscreen,
+  isFullscreenActive,
+  isFullscreenSupported,
+  isTelegramEnvironment,
+} from '../../services/telegram';
 
 const toPercent = (v: number): number => Math.round(v * 100);
 
@@ -28,8 +36,23 @@ export const SettingsOverlay = () => {
   const setMasterVolume = useSettingsStore((s) => s.setMasterVolume);
   const setSFXVolume = useSettingsStore((s) => s.setSFXVolume);
   const setMusicVolume = useSettingsStore((s) => s.setMusicVolume);
+  const hapticsEnabled = useSettingsStore((s) => s.hapticsEnabled);
+  const setHapticsEnabled = useSettingsStore((s) => s.setHapticsEnabled);
+  const useTelegramTheme = useSettingsStore((s) => s.useTelegramTheme);
+  const setUseTelegramTheme = useSettingsStore((s) => s.setUseTelegramTheme);
+  const reduceMotion = useSettingsStore((s) => s.reduceMotion);
+  const setReduceMotion = useSettingsStore((s) => s.setReduceMotion);
 
   const [confirmReset, setConfirmReset] = useState(false);
+  const inTelegram = isTelegramEnvironment();
+  const fullscreenAvailable = inTelegram && isFullscreenSupported();
+  const [fullscreen, setFullscreen] = useState(isFullscreenActive);
+
+  const toggleFullscreen = (on: boolean) => {
+    if (on) enterFullscreen();
+    else exitFullscreen();
+    setFullscreen(on);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -110,6 +133,36 @@ export const SettingsOverlay = () => {
               max={100}
             />
           </Stack>
+
+          <Switch
+            checked={reduceMotion}
+            onChange={(e) => setReduceMotion(e.currentTarget.checked)}
+            label="Reduce motion"
+          />
+
+          {inTelegram && (
+            <Switch
+              checked={hapticsEnabled}
+              onChange={(e) => setHapticsEnabled(e.currentTarget.checked)}
+              label="Haptics"
+            />
+          )}
+
+          {inTelegram && (
+            <Switch
+              checked={useTelegramTheme}
+              onChange={(e) => setUseTelegramTheme(e.currentTarget.checked)}
+              label="Use Telegram theme"
+            />
+          )}
+
+          {fullscreenAvailable && (
+            <Switch
+              checked={fullscreen}
+              onChange={(e) => toggleFullscreen(e.currentTarget.checked)}
+              label="Fullscreen"
+            />
+          )}
 
           <Button fullWidth color="primary" onClick={() => setPaused(false)}>
             Resume

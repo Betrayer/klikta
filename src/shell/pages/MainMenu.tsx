@@ -1,11 +1,11 @@
-import { useState } from 'react';
 import { Button, Center, Stack, Title } from '@mantine/core';
 import { useAppStore } from '../../state/appStore';
 import { AccountButton } from '../components/AccountButton';
 import { CustomizeModal } from '../components/CustomizeModal';
 
 export const MainMenu = () => {
-  const [customizeOpen, setCustomizeOpen] = useState(false);
+  const customizeOpen = useAppStore((s) => s.customizeOpen);
+  const setCustomizeOpen = useAppStore((s) => s.setCustomizeOpen);
 
   return (
     <Center h="100vh" bg="background">

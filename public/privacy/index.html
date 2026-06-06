@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+    <title>Klikta — Privacy Policy</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #1a0033;
+        --surface: #25104a;
+        --text: #e9e2ff;
+        --muted: #a99fc7;
+        --accent: #ff006e;
+        --border: rgba(255, 255, 255, 0.1);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        line-height: 1.6;
+        padding: 32px 20px 80px;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-family: ui-monospace, "Cascadia Code", monospace;
+        color: var(--accent);
+        letter-spacing: 2px;
+        font-size: clamp(1.6rem, 6vw, 2.4rem);
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-family: ui-monospace, "Cascadia Code", monospace;
+        color: #fff;
+        font-size: 1.15rem;
+        margin: 36px 0 8px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 6px;
+      }
+      .updated {
+        color: var(--muted);
+        font-size: 0.85rem;
+        margin: 0 0 8px;
+      }
+      a {
+        color: var(--accent);
+      }
+      ul {
+        padding-left: 22px;
+      }
+      li {
+        margin: 4px 0;
+      }
+      code {
+        background: var(--surface);
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      .note {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin: 24px 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      footer {
+        margin-top: 48px;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>KLIKTA — PRIVACY POLICY</h1>
+      <p class="updated">Last updated: 6 June 2026</p>
+
+      <p>
+        Klikta is a skill-based reaction game playable on the web and as a
+        Telegram Mini App. This policy explains what data the game handles, why,
+        and your choices. We keep data collection to the minimum needed to run
+        leaderboards and sync your progress.
+      </p>
+
+      <h2>What we collect</h2>
+      <ul>
+        <li>
+          <strong>Account identifier.</strong> When you play, the game signs you
+          in to Firebase Authentication. By default this is an
+          <em>anonymous</em> account (a random ID with no personal details). If
+          you choose "Sign in to sync", we use the identifier from your chosen
+          provider — Google, email/password, or Telegram.
+        </li>
+        <li>
+          <strong>Display name.</strong> A name shown on leaderboards. It comes
+          from your sign-in (e.g. your Telegram first name or a nickname you
+          enter). You can play without signing in.
+        </li>
+        <li>
+          <strong>Leaderboard entries.</strong> When you set a personal best, we
+          store your score, game mode, max combo, run duration, the build
+          (perks) you used, a timestamp, and your display name.
+        </li>
+        <li>
+          <strong>Cloud save (only if signed in).</strong> Your game progress —
+          in-game currency, selected perks, achievements, and theme/sound
+          preferences — so it follows you across devices.
+        </li>
+        <li>
+          <strong>On your device.</strong> Settings and progress are also stored
+          locally in your browser (localStorage). This never leaves your device
+          unless you sign in to sync.
+        </li>
+      </ul>
+
+      <h2>Telegram Mini App</h2>
+      <p>
+        When you open Klikta inside Telegram, Telegram provides signed launch
+        data including your Telegram user ID and first name. We validate this
+        data on our server (the validation secret never reaches your device) and
+        use it only to create your validated account and display name. We do not
+        receive your phone number, message history, or contacts.
+      </p>
+
+      <h2>What we do NOT do</h2>
+      <ul>
+        <li>No advertising and no third-party ad/marketing trackers.</li>
+        <li>No selling or renting of your data.</li>
+        <li>No collection of precise location, contacts, or message content.</li>
+      </ul>
+
+      <h2>Where data is stored</h2>
+      <p>
+        Leaderboard and cloud-save data are stored in Google Firebase
+        (Firestore and Firebase Authentication). The web app and its server
+        functions are hosted on Vercel. Hosting and infrastructure providers may
+        process basic technical data (such as IP address) for security and
+        reliability, as is standard for any website.
+      </p>
+
+      <h2>Your choices &amp; data deletion</h2>
+      <ul>
+        <li>
+          You can play fully anonymously — just don't sign in.
+        </li>
+        <li>
+          "Reset Progress" in the in-game settings clears your local progress on
+          that device.
+        </li>
+        <li>
+          To delete your account and associated leaderboard/cloud-save data,
+          contact us at the address below and we will remove it.
+        </li>
+      </ul>
+
+      <h2>Children</h2>
+      <p>
+        Klikta is not directed at children under 13 and does not knowingly
+        collect personal information from them.
+      </p>
+
+      <h2>Changes</h2>
+      <p>
+        We may update this policy as the game evolves. Material changes will be
+        reflected by the "Last updated" date above.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions or data requests:
+        <a href="mailto:CONTACT_EMAIL_PLACEHOLDER">CONTACT_EMAIL_PLACEHOLDER</a>
+      </p>
+
+      <div class="note">
+        Before publishing: replace <code>CONTACT_EMAIL_PLACEHOLDER</code> (both
+        the link and the text) with a real contact email, and confirm every
+        statement above still matches what the shipped build does.
+      </div>
+
+      <footer>Klikta © 2026</footer>
+    </main>
+  </body>
+</html>

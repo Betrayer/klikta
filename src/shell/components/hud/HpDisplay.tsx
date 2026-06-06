@@ -7,6 +7,8 @@ interface HpDisplayProps {
   maxHp: number;
 }
 
+const HEARTS_LIMIT = 10;
+
 const clampPct = (hp: number, maxHp: number): number =>
   maxHp > 0 ? Math.max(0, Math.min(100, (hp / maxHp) * 100)) : 0;
 
@@ -95,9 +97,16 @@ export const HpDisplay = ({ spec, hp, maxHp }: HpDisplayProps) => {
     );
   }
 
+  const hearts = hp > HEARTS_LIMIT ? `♥ ${hp}` : '♥'.repeat(hp) || '-';
   return (
-    <Text ff="monospace" fz="lg" fw={700} c={accent}>
-      {'♥'.repeat(hp) || '-'}
+    <Text
+      ff="monospace"
+      fz="lg"
+      fw={700}
+      c={accent}
+      style={{ whiteSpace: 'nowrap' }}
+    >
+      {hearts}
     </Text>
   );
 };
