@@ -24,6 +24,7 @@ import {
   isTelegramEnvironment,
 } from '../../services/telegram';
 import { LanguagePicker } from './LanguagePicker';
+import { MenuButton } from './menu/MenuButton';
 
 const toPercent = (v: number): number => Math.round(v * 100);
 
@@ -175,9 +176,9 @@ export const SettingsOverlay = () => {
             />
           )}
 
-          <Button fullWidth color="primary" onClick={() => setPaused(false)}>
+          <MenuButton variant="primary" onClick={() => setPaused(false)}>
             {t('settings:resume')}
-          </Button>
+          </MenuButton>
           <Button
             fullWidth
             variant="outline"
@@ -186,9 +187,9 @@ export const SettingsOverlay = () => {
           >
             {t('settings:resetProgress')}
           </Button>
-          <Button fullWidth variant="default" onClick={quitToMenu}>
+          <MenuButton variant="secondary" onClick={quitToMenu}>
             {t('settings:quitToMenu')}
-          </Button>
+          </MenuButton>
         </Stack>
       </Modal>
 

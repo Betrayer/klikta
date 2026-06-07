@@ -1,7 +1,6 @@
 import {
   Badge,
   Box,
-  Button,
   Center,
   Container,
   Divider,
@@ -16,6 +15,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { startNewRun } from '../../game/runLauncher';
 import { useLocalize } from '../../i18n/useLocalize';
+import { MenuButton } from '../components/menu/MenuButton';
+import { MenuShell } from '../components/menu/MenuShell';
 import {
   findPerk,
   findTierForPerk,
@@ -257,7 +258,7 @@ export const PostRunSummary = () => {
   const displayedTotal = useCountUp(totalEarned, CURRENCY_LINE_MS, totalDelay);
 
   return (
-    <Box bg="background" mih="100vh">
+    <MenuShell>
       <Center mih="100vh" p="md">
         <Container size={720} w="100%">
           <Stack gap="lg">
@@ -398,47 +399,24 @@ export const PostRunSummary = () => {
               </Paper>
             )}
 
-            <Group justify="center" gap="sm" wrap="wrap">
-              <Button
-                size="lg"
-                radius="xl"
-                color="primary"
-                onClick={handlePlayAgain}
-              >
+            <Stack gap="sm" w="100%" maw={320} mx="auto">
+              <MenuButton variant="primary" onClick={handlePlayAgain}>
                 {t('summary:playAgain')}
-              </Button>
-              <Button
-                size="md"
-                radius="xl"
-                variant="outline"
-                color="accent"
-                onClick={handleSkillTree}
-              >
+              </MenuButton>
+              <MenuButton variant="secondary" onClick={handleSkillTree}>
                 {t('common:skillTree')}
-              </Button>
-              <Button
-                size="md"
-                radius="xl"
-                variant="outline"
-                color="gold"
-                onClick={handleLeaderboard}
-              >
+              </MenuButton>
+              <MenuButton variant="secondary" onClick={handleLeaderboard}>
                 {t('common:leaderboard')}
-              </Button>
-              <Button
-                size="md"
-                radius="xl"
-                variant="subtle"
-                color="gray"
-                onClick={handleMainMenu}
-              >
+              </MenuButton>
+              <MenuButton variant="tertiary" onClick={handleMainMenu}>
                 {t('common:mainMenu')}
-              </Button>
-            </Group>
+              </MenuButton>
+            </Stack>
           </Stack>
         </Container>
       </Center>
-    </Box>
+    </MenuShell>
   );
 };
 

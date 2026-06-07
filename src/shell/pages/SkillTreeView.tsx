@@ -266,7 +266,11 @@ export const SkillTreeView = () => {
         </Text>
       )}
 
-      <PerkDetails focusedPerkId={focusedPerkId} onTrySelect={handleTrySelect} />
+      <PerkDetails
+        focusedPerkId={focusedPerkId}
+        onTrySelect={handleTrySelect}
+        onClose={() => setPinnedPerkId(null)}
+      />
 
       {import.meta.env.DEV && (
         <Group

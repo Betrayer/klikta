@@ -17,13 +17,15 @@ import { MODES, type ModeMeta } from '../../data/modes';
 import { useAppStore } from '../../state/appStore';
 import { useMetaStore } from '../../state/metaStore';
 import { useLocalize } from '../../i18n/useLocalize';
+import { MenuButton } from '../components/menu/MenuButton';
+import { MenuShell } from '../components/menu/MenuShell';
 
 export const ModeSelect = () => {
   const { t } = useTranslation();
   const bestScores = useMetaStore((s) => s.bestScores);
 
   return (
-    <Box bg="background" mih="100vh">
+    <MenuShell>
       <ScrollArea h="100vh" type="auto">
         <Container size={900} p="md">
           <Stack gap="lg">
@@ -31,13 +33,13 @@ export const ModeSelect = () => {
               <Title order={1} fz={36} fw={900} c="primary" lts={4}>
                 {t('menu:modeSelect.title')}
               </Title>
-              <Button
-                variant="subtle"
-                color="gray"
+              <MenuButton
+                variant="tertiary"
+                fullWidth={false}
                 onClick={() => useAppStore.getState().setScreen('menu')}
               >
                 {t('common:back')}
-              </Button>
+              </MenuButton>
             </Group>
 
             <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
@@ -52,7 +54,7 @@ export const ModeSelect = () => {
           </Stack>
         </Container>
       </ScrollArea>
-    </Box>
+    </MenuShell>
   );
 };
 

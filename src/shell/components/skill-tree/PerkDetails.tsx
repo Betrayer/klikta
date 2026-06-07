@@ -1,4 +1,14 @@
-import { Badge, Box, Button, Group, Paper, Stack, Text } from '@mantine/core';
+import {
+  Badge,
+  Box,
+  Button,
+  CloseButton,
+  Divider,
+  Group,
+  Paper,
+  Stack,
+  Text,
+} from '@mantine/core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -18,9 +28,14 @@ export interface PerkDetailsProps {
     branchId: BranchId,
     tier: TierLevel,
   ) => void;
+  onClose?: () => void;
 }
 
-export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) => {
+export const PerkDetails = ({
+  focusedPerkId,
+  onTrySelect,
+  onClose,
+}: PerkDetailsProps) => {
   const { t } = useTranslation();
   const loc = useLocalize();
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
@@ -82,11 +97,6 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
     onTrySelect(option, branch.id, tier.tier);
   };
 
-  const swapHint =
-    !isSelected && prevCost > 0
-      ? ` ${t('game:perk.swapHint', { refund: prevCost, net: effectiveCost })}`
-      : '';
-
   const actionDisabled = isSelected
     ? deselectBlockReason !== null
     : !tierGateMet || !canAfford;
@@ -131,51 +141,74 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
           boxShadow: `0 8px 28px rgba(0, 0, 0, 0.45), 0 0 18px color-mix(in srgb, ${branch.color} 22%, transparent)`,
         }}
       >
-        <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
-          <Stack gap={6} style={{ flex: 1, minWidth: 0 }}>
-            <Group gap="sm" wrap="nowrap">
-              <PerkIcon name={option.icon} size={30} color={branch.color} />
-              <Stack gap={2} style={{ minWidth: 0 }}>
-                <Text fw={700} fz="lg" c="white" lineClamp={1}>
-                  {loc('perks', option.id, 'name', option.name)}
+        <Stack gap="sm">
+          <Group gap="sm" wrap="nowrap" align="flex-start">
+            <PerkIcon name={option.icon} size={30} color={branch.color} />
+            <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+              <Text fw={700} fz="lg" c="white" lineClamp={2}>
+                {loc('perks', option.id, 'name', option.name)}
+              </Text>
+              <Group gap={6} wrap="wrap">
+                <Badge
+                  size="xs"
+                  variant="light"
+                  style={{
+                    backgroundColor: `color-mix(in srgb, ${branch.color} 22%, transparent)`,
+                    color: branch.color,
+                  }}
+                >
+                  {loc('perks', branch.id, 'name', branch.name)}
+                </Badge>
+                <Text size="xs" c="dimmed" tt="uppercase" lts={1}>
+                  {t('game:perk.tier', { tier: tier.tier })}
                 </Text>
-                <Group gap={6} wrap="nowrap">
-                  <Badge
-                    size="xs"
-                    variant="light"
-                    style={{ backgroundColor: `color-mix(in srgb, ${branch.color} 22%, transparent)`, color: branch.color }}
-                  >
-                    {loc('perks', branch.id, 'name', branch.name)}
-                  </Badge>
-                  <Text size="xs" c="dimmed" tt="uppercase" lts={1}>
-                    {t('game:perk.tier', { tier: tier.tier })}
-                  </Text>
-                </Group>
-              </Stack>
-            </Group>
-            <Text size="sm" c="gray.3">
-              {loc('perks', option.id, 'description', option.description)}
-            </Text>
-          </Stack>
+              </Group>
+            </Stack>
+            {onClose !== undefined && (
+              <CloseButton size="sm" onClick={onClose} />
+            )}
+          </Group>
 
-          <Stack gap={6} align="flex-end" miw={150}>
-            {isSelected ? (
-              <Text size="sm" c={branch.color} fw={600}>
-                {t('game:perk.active')}
-              </Text>
-            ) : (
-              <Text size="sm" c={canAfford ? 'gray.3' : 'red.5'} ff="monospace">
-                {t('game:perk.cost', { cost: option.cost })}
-                {swapHint}
-              </Text>
-            )}
-            {reasonText !== null && (
-              <Text size="xs" c="red.5" ta="right">
-                {reasonText}
-              </Text>
-            )}
+          <Text size="sm" c="gray.3">
+            {loc('perks', option.id, 'description', option.description)}
+          </Text>
+
+          <Divider color="dark.7" />
+
+          <Group justify="space-between" align="flex-end" wrap="wrap" gap="sm">
+            <Stack gap={2} style={{ minWidth: 0 }}>
+              {isSelected ? (
+                <Text size="md" fw={600} c={branch.color}>
+                  {t('game:perk.active')}
+                </Text>
+              ) : (
+                <>
+                  <Text
+                    fz="lg"
+                    fw={700}
+                    ff="monospace"
+                    c={canAfford ? 'white' : 'red.5'}
+                  >
+                    {t('game:perk.cost', { cost: option.cost })}
+                  </Text>
+                  {prevCost > 0 && (
+                    <Text size="xs" c="dimmed">
+                      {t('game:perk.swapHint', {
+                        refund: prevCost,
+                        net: effectiveCost,
+                      })}
+                    </Text>
+                  )}
+                </>
+              )}
+              {reasonText !== null && (
+                <Text size="xs" c="red.5">
+                  {reasonText}
+                </Text>
+              )}
+            </Stack>
             <Button
-              size="sm"
+              size="md"
               color={isSelected ? 'red' : branch.color}
               variant={isSelected ? 'outline' : 'filled'}
               disabled={actionDisabled}
@@ -183,8 +216,8 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
             >
               {actionLabel}
             </Button>
-          </Stack>
-        </Group>
+          </Group>
+        </Stack>
       </Paper>
     </Box>
   );

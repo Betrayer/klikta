@@ -1,4 +1,4 @@
-import type { BackgroundSpec, TargetVisual } from "../../data/themes/types";
+import type { BackgroundSpec } from "../../data/themes/types";
 
 const toHex = (value: number): string =>
   `#${(value & 0xffffff).toString(16).padStart(6, "0")}`;
@@ -28,6 +28,3 @@ export const backgroundCss = (bg: BackgroundSpec): string => {
       return toHex(bg.color ?? 0x101018);
   }
 };
-
-export const targetDotColor = (visual: TargetVisual): string =>
-  toHex(visual.color ?? 0xffffff);

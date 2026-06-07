@@ -3,6 +3,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../state/authStore";
 import { AuthModal } from "./AuthModal";
+import { MenuButton } from "./menu/MenuButton";
 
 export const AccountButton = () => {
   const { t } = useTranslation();
@@ -36,16 +37,9 @@ export const AccountButton = () => {
 
   return (
     <>
-      <Button
-        size="md"
-        radius="xl"
-        variant="light"
-        color="accent"
-        onClick={open}
-        fullWidth
-      >
+      <MenuButton variant="tertiary" loading={busy} onClick={open}>
         {t("auth:signInToSync")}
-      </Button>
+      </MenuButton>
       <AuthModal opened={opened} onClose={close} />
     </>
   );

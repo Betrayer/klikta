@@ -1,6 +1,7 @@
-import { Badge, Card, Group, Stack, Text } from '@mantine/core';
+import { Badge, Card, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { THEMES } from '../../data/themes';
+import { SOUND_PACKS } from '../../data/sound';
 import { useMetaStore } from '../../state/metaStore';
 import { ThemePreview } from './ThemePreview';
 
@@ -24,9 +25,10 @@ export const ThemePicker = () => {
       <Text size="xs" c="dimmed" tt="uppercase" lts={2}>
         {t('menu:themeSection')}
       </Text>
-      <Group gap="sm">
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
         {Object.values(THEMES).map((theme) => {
           const active = theme.id === activeThemeId;
+          const musicPackName = SOUND_PACKS[theme.defaultSoundPack]?.name;
           return (
             <Card
               key={theme.id}
@@ -36,7 +38,6 @@ export const ThemePicker = () => {
               onClick={() => apply(theme.id)}
               style={{
                 cursor: 'pointer',
-                width: 180,
                 background: theme.ui.surface,
                 borderColor: active ? theme.ui.primary : theme.ui.border,
                 borderWidth: active ? 2 : 1,
@@ -59,12 +60,17 @@ export const ThemePicker = () => {
                   <Badge size="xs" variant="light" color="gray">
                     {t(`menu:backgroundKind.${theme.background.kind}`)}
                   </Badge>
+                  {musicPackName !== undefined && (
+                    <Badge size="xs" variant="light" color="gray">
+                      {musicPackName}
+                    </Badge>
+                  )}
                 </Group>
               </Stack>
             </Card>
           );
         })}
-      </Group>
+      </SimpleGrid>
     </Stack>
   );
 };

@@ -1,6 +1,4 @@
 import {
-  Box,
-  Button,
   Center,
   Container,
   Group,
@@ -23,6 +21,8 @@ import {
   type LeaderboardEntry,
 } from '../../services/leaderboard';
 import { useLocalize } from '../../i18n/useLocalize';
+import { MenuButton } from '../components/menu/MenuButton';
+import { MenuShell } from '../components/menu/MenuShell';
 
 const formatDuration = (ms: number): string => {
   const totalSec = Math.max(0, Math.floor(ms / 1000));
@@ -67,7 +67,7 @@ export const LeaderboardView = () => {
   const isDuration = mode.leaderboardSort === 'duration_desc';
 
   return (
-    <Box bg="background" mih="100vh">
+    <MenuShell>
       <ScrollArea h="100vh" type="auto">
         <Container size={720} p="md">
           <Stack gap="lg">
@@ -75,13 +75,13 @@ export const LeaderboardView = () => {
               <Title order={1} fz={36} fw={900} c="primary" lts={4}>
                 {t('leaderboard:title')}
               </Title>
-              <Button
-                variant="subtle"
-                color="gray"
+              <MenuButton
+                variant="tertiary"
+                fullWidth={false}
                 onClick={() => useAppStore.getState().setScreen('menu')}
               >
                 {t('common:back')}
-              </Button>
+              </MenuButton>
             </Group>
 
             <Tabs
@@ -195,6 +195,6 @@ export const LeaderboardView = () => {
           </Stack>
         </Container>
       </ScrollArea>
-    </Box>
+    </MenuShell>
   );
 };
