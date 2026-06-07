@@ -1,0 +1,29 @@
+{
+  "achievements": {
+    "combo-100": "Zestaw 100",
+    "combo-25": "Zestaw 25",
+    "combo-50": "Zestaw 50",
+    "first-run": "Premiera",
+    "first-skill": "Odblokowano pierwszą umiejętność",
+    "no-bomb-clicks": "Żadnych kliknięć w bombę"
+  },
+  "activePerks": "Aktywne korzyści",
+  "bestRank": "Najlepszy wynik na świecie: #{{rank}}",
+  "currencyEarned": "Wypłacona kwota",
+  "leaderboardUnavailable": "Tabela wyników jest niedostępna",
+  "lines": {
+    "base": "Wynik",
+    "bombBounty": "Nagroda za bombę",
+    "comboBonus": "Bonus za pakiet",
+    "comboCoin": "Monety w pakiecie",
+    "victoryBonus": "Premia za zwycięstwo"
+  },
+  "newBest": "NOWE HITY",
+  "noCurrency": "W tej rundzie nie zdobyto żadnych punktów.",
+  "playAgain": "Zagraj ponownie",
+  "ranked": "{{rank}}. miejsce w światowym rankingu",
+  "runOver": "PODJECHAŁ",
+  "submitting": "Przesyłanie wyniku...",
+  "total": "Razem",
+  "victory": "ZWYCIĘSTWO"
+}

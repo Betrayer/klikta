@@ -25,7 +25,7 @@ export const buildMantineTheme = (
     primaryColor: "primary",
     fontFamily: theme.fonts.body,
     fontFamilyMonospace: theme.fonts.display,
-    components: isTouchDevice() ? touchComponents : undefined,
+    ...(isTouchDevice() ? { components: touchComponents } : {}),
     colors: {
       primary: colorsTuple(accentOverride ?? theme.ui.primary),
       accent: colorsTuple(theme.ui.accent),

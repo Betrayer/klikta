@@ -1,0 +1,22 @@
+{
+  "campaign": {
+    "description": "Ein durchinszenierter Run aus immer härteren Wellen mit einer run-gebundenen Perk-Wahl zwischen jeder. Schaffe Welle 15, um zu gewinnen.",
+    "name": "Kampagne",
+    "tagline": "15 Wellen."
+  },
+  "endless_hp": {
+    "description": "Der Original-Loop. Verpasst du ein Ziel, verlierst du HP. Der Run endet, wenn die HP auf null fallen. Stapel Combos für Score.",
+    "name": "Endlos",
+    "tagline": "Überlebe. Punkte."
+  },
+  "endless_timer": {
+    "description": "Starte mit einem schrumpfenden Timer. Jeder Treffer kauft dir mehr Zeit. Gier hält dich am Leben; Zögern tötet.",
+    "name": "Zeitangriff",
+    "tagline": "Lauf gegen die Uhr."
+  },
+  "physics_chaos": {
+    "description": "Ziele driften, prallen ab und verschmelzen. Klicks stoßen die nahen weg. Reaktion in Bewegung.",
+    "name": "Chaos",
+    "tagline": "Alles bewegt sich."
+  }
+}

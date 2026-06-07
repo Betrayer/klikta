@@ -86,7 +86,7 @@ export const WILD_BRANCH: SkillBranch = {
           id: "wild-t3-cursor-magnet",
           name: "Cursor Magnet",
           description:
-            "Targets drift toward your cursor at ~25 px/s - stronger than mutation magnet.",
+            "Targets drift toward your cursor at ~25 px/s - stacks with mutation magnet.",
           icon: "magnet",
           cost: 700,
           effects: [{ kind: "targetsFollowCursorSpeed", value: 25 }],

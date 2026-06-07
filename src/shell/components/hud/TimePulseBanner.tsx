@@ -1,7 +1,9 @@
 import { Paper, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { useRunStore } from '../../../state/runStore';
 
 export const TimePulseBanner = () => {
+  const { t } = useTranslation();
   const incoming = useRunStore((s) => s.timePulseIncoming);
   if (!incoming) return null;
 
@@ -24,7 +26,7 @@ export const TimePulseBanner = () => {
       }}
     >
       <Text ff="monospace" fz="xl" fw={900} c="white" lts={4}>
-        ⏱ TIME PULSE
+        {t('game:hud.timePulse')}
       </Text>
     </Paper>
   );

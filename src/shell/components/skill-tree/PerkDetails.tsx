@@ -1,5 +1,6 @@
 import { Badge, Box, Button, Group, Paper, Stack, Text } from '@mantine/core';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type {
   BranchId,
   SkillOption,
@@ -7,6 +8,7 @@ import type {
 } from '../../../data/skillTree';
 import { findPerk, findTierForPerk, tierKey } from '../../../data/skillTree';
 import { useMetaStore } from '../../../state/metaStore';
+import { useLocalize } from '../../../i18n/useLocalize';
 import { PerkIcon } from '../icons/PerkIcon';
 
 export interface PerkDetailsProps {
@@ -19,6 +21,8 @@ export interface PerkDetailsProps {
 }
 
 export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) => {
+  const { t } = useTranslation();
+  const loc = useLocalize();
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
   const currency = useMetaStore((s) => s.currency);
 
@@ -37,7 +41,8 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
   const isSelected = selectedPerks[key] === option.id;
 
   const branchPoints = branch.tiers.filter(
-    (t) => selectedPerks[tierKey(branch.id, t.tier)] !== undefined,
+    (tierItem) =>
+      selectedPerks[tierKey(branch.id, tierItem.tier)] !== undefined,
   ).length;
   const tierGateMet = branchPoints >= tier.requiresPointsInBranch;
 
@@ -52,14 +57,14 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
   const deselectBlockReason: string | null = (() => {
     if (!isSelected) return null;
     const afterPoints = branchPoints - 1;
-    for (const t of branch.tiers) {
-      if (t.tier <= tier.tier) continue;
-      const stillSelected = selectedPerks[tierKey(branch.id, t.tier)];
+    for (const tierItem of branch.tiers) {
+      if (tierItem.tier <= tier.tier) continue;
+      const stillSelected = selectedPerks[tierKey(branch.id, tierItem.tier)];
       if (
         stillSelected !== undefined &&
-        afterPoints < t.requiresPointsInBranch
+        afterPoints < tierItem.requiresPointsInBranch
       ) {
-        return `Deselect Tier ${t.tier} first.`;
+        return t('game:perk.deselectTierFirst', { tier: tierItem.tier });
       }
     }
     return null;
@@ -79,22 +84,27 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
 
   const swapHint =
     !isSelected && prevCost > 0
-      ? ` (refund ${prevCost}, net ${effectiveCost})`
+      ? ` ${t('game:perk.swapHint', { refund: prevCost, net: effectiveCost })}`
       : '';
 
   const actionDisabled = isSelected
     ? deselectBlockReason !== null
     : !tierGateMet || !canAfford;
 
-  const actionLabel = isSelected ? 'Deselect (refund)' : 'Select';
+  const actionLabel = isSelected
+    ? t('game:perk.deselect')
+    : t('game:perk.select');
 
   const reasonText: string | null = (() => {
     if (isSelected) return deselectBlockReason;
     if (!tierGateMet) {
-      return `Locked - need ${tier.requiresPointsInBranch} pts in ${branch.name}.`;
+      return t('game:perk.locked', {
+        points: tier.requiresPointsInBranch,
+        branch: loc('perks', branch.id, 'name', branch.name),
+      });
     }
     if (!canAfford) {
-      return `Need ${effectiveCost - currency} more.`;
+      return t('game:perk.needMore', { amount: effectiveCost - currency });
     }
     return null;
   })();
@@ -127,7 +137,7 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
               <PerkIcon name={option.icon} size={30} color={branch.color} />
               <Stack gap={2} style={{ minWidth: 0 }}>
                 <Text fw={700} fz="lg" c="white" lineClamp={1}>
-                  {option.name}
+                  {loc('perks', option.id, 'name', option.name)}
                 </Text>
                 <Group gap={6} wrap="nowrap">
                   <Badge
@@ -135,27 +145,27 @@ export const PerkDetails = ({ focusedPerkId, onTrySelect }: PerkDetailsProps) =>
                     variant="light"
                     style={{ backgroundColor: `color-mix(in srgb, ${branch.color} 22%, transparent)`, color: branch.color }}
                   >
-                    {branch.name}
+                    {loc('perks', branch.id, 'name', branch.name)}
                   </Badge>
                   <Text size="xs" c="dimmed" tt="uppercase" lts={1}>
-                    Tier {tier.tier}
+                    {t('game:perk.tier', { tier: tier.tier })}
                   </Text>
                 </Group>
               </Stack>
             </Group>
             <Text size="sm" c="gray.3">
-              {option.description}
+              {loc('perks', option.id, 'description', option.description)}
             </Text>
           </Stack>
 
           <Stack gap={6} align="flex-end" miw={150}>
             {isSelected ? (
               <Text size="sm" c={branch.color} fw={600}>
-                Active
+                {t('game:perk.active')}
               </Text>
             ) : (
               <Text size="sm" c={canAfford ? 'gray.3' : 'red.5'} ff="monospace">
-                Cost {option.cost}
+                {t('game:perk.cost', { cost: option.cost })}
                 {swapHint}
               </Text>
             )}

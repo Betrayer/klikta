@@ -1,0 +1,11 @@
+{
+  "customize": "Dostosuj",
+  "modeSelect": {
+    "noRecord": "Nie ma jeszcze żadnych wpisów",
+    "title": "WYBIERZ TRYB"
+  },
+  "musicSection": "Muzyka",
+  "sfxSection": "Efekty dźwiękowe",
+  "skills": "Umiejętności",
+  "themeSection": "Temat"
+}

@@ -1,0 +1,17 @@
+{
+  "deleteBody": "Dadurch werden Währung, Extras, Erfolge und Einstellungen gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+  "deleteConfirm": "Alles löschen",
+  "deleteTitle": "Alle Fortschritte löschen?",
+  "fullscreen": "Vollbild",
+  "haptics": "Haptik",
+  "language": "Sprache",
+  "master": "Meister",
+  "music": "Musik",
+  "quitToMenu": "Zurück zum Menü",
+  "reduceMotion": "Bewegung reduzieren",
+  "resetProgress": "Fortschritt zurücksetzen",
+  "resume": "Lebenslauf",
+  "sfx": "SFX",
+  "title": "Einstellungen",
+  "useTelegramTheme": "Telegram-Design verwenden"
+}

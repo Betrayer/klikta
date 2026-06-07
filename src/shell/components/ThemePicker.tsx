@@ -1,4 +1,5 @@
 import { Badge, Card, Group, Stack, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { THEMES } from '../../data/themes';
 import { useMetaStore } from '../../state/metaStore';
 import { ThemePreview } from './ThemePreview';
@@ -9,6 +10,7 @@ const titleCase = (value: string): string =>
 const bgLabel = (kind: string): string => titleCase(kind.replace(/_/g, ' '));
 
 export const ThemePicker = () => {
+  const { t } = useTranslation();
   const activeThemeId = useMetaStore((s) => s.activeThemeId);
   const setActiveTheme = useMetaStore((s) => s.setActiveTheme);
   const setActiveMusicPack = useMetaStore((s) => s.setActiveMusicPack);
@@ -25,7 +27,7 @@ export const ThemePicker = () => {
   return (
     <Stack gap={8}>
       <Text size="xs" c="dimmed" tt="uppercase" lts={2}>
-        Theme
+        {t('menu:themeSection')}
       </Text>
       <Group gap="sm">
         {Object.values(THEMES).map((theme) => {

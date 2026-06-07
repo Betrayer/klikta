@@ -1,0 +1,22 @@
+{
+  "campaign": {
+    "description": "Une partie scriptée de vagues croissantes avec un choix de perk propre à la partie entre chacune. Franchissez la vague 15 pour gagner.",
+    "name": "Campagne",
+    "tagline": "15 vagues."
+  },
+  "endless_hp": {
+    "description": "La boucle originale. Ratez une cible et perdez du HP. La partie se termine quand le HP atteint zéro. Enchaînez les combos pour le score.",
+    "name": "Infini",
+    "tagline": "Survivez. Marquez."
+  },
+  "endless_timer": {
+    "description": "Commencez avec un chrono qui s'épuise. Chaque coup vous achète plus de temps. La cupidité vous garde en vie ; l'hésitation tue.",
+    "name": "Contre la Montre",
+    "tagline": "Course contre le chrono."
+  },
+  "physics_chaos": {
+    "description": "Les cibles dérivent, rebondissent et fusionnent. Les clics poussent celles à proximité. Réaction en mouvement.",
+    "name": "Chaos",
+    "tagline": "Tout bouge."
+  }
+}

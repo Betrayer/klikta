@@ -1,0 +1,17 @@
+{
+  "deleteBody": "Cette opération effacera votre monnaie, vos bonus, vos succès et vos paramètres. Elle est irréversible.",
+  "deleteConfirm": "Tout supprimer",
+  "deleteTitle": "Supprimer toute la progression ?",
+  "fullscreen": "Plein écran",
+  "haptics": "Haptique",
+  "language": "Langue",
+  "master": "Maître",
+  "music": "Musique",
+  "quitToMenu": "Retour au menu",
+  "reduceMotion": "Réduire les mouvements",
+  "resetProgress": "Réinitialiser la progression",
+  "resume": "CV",
+  "sfx": "Effets spéciaux",
+  "title": "Paramètres",
+  "useTelegramTheme": "Utiliser le thème Telegram"
+}

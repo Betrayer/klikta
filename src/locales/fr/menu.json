@@ -1,0 +1,11 @@
+{
+  "customize": "Personnaliser",
+  "modeSelect": {
+    "noRecord": "Aucune entrée pour l'instant",
+    "title": "SÉLECTIONNER LE MODE"
+  },
+  "musicSection": "Musique",
+  "sfxSection": "Effets spéciaux",
+  "skills": "Compétences",
+  "themeSection": "Thème"
+}

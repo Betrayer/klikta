@@ -1,9 +1,11 @@
 import { Button, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../state/authStore";
 import { AuthModal } from "./AuthModal";
 
 export const AccountButton = () => {
+  const { t } = useTranslation();
   const status = useAuthStore((s) => s.status);
   const account = useAuthStore((s) => s.account);
   const busy = useAuthStore((s) => s.busy);
@@ -17,7 +19,7 @@ export const AccountButton = () => {
     return (
       <Stack gap={4} align="center">
         <Text size="sm" c="dimmed">
-          Synced as {account.displayName}
+          {t("auth:syncedAs", { name: account.displayName })}
         </Text>
         <Button
           size="compact-sm"
@@ -26,7 +28,7 @@ export const AccountButton = () => {
           loading={busy}
           onClick={() => void signOutAccount()}
         >
-          Sign out
+          {t("auth:signOut")}
         </Button>
       </Stack>
     );
@@ -42,7 +44,7 @@ export const AccountButton = () => {
         onClick={open}
         fullWidth
       >
-        Sign in to sync
+        {t("auth:signInToSync")}
       </Button>
       <AuthModal opened={opened} onClose={close} />
     </>

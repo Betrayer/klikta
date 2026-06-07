@@ -1,4 +1,5 @@
 import { Button, Group, Stack, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { SOUND_PACKS } from '../../data/sound';
 import { useMetaStore } from '../../state/metaStore';
 import { isTouchDevice } from '../../game/util/device';
@@ -32,6 +33,7 @@ const PackRow = ({ label, activeId, onSelect }: PackRowProps) => (
 );
 
 export const SoundPackPicker = () => {
+  const { t } = useTranslation();
   const activeMusicPackId = useMetaStore((s) => s.activeMusicPackId);
   const activeSfxPackId = useMetaStore((s) => s.activeSfxPackId);
   const setActiveMusicPack = useMetaStore((s) => s.setActiveMusicPack);
@@ -40,12 +42,12 @@ export const SoundPackPicker = () => {
   return (
     <Stack gap="md">
       <PackRow
-        label="Music"
+        label={t('menu:musicSection')}
         activeId={activeMusicPackId}
         onSelect={setActiveMusicPack}
       />
       <PackRow
-        label="SFX"
+        label={t('menu:sfxSection')}
         activeId={activeSfxPackId}
         onSelect={setActiveSfxPack}
       />

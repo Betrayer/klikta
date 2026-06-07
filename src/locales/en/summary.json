@@ -1,0 +1,29 @@
+{
+  "victory": "VICTORY",
+  "runOver": "RUN OVER",
+  "newBest": "NEW BEST",
+  "currencyEarned": "Currency Earned",
+  "noCurrency": "No currency earned this run.",
+  "total": "Total",
+  "activePerks": "Active Perks",
+  "playAgain": "Play Again",
+  "submitting": "Submitting score...",
+  "ranked": "Ranked #{{rank}} globally",
+  "bestRank": "Best rank #{{rank}} globally",
+  "leaderboardUnavailable": "Leaderboard unavailable",
+  "lines": {
+    "base": "Score",
+    "comboBonus": "Combo Bonus",
+    "victoryBonus": "Victory Bonus",
+    "bombBounty": "Bomb Bounty",
+    "comboCoin": "Combo Coins"
+  },
+  "achievements": {
+    "first-run": "First Run",
+    "combo-25": "Combo 25",
+    "combo-50": "Combo 50",
+    "combo-100": "Combo 100",
+    "no-bomb-clicks": "No Bomb Clicks",
+    "first-skill": "First Skill Unlocked"
+  }
+}

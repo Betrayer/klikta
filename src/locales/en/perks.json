@@ -1,0 +1,194 @@
+{
+  "greed": {
+    "description": "More risk, more reward, more shiny things.",
+    "name": "Greed"
+  },
+  "greed-t1-high-stakes": {
+    "description": "A bomb-click still triggers its penalty, but first cashes out your combo: 2x a regular target's score at your current multiplier. Your combo then resets.",
+    "name": "High Stakes"
+  },
+  "greed-t1-reckless": {
+    "description": "Clicking a bomb no longer resets your combo.",
+    "name": "Reckless"
+  },
+  "greed-t1-score-boost": {
+    "description": "Every target awards 25% more score.",
+    "name": "Score Boost"
+  },
+  "greed-t2-bomb-bounty": {
+    "description": "5% chance an expiring bomb drops currency.",
+    "name": "Bomb Bounty"
+  },
+  "greed-t2-double-drops": {
+    "description": "10% chance a target spawns as a 2× score variant.",
+    "name": "Double Drops"
+  },
+  "greed-t2-golden-rain": {
+    "description": "Golden targets spawn 50% more often.",
+    "name": "Golden Rain"
+  },
+  "greed-t3-coin-combo": {
+    "description": "While at combo 50+, every hit awards 2 currency.",
+    "name": "Coin Combo"
+  },
+  "greed-t3-combo-climb": {
+    "description": "Combo multiplier caps at ×8 instead of ×5.",
+    "name": "Combo Climb"
+  },
+  "greed-t4-frenzy": {
+    "description": "Ultimate: 8 seconds where every hit spawns 2 extras nearby and score is ×2.",
+    "name": "Frenzy"
+  },
+  "mutation": {
+    "description": "Distort the rules. Every perk gives both a cost and a reward - skill decides which dominates.",
+    "name": "Mutation"
+  },
+  "mutation-t1-beacon-bombs": {
+    "description": "Bombs grow to 150% over their lifetime instead of blinking. More visible, more space.",
+    "name": "Beacon Bombs"
+  },
+  "mutation-t1-convergent": {
+    "description": "All targets drift toward screen center at ~30 px/s. Tighter cluster - bombs too.",
+    "name": "Convergent"
+  },
+  "mutation-t1-slow-bloom": {
+    "description": "Targets grow for their first 0.5 s, then shrink. Bigger early window, different rhythm.",
+    "name": "Slow Bloom"
+  },
+  "mutation-t2-echo": {
+    "description": "Every hit leaves an 800 ms phantom. Clicking the phantom adds 30% bonus score without breaking combo.",
+    "name": "Echo"
+  },
+  "mutation-t2-magnet": {
+    "description": "All interactive objects drift toward your cursor at ~18 px/s. Bombs included.",
+    "name": "Magnet"
+  },
+  "mutation-t2-phase-flash": {
+    "description": "Targets fade to 10% alpha for 150 ms every 700 ms. Clicking while invisible = ×2 score.",
+    "name": "Phase Flash"
+  },
+  "mutation-t3-mirror-spawn": {
+    "description": "Every target spawns with a mirrored twin. Clicking either destroys both; score awarded only for the clicked one.",
+    "name": "Mirror Spawn"
+  },
+  "mutation-t3-time-pulse": {
+    "description": "Every 6 s, 2 s of either ×0.6 or ×1.6 game speed. HUD warns 0.5 s before.",
+    "name": "Time Pulse"
+  },
+  "mutation-t4-bloom": {
+    "description": "Ultimate: 5 s where targets and bombs grow from 100% to 200% over their lifetime, current spawn rate doubles, and all scores ×2.",
+    "name": "Bloom"
+  },
+  "reaction": {
+    "description": "Easier targets, more time, calmer rhythm.",
+    "name": "Reaction"
+  },
+  "reaction-t1-balanced": {
+    "description": "+10% lifetime and +8% size on every target.",
+    "name": "Balanced"
+  },
+  "reaction-t1-bigger-targets": {
+    "description": "All targets are 15% larger.",
+    "name": "Bigger Targets"
+  },
+  "reaction-t1-steady-hand": {
+    "description": "Every target stays alive 20% longer.",
+    "name": "Steady Hand"
+  },
+  "reaction-t2-bomb-warning": {
+    "description": "Bombs blink twice as fast in their last second.",
+    "name": "Bomb Warning"
+  },
+  "reaction-t2-pre-crack": {
+    "description": "Shielded targets lose their shield even on a missed click.",
+    "name": "Pre-Crack"
+  },
+  "reaction-t2-quick-multi": {
+    "description": "Multi targets only need 2 clicks instead of 3.",
+    "name": "Quick Multi"
+  },
+  "reaction-t3-golden-patience": {
+    "description": "Golden targets stay 50% longer.",
+    "name": "Golden Patience"
+  },
+  "reaction-t3-slow-spawn": {
+    "description": "Spawn animation is 50% slower - you see targets sooner.",
+    "name": "Slow Spawn"
+  },
+  "reaction-t4-time-slow": {
+    "description": "Ultimate: slow the world to half speed for 5 seconds.",
+    "name": "Time Slow"
+  },
+  "survival": {
+    "description": "Forgiveness, second chances, more HP.",
+    "name": "Survival"
+  },
+  "survival-t1-extra-life": {
+    "description": "Start every run with one additional HP.",
+    "name": "Extra Life"
+  },
+  "survival-t1-soft-bombs": {
+    "description": "After the first bomb-click per run, further bomb-clicks cost no HP.",
+    "name": "Soft Bombs"
+  },
+  "survival-t1-warm-up": {
+    "description": "Your first missed target each run is forgiven.",
+    "name": "Warm-Up"
+  },
+  "survival-t2-open-field": {
+    "description": "Clicking the background no longer breaks combo.",
+    "name": "Open Field"
+  },
+  "survival-t2-score-heal": {
+    "description": "Every 1000 score restores 1 HP.",
+    "name": "Score Heal"
+  },
+  "survival-t3-mercy": {
+    "description": "1 second of invulnerability after taking damage.",
+    "name": "Mercy"
+  },
+  "survival-t3-shield-forgiveness": {
+    "description": "A missed shielded target breaks your combo but costs no HP.",
+    "name": "Shield Forgiveness"
+  },
+  "survival-t4-restore": {
+    "description": "Ultimate: heal to full HP. Disables HP regen perks for the rest of the run.",
+    "name": "Restore"
+  },
+  "wild": {
+    "description": "Chaos rewards the bold and punishes the lazy.",
+    "name": "Wild"
+  },
+  "wild-t1-concentrated": {
+    "description": "Bomb spawn weight halved, but every 5th target is guaranteed a bomb.",
+    "name": "Concentrated"
+  },
+  "wild-t1-lucky-big": {
+    "description": "5% chance a target spawns at 2× size and awards 2× score.",
+    "name": "Lucky Big"
+  },
+  "wild-t1-volatile-time": {
+    "description": "Each target's lifetime varies randomly by ±50%.",
+    "name": "Volatile Time"
+  },
+  "wild-t2-decoy-gold": {
+    "description": "15% of bombs disguise themselves as golden targets.",
+    "name": "Decoy Gold"
+  },
+  "wild-t2-rush-pulse": {
+    "description": "Every 30 seconds, spawn rate triples for 5 seconds.",
+    "name": "Rush Pulse"
+  },
+  "wild-t3-cursor-magnet": {
+    "description": "Targets drift toward your cursor at ~25 px/s - stacks with mutation magnet.",
+    "name": "Cursor Magnet"
+  },
+  "wild-t3-mortgage": {
+    "description": "All scores ×2 this run, but you earn no currency.",
+    "name": "Mortgage"
+  },
+  "wild-t4-chaos-storm": {
+    "description": "Ultimate: 4 seconds of ×4 spawn rate, fully randomized target types, glitch shader.",
+    "name": "Chaos Storm"
+  }
+}

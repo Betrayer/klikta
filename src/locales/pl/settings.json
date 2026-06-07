@@ -1,0 +1,17 @@
+{
+  "deleteBody": "Spowoduje to usunięcie waluty, bonusów, osiągnięć i ustawień. Nie można cofnąć tej czynności.",
+  "deleteConfirm": "Usuń wszystko",
+  "deleteTitle": "Czy chcesz usunąć wszystkie postępy?",
+  "fullscreen": "Pełny ekran",
+  "haptics": "Haptyka",
+  "language": "Język",
+  "master": "Mistrz",
+  "music": "Muzyka",
+  "quitToMenu": "Wróć do menu",
+  "reduceMotion": "Ogranicz ruch",
+  "resetProgress": "Zresetuj postęp",
+  "resume": "CV",
+  "sfx": "Efekty specjalne",
+  "title": "Ustawienia",
+  "useTelegramTheme": "Użyj motywu Telegram"
+}

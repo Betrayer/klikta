@@ -343,10 +343,10 @@ export class EffectResolver {
           convergentDriftSpeed = Math.max(convergentDriftSpeed, eff.value);
           break;
         case "magnetSpeed":
-          magnetSpeed = Math.max(magnetSpeed, eff.value);
+          magnetSpeed += eff.value;
           break;
         case "targetsFollowCursorSpeed":
-          magnetSpeed = Math.max(magnetSpeed, eff.value);
+          magnetSpeed += eff.value;
           break;
         case "phaseFlashCycle":
           phaseFlash = {

@@ -1,5 +1,11 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+import i18n, { applyLanguageBundles } from "../i18n";
+import {
+  DEFAULT_LANGUAGE,
+  isSupportedLang,
+  type SupportedLang,
+} from "../i18n/languages";
 
 export interface SettingsState {
   masterVolume: number;
@@ -8,12 +14,14 @@ export interface SettingsState {
   hapticsEnabled: boolean;
   useTelegramTheme: boolean;
   reduceMotion: boolean;
+  language: SupportedLang;
   setMasterVolume: (v: number) => void;
   setSFXVolume: (v: number) => void;
   setMusicVolume: (v: number) => void;
   setHapticsEnabled: (v: boolean) => void;
   setUseTelegramTheme: (v: boolean) => void;
   setReduceMotion: (v: boolean) => void;
+  setLanguage: (lang: SupportedLang) => void;
   reset: () => void;
 }
 
@@ -26,6 +34,7 @@ const initialSettings = {
   hapticsEnabled: true,
   useTelegramTheme: false,
   reduceMotion: false,
+  language: DEFAULT_LANGUAGE,
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -45,11 +54,15 @@ export const useSettingsStore = create<SettingsState>()(
           set({ useTelegramTheme: v }, false, "setUseTelegramTheme"),
         setReduceMotion: (v) =>
           set({ reduceMotion: v }, false, "setReduceMotion"),
+        setLanguage: (lang) => {
+          set({ language: lang }, false, "setLanguage");
+          void i18n.changeLanguage(lang).then(() => applyLanguageBundles(lang));
+        },
         reset: () => set({ ...initialSettings }, false, "reset"),
       }),
       {
         name: "klikta-settings-v1",
-        version: 2,
+        version: 3,
         migrate: (persistedState) => {
           const s = (persistedState ?? {}) as Partial<SettingsState>;
           return {
@@ -57,6 +70,9 @@ export const useSettingsStore = create<SettingsState>()(
             hapticsEnabled: s.hapticsEnabled ?? true,
             useTelegramTheme: s.useTelegramTheme ?? false,
             reduceMotion: s.reduceMotion ?? false,
+            language: isSupportedLang(s.language)
+              ? s.language
+              : DEFAULT_LANGUAGE,
           } as SettingsState;
         },
         partialize: (state) => ({
@@ -66,6 +82,7 @@ export const useSettingsStore = create<SettingsState>()(
           hapticsEnabled: state.hapticsEnabled,
           useTelegramTheme: state.useTelegramTheme,
           reduceMotion: state.reduceMotion,
+          language: state.language,
         }),
       },
     ),

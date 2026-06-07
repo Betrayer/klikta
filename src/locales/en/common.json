@@ -1,0 +1,22 @@
+{
+  "back": "Back to Menu",
+  "cancel": "Cancel",
+  "play": "Play",
+  "best": "Best",
+  "score": "Score",
+  "time": "Time",
+  "combo": "Combo",
+  "maxCombo": "Max Combo",
+  "leaderboard": "Leaderboard",
+  "mainMenu": "Main Menu",
+  "skillTree": "Skill Tree",
+  "gate": {
+    "closedTitle": "Closed test",
+    "closedBody": "Klikta is in private testing. Access is limited to a small list.",
+    "yourTelegramId": "Your Telegram ID:",
+    "webPrivate": "Private test. Enter the password to continue.",
+    "passwordPlaceholder": "Password",
+    "wrongPassword": "Wrong password",
+    "enter": "Enter"
+  }
+}

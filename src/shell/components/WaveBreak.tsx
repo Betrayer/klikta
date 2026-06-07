@@ -1,8 +1,12 @@
 import { Box, Card, Group, Stack, Text, Title } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { useCampaignStore } from '../../state/campaignStore';
 import { requestRunPerkPick } from '../../game/modes/runPerkPick';
+import { useLocalize } from '../../i18n/useLocalize';
 
 export const WaveBreak = () => {
+  const { t } = useTranslation();
+  const loc = useLocalize();
   const breakActive = useCampaignStore((s) => s.breakActive);
   const upcomingWave = useCampaignStore((s) => s.upcomingWave);
   const totalWaves = useCampaignStore((s) => s.totalWaves);
@@ -30,10 +34,13 @@ export const WaveBreak = () => {
       <Stack align="center" gap="xl" maw={900} px="md" w="100%">
         <Stack align="center" gap={4}>
           <Title order={2} fz={40} fw={900} c="info" lts={3}>
-            WAVE CLEARED
+            {t('game:waveBreak.cleared')}
           </Title>
           <Text c="dimmed" size="sm" tt="uppercase" lts={2}>
-            Choose a boon - Wave {upcomingWave} / {totalWaves} next
+            {t('game:waveBreak.chooseBoon', {
+              wave: upcomingWave,
+              total: totalWaves,
+            })}
           </Text>
         </Stack>
 
@@ -55,10 +62,10 @@ export const WaveBreak = () => {
             >
               <Stack gap="xs" h="100%" justify="space-between">
                 <Text fz="lg" fw={700} c="accent">
-                  {choice.name}
+                  {loc('runPerks', choice.id, 'name', choice.name)}
                 </Text>
                 <Text size="sm" c="gray.3">
-                  {choice.description}
+                  {loc('runPerks', choice.id, 'description', choice.description)}
                 </Text>
               </Stack>
             </Card>

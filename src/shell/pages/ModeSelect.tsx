@@ -11,12 +11,15 @@ import {
   Text,
   Title,
 } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { startNewRun } from '../../game/runLauncher';
 import { MODES, type ModeMeta } from '../../data/modes';
 import { useAppStore } from '../../state/appStore';
 import { useMetaStore } from '../../state/metaStore';
+import { useLocalize } from '../../i18n/useLocalize';
 
 export const ModeSelect = () => {
+  const { t } = useTranslation();
   const bestScores = useMetaStore((s) => s.bestScores);
 
   return (
@@ -26,14 +29,14 @@ export const ModeSelect = () => {
           <Stack gap="lg">
             <Group justify="space-between" align="center">
               <Title order={1} fz={36} fw={900} c="primary" lts={4}>
-                SELECT MODE
+                {t('menu:modeSelect.title')}
               </Title>
               <Button
                 variant="subtle"
                 color="gray"
                 onClick={() => useAppStore.getState().setScreen('menu')}
               >
-                Back to Menu
+                {t('common:back')}
               </Button>
             </Group>
 
@@ -59,6 +62,8 @@ interface ModeCardProps {
 }
 
 const ModeCard = ({ mode, best }: ModeCardProps) => {
+  const { t } = useTranslation();
+  const loc = useLocalize();
   return (
     <Card
       bg="surface"
@@ -77,21 +82,21 @@ const ModeCard = ({ mode, best }: ModeCardProps) => {
         </Text>
         <Stack gap={0}>
           <Title order={2} fz={26} fw={900} c="gray.0" lts={1}>
-            {mode.name}
+            {loc('modes', mode.id, 'name', mode.name)}
           </Title>
           <Text size="sm" fw={700} style={{ color: mode.color }}>
-            {mode.tagline}
+            {loc('modes', mode.id, 'tagline', mode.tagline)}
           </Text>
         </Stack>
       </Group>
 
       <Text size="sm" c="gray.5" mt="sm" style={{ flex: 1 }}>
-        {mode.description}
+        {loc('modes', mode.id, 'description', mode.description)}
       </Text>
 
       <Group justify="space-between" align="baseline" mt="md">
         <Text size="xs" c="dimmed" tt="uppercase" lts={1}>
-          Best
+          {t('common:best')}
         </Text>
         {best > 0 ? (
           <Text ff="monospace" fz="lg" fw={700} c="highlight">
@@ -99,7 +104,7 @@ const ModeCard = ({ mode, best }: ModeCardProps) => {
           </Text>
         ) : (
           <Text size="sm" c="dimmed">
-            No record yet
+            {t('menu:modeSelect.noRecord')}
           </Text>
         )}
       </Group>
@@ -112,7 +117,7 @@ const ModeCard = ({ mode, best }: ModeCardProps) => {
         mt="md"
         fullWidth
       >
-        Play
+        {t('common:play')}
       </Button>
     </Card>
   );

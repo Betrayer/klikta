@@ -1,0 +1,11 @@
+{
+  "customize": "Налаштувати",
+  "modeSelect": {
+    "noRecord": "Поки що немає записів",
+    "title": "ВИБРАТИ РЕЖИМ"
+  },
+  "musicSection": "Музика",
+  "sfxSection": "Звукові ефекти",
+  "skills": "Навички",
+  "themeSection": "Тема"
+}

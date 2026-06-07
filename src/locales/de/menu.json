@@ -1,0 +1,11 @@
+{
+  "customize": "Anpassen",
+  "modeSelect": {
+    "noRecord": "Noch keine Einträge",
+    "title": "MODUS AUSWÄHLEN"
+  },
+  "musicSection": "Musik",
+  "sfxSection": "SFX",
+  "skills": "Fähigkeiten",
+  "themeSection": "Thema"
+}

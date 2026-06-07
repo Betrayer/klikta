@@ -1,0 +1,29 @@
+{
+  "achievements": {
+    "combo-100": "Combo 100",
+    "combo-25": "Combo 25",
+    "combo-50": "Combo 50",
+    "first-run": "Primera proyección",
+    "first-skill": "Primera habilidad desbloqueada",
+    "no-bomb-clicks": "Sin clics en «Bomb»"
+  },
+  "activePerks": "Ventajas activas",
+  "bestRank": "Mejor clasificación: n.º {{rank}} a nivel mundial",
+  "currencyEarned": "Divisa obtenida",
+  "leaderboardUnavailable": "La tabla de clasificación no está disponible",
+  "lines": {
+    "base": "Puntuación",
+    "bombBounty": "Recompensa por la bomba",
+    "comboBonus": "Bonificación por compra combinada",
+    "comboCoin": "Monedas combinadas",
+    "victoryBonus": "Bonificación por victoria"
+  },
+  "newBest": "LO MEJOR",
+  "noCurrency": "No se ha ganado ninguna moneda en esta partida.",
+  "playAgain": "Volver a reproducir",
+  "ranked": "N.º {{rank}} a nivel mundial",
+  "runOver": "ATROPELLAR",
+  "submitting": "Enviando puntuación...",
+  "total": "Total",
+  "victory": "VICTORIA"
+}

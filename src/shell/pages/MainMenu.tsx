@@ -1,9 +1,11 @@
 import { Button, Center, Stack, Title } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../state/appStore';
 import { AccountButton } from '../components/AccountButton';
 import { CustomizeModal } from '../components/CustomizeModal';
 
 export const MainMenu = () => {
+  const { t } = useTranslation();
   const customizeOpen = useAppStore((s) => s.customizeOpen);
   const setCustomizeOpen = useAppStore((s) => s.setCustomizeOpen);
 
@@ -21,7 +23,7 @@ export const MainMenu = () => {
             onClick={() => useAppStore.getState().setScreen('mode-select')}
             fullWidth
           >
-            Play
+            {t('common:play')}
           </Button>
           <Button
             size="md"
@@ -31,7 +33,7 @@ export const MainMenu = () => {
             onClick={() => useAppStore.getState().setScreen('skill-tree')}
             fullWidth
           >
-            Skills
+            {t('menu:skills')}
           </Button>
           <Button
             size="md"
@@ -41,7 +43,7 @@ export const MainMenu = () => {
             onClick={() => useAppStore.getState().setScreen('leaderboard')}
             fullWidth
           >
-            Leaderboard
+            {t('common:leaderboard')}
           </Button>
           <AccountButton />
           <Button
@@ -52,7 +54,7 @@ export const MainMenu = () => {
             onClick={() => setCustomizeOpen(true)}
             fullWidth
           >
-            Customize
+            {t('menu:customize')}
           </Button>
         </Stack>
       </Stack>

@@ -15,6 +15,7 @@ import bloomShieldUp from "../../assets/themes/bloom/shield_up.png";
 import bloomShieldDown from "../../assets/themes/bloom/shield_down.png";
 import bloomSplitter from "../../assets/themes/bloom/splitter.png";
 import bloomSticky from "../../assets/themes/bloom/sticky.png";
+import { TEST_THEME_TEXTURES } from "../../data/themes/test";
 
 export interface TextureAsset {
   alias: string;
@@ -44,4 +45,5 @@ export const THEME_TEXTURES: Record<string, TextureAsset[]> = {
     { alias: "bloom-splitter", src: bloomSplitter },
     { alias: "bloom-sticky", src: bloomSticky },
   ],
+  test: TEST_THEME_TEXTURES,
 };

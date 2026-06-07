@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type {
   BranchId,
   SkillOption,
@@ -18,6 +19,7 @@ import type {
 import { findPerk, SKILL_TREE, tierKey } from '../../data/skillTree';
 import { useAppStore } from '../../state/appStore';
 import { useMetaStore } from '../../state/metaStore';
+import { useLocalize } from '../../i18n/useLocalize';
 import { PerkDetails } from '../components/skill-tree/PerkDetails';
 import { SkillTreeCanvas } from '../components/skill-tree/SkillTreeCanvas';
 import { SKILL_TREE_LAYOUT } from '../components/skill-tree/layout';
@@ -78,6 +80,8 @@ const resetTestCurrency = (): void => {
 };
 
 export const SkillTreeView = () => {
+  const { t } = useTranslation();
+  const loc = useLocalize();
   const [hoveredPerkId, setHoveredPerkId] = useState<string | null>(null);
   const [pinnedPerkId, setPinnedPerkId] = useState<string | null>(null);
   const [pending, setPending] = useState<PendingSelection | null>(null);
@@ -182,7 +186,7 @@ export const SkillTreeView = () => {
         }}
       >
         <Title order={1} fz={28} fw={900} c="primary" lts={4}>
-          SKILL TREE
+          {t('game:skillTree.title')}
         </Title>
         <Group gap="xs" style={{ pointerEvents: 'auto' }}>
           <Button
@@ -191,14 +195,14 @@ export const SkillTreeView = () => {
             disabled={selectedCount === 0}
             onClick={() => setConfirmReset(true)}
           >
-            Reset Perks
+            {t('game:skillTree.resetPerks')}
           </Button>
           <Button
             variant="light"
             color="gray"
             onClick={() => useAppStore.getState().setScreen('menu')}
           >
-            Back to Menu
+            {t('common:back')}
           </Button>
         </Group>
       </Group>
@@ -212,32 +216,32 @@ export const SkillTreeView = () => {
           zIndex: 20,
         }}
       >
-        <Tooltip label="Zoom in" position="left">
+        <Tooltip label={t('game:skillTree.zoomIn')} position="left">
           <ActionIcon
             variant="default"
             size={zoomIconSize}
             onClick={() => panZoom.zoomBy(1.25)}
-            aria-label="Zoom in"
+            aria-label={t('game:skillTree.zoomIn')}
           >
             +
           </ActionIcon>
         </Tooltip>
-        <Tooltip label="Zoom out" position="left">
+        <Tooltip label={t('game:skillTree.zoomOut')} position="left">
           <ActionIcon
             variant="default"
             size={zoomIconSize}
             onClick={() => panZoom.zoomBy(0.8)}
-            aria-label="Zoom out"
+            aria-label={t('game:skillTree.zoomOut')}
           >
             -
           </ActionIcon>
         </Tooltip>
-        <Tooltip label="Reset view" position="left">
+        <Tooltip label={t('game:skillTree.resetView')} position="left">
           <ActionIcon
             variant="default"
             size={zoomIconSize}
             onClick={panZoom.reset}
-            aria-label="Reset view"
+            aria-label={t('game:skillTree.resetView')}
           >
             ⌂
           </ActionIcon>
@@ -258,7 +262,7 @@ export const SkillTreeView = () => {
             pointerEvents: 'none',
           }}
         >
-          Tap a perk to inspect - drag to pan, scroll or pinch to zoom.
+          {t('game:skillTree.hint')}
         </Text>
       )}
 
@@ -291,24 +295,23 @@ export const SkillTreeView = () => {
       <Modal
         opened={confirmReset}
         onClose={() => setConfirmReset(false)}
-        title="Reset all perks?"
+        title={t('game:skillTree.resetTitle')}
         centered
         overlayProps={{ backgroundOpacity: 0.7, blur: 2 }}
       >
         <Stack>
           <Text size="sm">
-            Deselects all {selectedCount} perks and refunds{' '}
-            <Text component="span" fw={700}>
-              {refundTotal}
-            </Text>{' '}
-            currency. You can re-select them anytime.
+            {t('game:skillTree.resetBody', {
+              count: selectedCount,
+              refund: refundTotal,
+            })}
           </Text>
           <Group justify="flex-end">
             <Button variant="default" onClick={() => setConfirmReset(false)}>
-              Cancel
+              {t('common:cancel')}
             </Button>
             <Button color="red" onClick={resetAllPerks}>
-              Reset Perks
+              {t('game:skillTree.resetPerks')}
             </Button>
           </Group>
         </Stack>
@@ -317,25 +320,32 @@ export const SkillTreeView = () => {
       <Modal
         opened={pending !== null}
         onClose={() => setPending(null)}
-        title="Bind ultimate?"
+        title={t('game:skillTree.bindTitle')}
         centered
         overlayProps={{ backgroundOpacity: 0.7, blur: 2 }}
       >
         {pending !== null && (
           <Stack>
             <Text size="sm">
-              Bind <Text component="span" fw={700}>{pending.option.name}</Text>{' '}
-              as your active ultimate for {pending.effectiveCost} currency?
+              {t('game:skillTree.bindBody', {
+                name: loc('perks', pending.option.id, 'name', pending.option.name),
+                cost: pending.effectiveCost,
+              })}
             </Text>
             <Text size="xs" c="dimmed">
-              {pending.option.description}
+              {loc(
+                'perks',
+                pending.option.id,
+                'description',
+                pending.option.description,
+              )}
             </Text>
             <Group justify="flex-end">
               <Button variant="default" onClick={() => setPending(null)}>
-                Cancel
+                {t('common:cancel')}
               </Button>
               <Button color="primary" onClick={confirmPending}>
-                Bind
+                {t('game:skillTree.bind')}
               </Button>
             </Group>
           </Stack>

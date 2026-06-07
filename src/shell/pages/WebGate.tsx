@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Button, Center, PasswordInput, Stack, Text, Title } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { tryUnlockWeb } from '../../services/webAccess';
 
 export const WebGate = ({ onUnlock }: { onUnlock: () => void }) => {
+  const { t } = useTranslation();
   const [value, setValue] = useState('');
   const [error, setError] = useState(false);
 
@@ -21,13 +23,13 @@ export const WebGate = ({ onUnlock }: { onUnlock: () => void }) => {
           KLIKTA
         </Title>
         <Text ta="center" c="dimmed" size="sm">
-          Private test. Enter the password to continue.
+          {t('common:gate.webPrivate')}
         </Text>
         <PasswordInput
           w="100%"
-          placeholder="Password"
+          placeholder={t('common:gate.passwordPlaceholder')}
           value={value}
-          error={error ? 'Wrong password' : undefined}
+          error={error ? t('common:gate.wrongPassword') : undefined}
           onChange={(event) => {
             setValue(event.currentTarget.value);
             setError(false);
@@ -37,7 +39,7 @@ export const WebGate = ({ onUnlock }: { onUnlock: () => void }) => {
           }}
         />
         <Button color="primary" radius="xl" fullWidth onClick={submit}>
-          Enter
+          {t('common:gate.enter')}
         </Button>
       </Stack>
     </Center>

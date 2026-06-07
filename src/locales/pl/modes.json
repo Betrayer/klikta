@@ -1,0 +1,22 @@
+{
+  "campaign": {
+    "description": "Scenariuszowa runda narastających fal z wyborem perka na rundę między każdą z nich. Pokonaj falę 15, aby wygrać.",
+    "name": "Kampania",
+    "tagline": "15 fal."
+  },
+  "endless_hp": {
+    "description": "Oryginalna pętla. Chybisz cel i tracisz HP. Runda kończy się, gdy HP spadnie do zera. Buduj combo dla wyniku.",
+    "name": "Nieskończoność",
+    "tagline": "Przetrwaj. Punktuj."
+  },
+  "endless_timer": {
+    "description": "Zaczynasz z malejącym czasomierzem. Każde trafienie kupuje ci więcej czasu. Chciwość trzyma cię przy życiu; wahanie zabija.",
+    "name": "Atak na Czas",
+    "tagline": "Ścigaj zegar."
+  },
+  "physics_chaos": {
+    "description": "Cele dryfują, odbijają się i łączą. Kliknięcia odpychają te w pobliżu. Reakcja w ruchu.",
+    "name": "Chaos",
+    "tagline": "Wszystko się rusza."
+  }
+}

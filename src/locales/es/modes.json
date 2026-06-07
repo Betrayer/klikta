@@ -1,0 +1,22 @@
+{
+  "campaign": {
+    "description": "Una partida guionizada de oleadas crecientes con una elección de mejora propia de la partida entre cada una. Supera la oleada 15 para ganar.",
+    "name": "Campaña",
+    "tagline": "15 oleadas."
+  },
+  "endless_hp": {
+    "description": "El bucle original. Falla un objetivo y pierde HP. La partida termina cuando el HP llega a cero. Acumula combos para puntuar.",
+    "name": "Sin Fin",
+    "tagline": "Sobrevive. Puntúa."
+  },
+  "endless_timer": {
+    "description": "Empiezas con un temporizador que se reduce. Cada acierto te da más tiempo. La codicia te mantiene vivo; la duda te mata.",
+    "name": "Contrarreloj",
+    "tagline": "Corre contra el reloj."
+  },
+  "physics_chaos": {
+    "description": "Los objetivos derivan, rebotan y se fusionan. Los clics empujan a los cercanos. Reacción en movimiento.",
+    "name": "Caos",
+    "tagline": "Todo se mueve."
+  }
+}

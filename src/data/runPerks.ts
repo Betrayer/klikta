@@ -7,7 +7,7 @@ export interface RunPerk {
   effects: readonly SkillEffect[];
 }
 
-const RUN_PERKS: readonly RunPerk[] = [
+export const RUN_PERKS: readonly RunPerk[] = [
   {
     id: "rp-overdrive",
     name: "Overdrive",

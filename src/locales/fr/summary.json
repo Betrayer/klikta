@@ -1,0 +1,29 @@
+{
+  "achievements": {
+    "combo-100": "Pack 100",
+    "combo-25": "Lot 25",
+    "combo-50": "Lot de 50",
+    "first-run": "Première diffusion",
+    "first-skill": "Première compétence débloquée",
+    "no-bomb-clicks": "Pas de clics intempestifs"
+  },
+  "activePerks": "Avantages actifs",
+  "bestRank": "Meilleur classement mondial : n°{{rank}}",
+  "currencyEarned": "Devise perçue",
+  "leaderboardUnavailable": "Classement indisponible",
+  "lines": {
+    "base": "Score",
+    "bombBounty": "Prime pour la bombe",
+    "comboBonus": "Bonus combiné",
+    "comboCoin": "Pièces combinées",
+    "victoryBonus": "Bonus de victoire"
+  },
+  "newBest": "NOUVEAU MEILLEUR",
+  "noCurrency": "Aucune devise n'a été gagnée lors de cette partie.",
+  "playAgain": "Rejouer",
+  "ranked": "Classé n°{{rank}}e au niveau mondial",
+  "runOver": "ÉCRASÉ",
+  "submitting": "Envoi des résultats...",
+  "total": "Total",
+  "victory": "VICTOIRE"
+}

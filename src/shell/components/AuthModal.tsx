@@ -10,34 +10,9 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../state/authStore";
 import { isTelegramEnvironment } from "../../services/telegram";
-
-const MESSAGES: Record<string, string> = {
-  "auth/invalid-email": "Invalid email address.",
-  "auth/email-already-in-use": "That email is already registered.",
-  "auth/weak-password": "Password is too short (min 6 characters).",
-  "auth/wrong-password": "Wrong email or password.",
-  "auth/invalid-credential": "Wrong email or password.",
-  "auth/user-not-found": "No account found for that email.",
-  "auth/too-many-requests": "Too many attempts. Try again later.",
-  "auth/operation-not-allowed": "Email sign-in is not enabled yet.",
-  "auth/network-request-failed": "Network error. Check your connection.",
-  "auth/telegram-failed": "Telegram sign-in failed. Try again.",
-  "auth/reset-email-sent": "Password reset link sent to your email.",
-  "auth/unknown": "Something went wrong. Try again.",
-  "tg/no-init-data": "No Telegram init data on the client.",
-  "tg/network": "Network error reaching /api/telegram-auth.",
-  "tg/server-misconfigured": "Server is missing the bot token (Vercel env).",
-  "tg/missing-init-data": "Server received no init data.",
-  "tg/invalid-init-data": "Signature check failed - wrong bot token.",
-  "tg/stale-init-data": "Telegram data expired. Reopen the app.",
-  "tg/no-user": "No Telegram user in init data.",
-  "tg/token-failed": "Server could not mint the Firebase token (admin creds).",
-  "tg/malformed": "Bad response from /api/telegram-auth.",
-};
-
-const messageFor = (code: string): string => MESSAGES[code] ?? code;
 
 type Mode = "signin" | "signup";
 
@@ -47,6 +22,9 @@ interface AuthModalProps {
 }
 
 export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
+  const { t } = useTranslation();
+  const messageFor = (code: string): string =>
+    t(`auth:errors.${code}`, { defaultValue: code });
   const busy = useAuthStore((s) => s.busy);
   const error = useAuthStore((s) => s.error);
   const notice = useAuthStore((s) => s.notice);
@@ -81,7 +59,12 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
     (mode === "signin" || nickname.trim().length > 0);
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Sync your progress" centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={t("auth:syncTitle")}
+      centered
+    >
       <Stack gap="md">
         {inTelegram ? (
           <Button
@@ -91,7 +74,7 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
             onClick={() => void onTelegram()}
             fullWidth
           >
-            Continue with Telegram
+            {t("auth:continueTelegram")}
           </Button>
         ) : (
           <Button
@@ -102,25 +85,25 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
             onClick={() => void signInWithGoogle()}
             fullWidth
           >
-            Continue with Google
+            {t("auth:continueGoogle")}
           </Button>
         )}
-        <Divider label="or with email" />
+        <Divider label={t("auth:orWithEmail")} />
 
         <SegmentedControl
           value={mode}
           onChange={(value) => setMode(value as Mode)}
           data={[
-            { label: "Sign in", value: "signin" },
-            { label: "Create account", value: "signup" },
+            { label: t("auth:signIn"), value: "signin" },
+            { label: t("auth:createAccount"), value: "signup" },
           ]}
           fullWidth
         />
 
         {mode === "signup" && (
           <TextInput
-            label="Nickname"
-            placeholder="Shown on the leaderboard"
+            label={t("auth:nickname")}
+            placeholder={t("auth:nicknamePlaceholder")}
             value={nickname}
             onChange={(e) => setNickname(e.currentTarget.value)}
             maxLength={20}
@@ -128,13 +111,13 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
         )}
 
         <TextInput
-          label="Email"
+          label={t("auth:email")}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.currentTarget.value)}
         />
         <PasswordInput
-          label="Password"
+          label={t("auth:password")}
           value={password}
           onChange={(e) => setPassword(e.currentTarget.value)}
         />
@@ -147,7 +130,7 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
           onClick={() => void submit()}
           fullWidth
         >
-          {mode === "signin" ? "Sign in" : "Create account"}
+          {mode === "signin" ? t("auth:signIn") : t("auth:createAccount")}
         </Button>
 
         {mode === "signin" && (
@@ -156,7 +139,7 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
             c="dimmed"
             onClick={() => void resetPassword(email.trim())}
           >
-            Forgot password?
+            {t("auth:forgotPassword")}
           </Anchor>
         )}
 
@@ -173,10 +156,10 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
 
         <Divider />
         <Button variant="subtle" color="gray" onClick={onClose} fullWidth>
-          Continue without account
+          {t("auth:continueWithout")}
         </Button>
         <Text size="xs" c="dimmed" ta="center">
-          Without an account, progress is saved only on this device.
+          {t("auth:withoutNotice")}
         </Text>
       </Stack>
     </Modal>

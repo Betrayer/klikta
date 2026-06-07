@@ -1,0 +1,17 @@
+{
+  "deleteBody": "Esto borrará la moneda, las ventajas, los logros y la configuración. No se puede deshacer.",
+  "deleteConfirm": "Borrar todo",
+  "deleteTitle": "¿Borrar todo el progreso?",
+  "fullscreen": "Pantalla completa",
+  "haptics": "Sensaciones táctiles",
+  "language": "Idioma",
+  "master": "Maestro",
+  "music": "Música",
+  "quitToMenu": "Salir al menú",
+  "reduceMotion": "Reducir el movimiento",
+  "resetProgress": "Restablecer progreso",
+  "resume": "Currículum",
+  "sfx": "Efectos especiales",
+  "title": "Configuración",
+  "useTelegramTheme": "Usar el tema de Telegram"
+}

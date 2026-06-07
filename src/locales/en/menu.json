@@ -1,0 +1,11 @@
+{
+  "skills": "Skills",
+  "customize": "Customize",
+  "themeSection": "Theme",
+  "musicSection": "Music",
+  "sfxSection": "SFX",
+  "modeSelect": {
+    "title": "SELECT MODE",
+    "noRecord": "No record yet"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Settings",
+  "language": "Language",
+  "master": "Master",
+  "sfx": "SFX",
+  "music": "Music",
+  "reduceMotion": "Reduce motion",
+  "haptics": "Haptics",
+  "useTelegramTheme": "Use Telegram theme",
+  "fullscreen": "Fullscreen",
+  "resume": "Resume",
+  "resetProgress": "Reset Progress",
+  "quitToMenu": "Quit to Menu",
+  "deleteTitle": "Delete all progress?",
+  "deleteBody": "This erases currency, perks, achievements, and settings. Cannot be undone.",
+  "deleteConfirm": "Delete everything"
+}
