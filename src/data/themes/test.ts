@@ -49,6 +49,17 @@ const statefulVisual = (
   return { mode: "sprite", texture: primary, color: base[kind].color, states };
 };
 
+const splitterFragmentTextures = ["splitter1", "splitter2", "splitter3"]
+  .map(aliasOf)
+  .filter((alias): alias is string => alias !== undefined);
+
+const splitterVisual = ((): TargetVisual => {
+  const base = singleVisual("splitter", "splitter00");
+  return splitterFragmentTextures.length > 0
+    ? { ...base, fragmentTextures: splitterFragmentTextures }
+    : base;
+})();
+
 export const testTheme: Theme = {
   ...synthwaveTheme,
   id: TEST_THEME_ID,
@@ -67,7 +78,7 @@ export const testTheme: Theme = {
       ["shield_up", "shielded1"],
       ["shield_down", "shielded0"],
     ]),
-    splitter: singleVisual("splitter", "splitter00"),
+    splitter: splitterVisual,
     sticky: singleVisual("sticky", "sticky"),
   },
 };

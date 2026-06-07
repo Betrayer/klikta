@@ -31,7 +31,7 @@ import { BackgroundLayer } from "../background/BackgroundLayer";
 import { getActiveTheme, getBackgroundSpec } from "../../state/themeSelectors";
 import { useSettingsStore } from "../../state/settingsStore";
 import { FpsMonitor, reduceBackgroundSpec } from "../util/performance";
-import type { BackgroundSpec } from "../../data/themes/types";
+import type { BackgroundSpec, TargetVisual } from "../../data/themes/types";
 import { UltimateSystem } from "../systems/UltimateSystem";
 import {
   setUltimateActivationHandler,
@@ -866,6 +866,9 @@ export class Game {
     const lifetimeMul =
       (SPLITTER_FRAGMENT_LIFETIME_MS / TARGET_CONFIG.regular.lifetimeMs) *
       this.targetMods.lifetimeMul;
+    const splitterVisual = getActiveTheme().targets.splitter;
+    const fragmentTextures = splitterVisual.fragmentTextures;
+    const fragmentColor = splitterVisual.color ?? TARGET_CONFIG.splitter.color;
     for (let i = 0; i < SPLITTER_FRAGMENT_COUNT; i++) {
       const angle =
         (Math.PI * 2 * i) / SPLITTER_FRAGMENT_COUNT + Math.random() * 0.5;
@@ -878,13 +881,20 @@ export class Game {
         sizeMul: this.targetMods.sizeMul * SPLITTER_FRAGMENT_SIZE_MUL,
         scoreMul: this.targetMods.scoreMul * SPLITTER_FRAGMENT_SCORE_MUL,
       };
+      const fragmentAlias = fragmentTextures?.[i];
+      const visualOverride: TargetVisual | null =
+        fragmentAlias !== undefined
+          ? { mode: "sprite", texture: fragmentAlias, color: fragmentColor }
+          : null;
       const fragment = new RegularTarget(
         { x: x + Math.cos(angle) * dist, y: y + Math.sin(angle) * dist },
         modifiers,
+        visualOverride,
       );
       fragment.bindPointerDown(() => this.handleTargetClick(fragment));
       this.targetLayer.addChild(fragment.view);
       this.targets.push(fragment);
+      if (this.physics !== null) this.bindToPhysics(fragment);
     }
   }
 

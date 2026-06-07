@@ -66,6 +66,7 @@ export abstract class Target {
   protected readonly decoration: Graphics;
   protected base!: Container;
   protected visual: TargetVisual;
+  protected visualOverride: TargetVisual | null = null;
   protected readonly initialSize: number;
   protected elapsedMs = 0;
   protected lifeScale = 1;
@@ -154,7 +155,7 @@ export abstract class Target {
   }
 
   protected resolveVisual(): TargetVisual {
-    return getActiveTheme().targets[this.kind];
+    return this.visualOverride ?? getActiveTheme().targets[this.kind];
   }
 
   protected baseSize(): number {

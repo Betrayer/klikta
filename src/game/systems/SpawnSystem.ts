@@ -37,11 +37,9 @@ const FRENZY_EXTRA_COUNT = 2;
 const CHAOS_RATE_MUL = 4;
 
 const KINDS = Object.keys(TARGET_CONFIG) as TargetKind[];
-const RANDOM_KINDS = KINDS.filter((k) => k !== "splitter" && k !== "sticky");
+const RANDOM_KINDS = KINDS.filter((k) => k !== "sticky");
 
-export const PHYSICS_KIND_POOL: readonly TargetKind[] = KINDS.filter(
-  (k) => k !== "splitter",
-);
+export const PHYSICS_KIND_POOL: readonly TargetKind[] = KINDS;
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);

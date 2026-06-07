@@ -3,13 +3,16 @@ import {
   DEFAULT_TARGET_MODIFIERS,
   type TargetSpawnModifiers,
 } from "../effects/EffectResolver";
+import type { TargetVisual } from "../../data/themes/types";
 
 export class RegularTarget extends Target {
   constructor(
     spawn: TargetSpawn,
     modifiers: TargetSpawnModifiers = DEFAULT_TARGET_MODIFIERS,
+    visualOverride: TargetVisual | null = null,
   ) {
     super("regular", spawn, modifiers);
+    this.visualOverride = visualOverride;
     this.spawn();
   }
 
