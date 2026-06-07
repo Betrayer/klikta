@@ -4,11 +4,6 @@ import { THEMES } from '../../data/themes';
 import { useMetaStore } from '../../state/metaStore';
 import { ThemePreview } from './ThemePreview';
 
-const titleCase = (value: string): string =>
-  value.charAt(0).toUpperCase() + value.slice(1);
-
-const bgLabel = (kind: string): string => titleCase(kind.replace(/_/g, ' '));
-
 export const ThemePicker = () => {
   const { t } = useTranslation();
   const activeThemeId = useMetaStore((s) => s.activeThemeId);
@@ -59,10 +54,10 @@ export const ThemePicker = () => {
                 </Text>
                 <Group gap={6}>
                   <Badge size="xs" variant="light" color="gray">
-                    {titleCase(theme.hud.style)}
+                    {t(`menu:hudStyle.${theme.hud.style}`)}
                   </Badge>
                   <Badge size="xs" variant="light" color="gray">
-                    {bgLabel(theme.background.kind)}
+                    {t(`menu:backgroundKind.${theme.background.kind}`)}
                   </Badge>
                 </Group>
               </Stack>

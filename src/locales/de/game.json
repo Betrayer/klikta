@@ -26,7 +26,8 @@
     "resetView": "Ansicht zurücksetzen",
     "title": "FÄHIGKEITSBÄUME",
     "zoomIn": "Vergrößern",
-    "zoomOut": "Vergrößern"
+    "zoomOut": "Vergrößern",
+    "hubPerks": "{{selected}}/{{total}} Vorteile"
   },
   "waveBreak": {
     "chooseBoon": "Wähle einen Segen – Wave {{wave}} / {{total}} Weiter",

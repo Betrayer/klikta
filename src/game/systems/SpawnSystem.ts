@@ -24,6 +24,7 @@ export interface SpawnEvent {
 
 const INITIAL_INTERVAL_MS = 1500;
 const EDGE_MARGIN = 0.1;
+const BOMB_EDGE_BAND = 0.2;
 const DECAY_EVERY_MS = 10_000;
 const DECAY_FACTOR = 0.95;
 const MIN_INTERVAL_MS = 300;
@@ -155,6 +156,14 @@ export class SpawnSystem {
     return phase < surge.durationMs ? surge.mul : 1;
   }
 
+  surgeActive(currentTimeMs: number): boolean {
+    const surge = this.policy.spawnRateSurge;
+    if (surge === null) return false;
+    const elapsed = currentTimeMs - this.startTimeMs;
+    if (elapsed < surge.periodMs) return false;
+    return elapsed % surge.periodMs < surge.durationMs;
+  }
+
   setFrenzy(active: boolean): void {
     this.frenzyActive = active;
   }
@@ -254,10 +263,10 @@ export class SpawnSystem {
     bounds: SpawnBounds,
     pairWithNext: boolean,
   ): SpawnEvent {
-    const marginX = bounds.width * EDGE_MARGIN;
-    const marginY = bounds.height * EDGE_MARGIN;
-    const x = marginX + Math.random() * (bounds.width - marginX * 2);
-    const y = marginY + Math.random() * (bounds.height - marginY * 2);
+    const edgeBomb = kind === "bomb" && this.policy.bombEdgeOnly;
+    const { x, y } = edgeBomb
+      ? this.bombEdgePosition(bounds)
+      : this.randomPosition(bounds);
 
     return {
       x,
@@ -271,13 +280,55 @@ export class SpawnSystem {
     };
   }
 
-  private buildMirror(source: SpawnEvent, bounds: SpawnBounds): SpawnEvent {
+  private randomPosition(bounds: SpawnBounds): { x: number; y: number } {
+    const marginX = bounds.width * EDGE_MARGIN;
+    const marginY = bounds.height * EDGE_MARGIN;
     return {
-      ...source,
-      x: bounds.width - source.x,
-      y: bounds.height - source.y,
-      pairWithNext: false,
+      x: marginX + Math.random() * (bounds.width - marginX * 2),
+      y: marginY + Math.random() * (bounds.height - marginY * 2),
     };
+  }
+
+  private bombEdgePosition(bounds: SpawnBounds): { x: number; y: number } {
+    const marginX = bounds.width * EDGE_MARGIN;
+    const marginY = bounds.height * EDGE_MARGIN;
+    const bandX = bounds.width * BOMB_EDGE_BAND;
+    const bandY = bounds.height * BOMB_EDGE_BAND;
+    if (Math.random() < 0.5) {
+      const x =
+        Math.random() < 0.5
+          ? marginX + Math.random() * (bandX - marginX)
+          : bounds.width - bandX + Math.random() * (bandX - marginX);
+      const y = marginY + Math.random() * (bounds.height - marginY * 2);
+      return { x, y };
+    }
+    const y =
+      Math.random() < 0.5
+        ? marginY + Math.random() * (bandY - marginY)
+        : bounds.height - bandY + Math.random() * (bandY - marginY);
+    const x = marginX + Math.random() * (bounds.width - marginX * 2);
+    return { x, y };
+  }
+
+  private buildMirror(source: SpawnEvent, bounds: SpawnBounds): SpawnEvent {
+    const x = bounds.width - source.x;
+    const y = bounds.height - source.y;
+    if (
+      source.kind !== "bomb" &&
+      this.policy.mirrorBombTwinChance > 0 &&
+      Math.random() < this.policy.mirrorBombTwinChance
+    ) {
+      return {
+        x,
+        y,
+        kind: "bomb",
+        modifiers: this.deriveModifiers("bomb"),
+        appearAsGolden: false,
+        multiClicksOverride: null,
+        pairWithNext: false,
+      };
+    }
+    return { ...source, x, y, pairWithNext: false };
   }
 
   private deriveModifiers(kind: TargetKind): TargetSpawnModifiers {

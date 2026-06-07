@@ -303,6 +303,74 @@ export const PERK_ICONS: Record<PerkIconName, ReactNode> = {
       <ellipse cx="17.5" cy="12" rx="3" ry="2" />
     </>
   ),
+  frame: (
+    <>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="2" />
+      <rect x="8.5" y="8.5" width="7" height="7" rx="1.2" />
+    </>
+  ),
+  "hourglass-bottom": (
+    <>
+      <path d="M6 3h12" />
+      <path d="M6 21h12" />
+      <path d="M8 3v3l4 6 4-6V3" />
+      <path d="M8 21v-3l4-6 4 6v3" />
+      <path d="M9 21h6l-3-4.2z" fill="currentColor" stroke="none" />
+    </>
+  ),
+  "trending-up-2": (
+    <>
+      <polyline points="3 12 8 7 12 11 20 4" />
+      <polyline points="15 4 20 4 20 9" />
+      <polyline points="3 20 8 15 12 19 20 12" />
+    </>
+  ),
+  diamond: (
+    <>
+      <path d="M12 2 22 12 12 22 2 12 12 2z" />
+      <path d="M12 2 8 12l4 10" />
+      <path d="M12 2l4 10-4 10" />
+    </>
+  ),
+  "first-aid-kit": (
+    <>
+      <rect x="3" y="7" width="18" height="13" rx="2" />
+      <path d="M9 7V5.2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2V7" />
+      <path d="M12 11v5M9.5 13.5h5" />
+    </>
+  ),
+  "flame-heart": (
+    <>
+      <path d="M12 20.6 5 13.6a4.4 4.4 0 0 1 6.2-6.2l.8.8.8-.8a4.4 4.4 0 0 1 6.2 6.2L12 20.6z" />
+      <path
+        d="M12 16.5c1.6-1 2.4-2.1 2.4-3.4 0-1.2-.8-2.1-1.5-2.7.1.8-.3 1.3-.9 1.7-.6-.7-.5-1.6-.2-2.3-1.1.6-2.1 1.7-2.1 3.1 0 1.4.7 2.5 2.3 3.5z"
+        fill="currentColor"
+        stroke="none"
+      />
+    </>
+  ),
+  lightning: (
+    <>
+      <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" />
+    </>
+  ),
+  skull: (
+    <>
+      <path d="M5 11a7 7 0 0 1 14 0v2.6c0 1-.6 1.9-1.5 2.3V19a1 1 0 0 1-1 1h-9A1 1 0 0 1 6.5 19v-3.1C5.6 15.5 5 14.6 5 13.6V11z" />
+      <circle cx="9.2" cy="11.5" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="14.8" cy="11.5" r="1.5" fill="currentColor" stroke="none" />
+      <path d="M12 14.5v2.5M9.5 20v-2M14.5 20v-2" />
+    </>
+  ),
+  tornado: (
+    <>
+      <path d="M4 5c4 2 12 2 16 0" />
+      <path d="M6 9c3 1.4 9 1.4 12 0" />
+      <path d="M8 13c2 1 6 1 8 0" />
+      <path d="M10.5 17c1 .6 3 .6 4 0" />
+      <path d="M12.5 20.5c.5.3 1.3 0 1.5-.6" />
+    </>
+  ),
   locked: (
     <>
       <rect x="5" y="11" width="14" height="9" rx="2" />

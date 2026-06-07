@@ -26,7 +26,8 @@
     "resetView": "Restablecer vista",
     "title": "ÁRBOL DE HABILIDADES",
     "zoomIn": "Acercar",
-    "zoomOut": "Alejar la imagen"
+    "zoomOut": "Alejar la imagen",
+    "hubPerks": "{{selected}}/{{total}} ventajas"
   },
   "waveBreak": {
     "chooseBoon": "Elige una ventaja: Wave {{wave}} / {{total}} siguiente",

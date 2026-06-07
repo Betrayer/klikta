@@ -244,7 +244,15 @@ export abstract class Target {
           this.lifeScale = this.elapsedMs / phaseMs;
         } else {
           const tail = Math.max(this.lifetimeMs - phaseMs, 1);
-          this.lifeScale = Math.max(1 - (this.elapsedMs - phaseMs) / tail, 0);
+          const lastChance = this.modifiers.lastChanceMs;
+          const shrinkElapsed =
+            lastChance > 0
+              ? Math.min(
+                  this.elapsedMs,
+                  Math.max(this.lifetimeMs - lastChance, phaseMs),
+                )
+              : this.elapsedMs;
+          this.lifeScale = Math.max(1 - (shrinkElapsed - phaseMs) / tail, 0);
         }
       }
       this.currentSize = this.initialSize * this.lifeScale;

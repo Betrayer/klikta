@@ -7,5 +7,20 @@
   "modeSelect": {
     "title": "SELECT MODE",
     "noRecord": "No record yet"
+  },
+  "hudStyle": {
+    "framed": "Framed",
+    "ringed": "Ringed",
+    "minimal": "Minimal"
+  },
+  "backgroundKind": {
+    "solid": "Solid",
+    "gradient": "Gradient",
+    "image": "Image",
+    "tiled": "Tiled",
+    "animated_gradient": "Animated Gradient",
+    "bokeh": "Bokeh",
+    "noise": "Noise",
+    "custom": "Custom"
   }
 }

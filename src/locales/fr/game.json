@@ -26,7 +26,8 @@
     "resetView": "Réinitialiser l'affichage",
     "title": "ARBRE DE COMPÉTENCES",
     "zoomIn": "Agrandir",
-    "zoomOut": "Réduire"
+    "zoomOut": "Réduire",
+    "hubPerks": "{{selected}}/{{total}} avantages"
   },
   "waveBreak": {
     "chooseBoon": "Choisissez un avantage - Wave {{wave}} / {{total}} suivant",

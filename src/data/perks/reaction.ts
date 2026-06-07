@@ -45,12 +45,13 @@ export const REACTION_BRANCH: SkillBranch = {
       requiresPointsInBranch: TIER_REQUIRES_POINTS[2],
       options: [
         {
-          id: "reaction-t2-bomb-warning",
-          name: "Bomb Warning",
-          description: "Bombs blink twice as fast in their last second.",
-          icon: "alert-triangle",
+          id: "reaction-t2-steady-bombs",
+          name: "Steady Bombs",
+          description:
+            "Bombs only spawn near the screen edges, never in the center. Pairs with Wild's Concentrated for predictable bomb timing AND placement.",
+          icon: "frame",
           cost: 250,
-          effects: [{ kind: "bombBlinkFasterEndS", value: 1 }],
+          effects: [{ kind: "bombSpawnZone", zone: "edge" }],
         },
         {
           id: "reaction-t2-quick-multi",
@@ -91,6 +92,15 @@ export const REACTION_BRANCH: SkillBranch = {
           icon: "eye",
           cost: 700,
           effects: [{ kind: "spawnAnimMul", value: 1.5 }],
+        },
+        {
+          id: "reaction-t3-last-chance",
+          name: "Last Chance",
+          description:
+            "In the final 0.3 s of a target's lifetime, it stops shrinking and holds. Pairs with Steady Hand for very forgiving runs.",
+          icon: "hourglass-bottom",
+          cost: 700,
+          effects: [{ kind: "lastChanceMs", value: 300 }],
         },
       ],
     },

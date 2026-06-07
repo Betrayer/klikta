@@ -1,6 +1,7 @@
 import {
   Application,
   Container,
+  Graphics,
   type FederatedPointerEvent,
   type Ticker,
 } from "pixi.js";
@@ -44,6 +45,7 @@ import { TARGET_CONFIG, type TargetKind } from "../../data/targetConfig";
 import { rollRunPerkChoices, type RunPerk } from "../../data/runPerks";
 import type { SkillEffect } from "../effects/types";
 import { tweenManager } from "../util/TweenManager";
+import { linear } from "../util/easings";
 import { FEEL } from "../config/feel";
 import {
   ACHIEVEMENT_REWARDS,
@@ -108,6 +110,7 @@ export class Game {
   private app: Application | null = null;
   private targetLayer: Container | null = null;
   private phantomLayer: Container | null = null;
+  private overlayLayer: Container | null = null;
   private readonly targets: Target[] = [];
   private readonly phantoms: PhantomTarget[] = [];
   private spawnSystem: SpawnSystem | null = null;
@@ -170,6 +173,12 @@ export class Game {
   private baseTickerSpeed = 1;
   private timePulseNextStartMs = Infinity;
   private timePulseEndMs = 0;
+  private vortexCenter: { x: number; y: number } | null = null;
+  private speculationStacks = 0;
+  private speculationLastHitAt = 0;
+  private readonly healedMilestones = new Set<number>();
+  private phoenixUsedThisRun = false;
+  private phoenixIframesUntil = 0;
 
   constructor(parent: HTMLElement) {
     this.parent = parent;
@@ -193,6 +202,12 @@ export class Game {
     this.ultimateTimeScale = 1;
     this.hpRegenDisabled = false;
     this.runEnded = false;
+    this.vortexCenter = null;
+    this.speculationStacks = 0;
+    this.speculationLastHitAt = 0;
+    this.healedMilestones.clear();
+    this.phoenixUsedThisRun = false;
+    this.phoenixIframesUntil = 0;
     this.physics = null;
     this.usedRunPerkIds.length = 0;
     this.waveBreakChoices = [];
@@ -255,6 +270,7 @@ export class Game {
     const overlayLayer = new Container();
     overlayLayer.eventMode = "none";
     app.stage.addChild(overlayLayer);
+    this.overlayLayer = overlayLayer;
 
     const particleLayer = new Container();
     app.stage.addChild(particleLayer);
@@ -401,6 +417,7 @@ export class Game {
       this.runMods.shieldedMissNoHPLoss && this.hasActiveShield();
     if (!this.runMods.backgroundClickIgnored) {
       useRunStore.getState().resetCombo();
+      this.clearSpeculation();
     }
     if (!skipHpLoss) this.applyMissPenalty();
     this.syncMusicToCombo();
@@ -548,6 +565,7 @@ export class Game {
     this.updateHitFrame();
     this.updateTimePulse();
     this.applyHpRegen();
+    this.updateSpeculation();
     const directive = this.mode.onTick(deltaMs, this.buildModeContext());
     if (directive) this.applyModeDirective(directive);
     if (this.ultimateSystem !== null) {
@@ -568,6 +586,8 @@ export class Game {
       centerX: width / 2,
       centerY: height / 2,
     };
+
+    this.applyVortex(deltaMs);
 
     for (let i = this.targets.length - 1; i >= 0; i--) {
       const target = this.targets[i];
@@ -608,13 +628,26 @@ export class Game {
   };
 
   private handleMissExpiry(): void {
+    this.clearSpeculation();
     if (this.runMods.firstMissForgiven && this.missesThisRun === 0) {
       this.missesThisRun = 1;
       return;
     }
     this.missesThisRun += 1;
+    if (this.isComboProtected()) {
+      this.syncMusicToCombo();
+      return;
+    }
     useRunStore.getState().resetCombo();
     this.syncMusicToCombo();
+  }
+
+  private isComboProtected(): boolean {
+    return (
+      this.spawnPolicy.spawnRateSurge?.comboProtected === true &&
+      this.spawnSystem !== null &&
+      this.spawnSystem.surgeActive(this.clockMs)
+    );
   }
 
   private applyHpRegen(): void {
@@ -632,9 +665,34 @@ export class Game {
     if (amount <= 0) return;
     const iframes = this.runMods.damageIframesMs;
     if (iframes > 0 && this.clockMs - this.lastDamageMs < iframes) return;
+    if (this.clockMs < this.phoenixIframesUntil) return;
+    if (this.tryPhoenixRevive(amount)) return;
     this.lastDamageMs = this.clockMs;
     useRunStore.getState().loseHPBy(amount);
     this.checkRunOver();
+  }
+
+  private tryPhoenixRevive(amount: number): boolean {
+    const phoenix = this.runMods.phoenix;
+    if (phoenix === null || this.phoenixUsedThisRun) return false;
+    const hp = useRunStore.getState().hp;
+    if (hp - amount > 0) return false;
+    this.phoenixUsedThisRun = true;
+    if (hp > 1) useRunStore.getState().loseHPBy(hp - 1);
+    this.lastDamageMs = this.clockMs;
+    this.phoenixIframesUntil = this.clockMs + phoenix.iframesMs;
+    this.emitPhoenixFeedback();
+    return true;
+  }
+
+  private emitPhoenixFeedback(): void {
+    if (this.app === null) return;
+    const { width, height } = this.app.renderer.screen;
+    this.vfx?.emitGoldenHit(width / 2, height / 2);
+    this.vfx?.emitMilestone(width / 2, height / 2);
+    this.camera?.shake(FEEL.shake.comboIntensity, FEEL.shake.comboMs);
+    audioSystem.playSFX("combo_milestone");
+    haptic("milestone");
   }
 
   private applyMissPenalty(): void {
@@ -770,13 +828,25 @@ export class Game {
     }
   }
 
+  private applyLastStandLifetime(event: SpawnEvent): SpawnEvent {
+    const ls = this.runMods.lastStand;
+    if (ls === null || useRunStore.getState().hp !== 1) return event;
+    return {
+      ...event,
+      modifiers: {
+        ...event.modifiers,
+        lifetimeMul: event.modifiers.lifetimeMul * ls.lifetimeMul,
+      },
+    };
+  }
+
   private spawnEvents(events: SpawnEvent[]): void {
     if (this.targetLayer === null) return;
     if (this.physics !== null && this.targets.length >= PHYSICS_BODY_CAP)
       return;
     const spawned: Target[] = [];
     for (const event of events) {
-      const target = this.createTarget(event);
+      const target = this.createTarget(this.applyLastStandLifetime(event));
       target.bindPointerDown(() => this.handleTargetClick(target));
       this.targetLayer.addChild(target.view);
       this.targets.push(target);
@@ -816,27 +886,7 @@ export class Game {
     if (result.destroyed) {
       this.physics?.removeTarget(target.id);
       if (target.kind !== "bomb") {
-        this.mode.onHit(this.buildModeContext(), target.kind);
-        if (result.score > 0) {
-          let scaled =
-            result.score * this.runMods.scoreMul * this.scoreMultiplier.current;
-          const pf = target.modifiers.phaseFlash;
-          if (wasPhaseInvisible && pf !== null) {
-            scaled *= pf.bonusMul;
-          }
-          const scoreBefore = useRunStore.getState().score;
-          useRunStore.getState().registerHit(Math.round(scaled));
-          this.tryAwardComboCoin();
-          this.spawnEchoPhantom(
-            target,
-            useRunStore.getState().score - scoreBefore,
-          );
-        }
-        this.ultimateSystem?.addCharge(CHARGE_PER_HIT[target.kind]);
-        this.syncMusicToCombo();
-        audioSystem.playSFX(this.hitSfx(target.kind));
-        haptic(target.kind === "golden" ? "golden" : "hit");
-        this.handleComboMilestone();
+        this.registerTargetHit(target, result.score, wasPhaseInvisible);
         this.spawnFrenzyBurst(target.x, target.y);
       }
       this.emitHitVfx(target);
@@ -846,11 +896,153 @@ export class Game {
       }
       target.beginHitExit();
       this.killPair(target);
+      if (target.kind !== "bomb") this.maybeChain(target);
     } else if (target.kind === "multi" || target.kind === "sticky") {
       audioSystem.playSFX("hit_multi_partial");
       this.vfx?.emitSubHit(target.x, target.y, target.color);
     } else if (target.kind === "shielded") {
       audioSystem.playSFX("hit_shielded_break");
+    }
+  }
+
+  private registerTargetHit(
+    target: Target,
+    score: number,
+    phaseBonus: boolean,
+  ): void {
+    this.mode.onHit(this.buildModeContext(), target.kind);
+    if (score > 0) {
+      let scaled = score * this.runMods.scoreMul * this.dynamicScoreMul();
+      const pf = target.modifiers.phaseFlash;
+      if (phaseBonus && pf !== null) scaled *= pf.bonusMul;
+      const scoreBefore = useRunStore.getState().score;
+      useRunStore.getState().registerHit(Math.round(scaled));
+      this.tryAwardComboCoin();
+      this.spawnEchoPhantom(target, useRunStore.getState().score - scoreBefore);
+    }
+    if (target.kind === "golden") this.bumpSpeculation();
+    this.vortexCenter = { x: target.x, y: target.y };
+    this.ultimateSystem?.addCharge(CHARGE_PER_HIT[target.kind]);
+    this.syncMusicToCombo();
+    audioSystem.playSFX(this.hitSfx(target.kind));
+    haptic(target.kind === "golden" ? "golden" : "hit");
+    this.handleComboMilestone();
+  }
+
+  private dynamicScoreMul(): number {
+    let mul = this.scoreMultiplier.current;
+    const spec = this.runMods.goldenScoreStack;
+    if (spec !== null && this.speculationStacks > 0) {
+      mul *= 1 + this.speculationStacks * spec.perStackMul;
+    }
+    const ls = this.runMods.lastStand;
+    if (ls !== null && useRunStore.getState().hp === 1) {
+      mul *= ls.scoreMul;
+    }
+    return mul;
+  }
+
+  private bumpSpeculation(): void {
+    const spec = this.runMods.goldenScoreStack;
+    if (spec === null) return;
+    this.speculationStacks = Math.min(
+      this.speculationStacks + 1,
+      spec.maxStacks,
+    );
+    this.speculationLastHitAt = this.clockMs;
+  }
+
+  private clearSpeculation(): void {
+    if (this.speculationStacks !== 0) this.speculationStacks = 0;
+  }
+
+  private updateSpeculation(): void {
+    const spec = this.runMods.goldenScoreStack;
+    if (spec === null || this.speculationStacks === 0) return;
+    if (this.clockMs - this.speculationLastHitAt > spec.durationMs) {
+      this.speculationStacks = 0;
+    }
+  }
+
+  private maybeChain(source: Target): void {
+    const cfg = this.runMods.chainHit;
+    if (cfg === null) return;
+    if (Math.random() >= cfg.triggerChance) return;
+    let from = source;
+    for (let hop = 0; hop < cfg.maxHops; hop++) {
+      const next = this.findChainTarget(from, cfg.radiusMul);
+      if (next === null) break;
+      this.drawChainArc(from.x, from.y, next.x, next.y);
+      this.processChainHit(next);
+      from = next;
+    }
+  }
+
+  private findChainTarget(from: Target, radiusMul: number): Target | null {
+    const radius = Math.max(from.currentSize, 1) * radiusMul;
+    const maxDistSq = radius * radius;
+    let best: Target | null = null;
+    let bestDistSq = Infinity;
+    for (const t of this.targets) {
+      if (t === from || t.kind === "bomb" || !t.isInteractive) continue;
+      const dx = t.x - from.x;
+      const dy = t.y - from.y;
+      const distSq = dx * dx + dy * dy;
+      if (distSq > maxDistSq || distSq >= bestDistSq) continue;
+      bestDistSq = distSq;
+      best = t;
+    }
+    return best;
+  }
+
+  private processChainHit(target: Target): void {
+    const score = TARGET_CONFIG[target.kind].score * target.scoreMul;
+    this.registerTargetHit(target, score, false);
+    this.emitHitVfx(target);
+    this.triggerJuice(target);
+    this.physics?.removeTarget(target.id);
+    target.beginHitExit();
+    this.killPair(target);
+  }
+
+  private drawChainArc(x1: number, y1: number, x2: number, y2: number): void {
+    if (this.overlayLayer === null) return;
+    const arc = FEEL.chainArc;
+    const g = new Graphics();
+    g.moveTo(x1, y1)
+      .lineTo(x2, y2)
+      .stroke({ width: arc.width, color: arc.color, alpha: arc.alpha });
+    g.eventMode = "none";
+    this.overlayLayer.addChild(g);
+    tweenManager.to(
+      arc.alpha,
+      0,
+      arc.fadeMs,
+      (a) => {
+        g.alpha = a;
+      },
+      linear,
+      () => {
+        g.destroy();
+      },
+    );
+  }
+
+  private applyVortex(deltaMs: number): void {
+    if (this.physics !== null) return;
+    const speed = this.runMods.vortexRadPerSec;
+    if (speed <= 0) return;
+    const center = this.vortexCenter;
+    if (center === null) return;
+    const ang = speed * (deltaMs / 1000);
+    const cos = Math.cos(ang);
+    const sin = Math.sin(ang);
+    for (const t of this.targets) {
+      if (!t.isInteractive) continue;
+      const dx = t.x - center.x;
+      const dy = t.y - center.y;
+      t.x = center.x + dx * cos - dy * sin;
+      t.y = center.y + dx * sin + dy * cos;
     }
   }
 
@@ -967,7 +1159,7 @@ export class Game {
     const chance = this.runMods.bombExpireCurrencyChance;
     if (chance <= 0 || this.runMods.currencyDisabled) return;
     if (Math.random() >= chance) return;
-    this.bombBountyEarned += 1;
+    this.bombBountyEarned += this.runMods.bombExpireCurrencyAmount;
   }
 
   private tryAwardComboCoin(): void {
@@ -985,10 +1177,15 @@ export class Game {
     const maxCombo = run.maxCombo;
     const bombClicks = run.bombClicksThisRun;
     const disabled = this.runMods.currencyDisabled;
+    const currencyMul = this.runMods.currencyMul;
+    const scaleCurrency = (n: number): number =>
+      Math.max(0, Math.floor(n * currencyMul));
     const isFirstRunEver = meta.runsCompleted === 0;
 
-    const base = disabled ? 0 : Math.floor(score / SCORE_PER_CURRENCY);
-    const comboBonus = disabled ? 0 : comboBonusForMax(maxCombo);
+    const base = disabled
+      ? 0
+      : scaleCurrency(Math.floor(score / SCORE_PER_CURRENCY));
+    const comboBonus = disabled ? 0 : scaleCurrency(comboBonusForMax(maxCombo));
 
     const achievements: AchievementAward[] = [];
     if (!disabled) {
@@ -1028,10 +1225,17 @@ export class Game {
     }
 
     const achievementsTotal = achievements.reduce((s, a) => s + a.amount, 0);
-    const victoryBonus = !disabled && victory ? VICTORY_BONUS_CURRENCY : 0;
-    const endTotal = base + comboBonus + achievementsTotal + victoryBonus;
+    const victoryBonus =
+      !disabled && victory ? scaleCurrency(VICTORY_BONUS_CURRENCY) : 0;
+    const bombBounty = scaleCurrency(this.bombBountyEarned);
+    const comboCoin = scaleCurrency(this.comboCoinEarned);
     const sessionTotal =
-      endTotal + this.bombBountyEarned + this.comboCoinEarned;
+      base +
+      comboBonus +
+      achievementsTotal +
+      victoryBonus +
+      bombBounty +
+      comboCoin;
     if (!disabled && sessionTotal > 0) meta.awardCurrency(sessionTotal);
     const previousBestScore = meta.bestScores[run.mode] ?? 0;
     meta.recordRun(run.mode, score);
@@ -1039,8 +1243,8 @@ export class Game {
     const breakdown: CurrencyBreakdown = {
       base,
       comboBonus,
-      bombBounty: this.bombBountyEarned,
-      comboCoin: this.comboCoinEarned,
+      bombBounty,
+      comboCoin,
       victoryBonus,
       achievements,
       total: sessionTotal,
@@ -1074,6 +1278,16 @@ export class Game {
     this.ultimateSystem?.addCharge(CHARGE_PER_COMBO_MILESTONE);
     const { width, height } = this.app.renderer.screen;
     this.vfx?.emitMilestone(width / 2, height / 2);
+    this.tryBandageHeal(combo);
+  }
+
+  private tryBandageHeal(combo: number): void {
+    const heal = this.runMods.comboHealMilestones;
+    if (heal === null) return;
+    if (!heal.milestones.includes(combo)) return;
+    if (this.healedMilestones.has(combo)) return;
+    this.healedMilestones.add(combo);
+    useRunStore.getState().healHP(heal.healAmount);
   }
 
   private emitHitVfx(target: Target): void {
@@ -1187,6 +1401,7 @@ export class Game {
     this.app = null;
     this.targetLayer = null;
     this.phantomLayer = null;
+    this.overlayLayer = null;
     this.ultimateCtx = null;
     this.ultimateTimeScale = 1;
     this.spawnSystem = null;

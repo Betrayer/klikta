@@ -7,5 +7,20 @@
   "musicSection": "Música",
   "sfxSection": "Efectos especiales",
   "skills": "Habilidades",
-  "themeSection": "Tema"
+  "themeSection": "Tema",
+  "hudStyle": {
+    "framed": "Con marco",
+    "ringed": "Anillo",
+    "minimal": "Mínimo"
+  },
+  "backgroundKind": {
+    "solid": "Sólido",
+    "gradient": "Degradado",
+    "image": "Imagen",
+    "tiled": "Mosaico",
+    "animated_gradient": "Degradado animado",
+    "bokeh": "Bokeh",
+    "noise": "Ruido",
+    "custom": "Personalizado"
+  }
 }

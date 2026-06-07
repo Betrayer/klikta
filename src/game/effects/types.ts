@@ -11,7 +11,7 @@ export type SkillEffect =
   | { kind: "bombComboCashout"; scoreMul: number }
   | { kind: "goldenSpawnRateMul"; value: number }
   | { kind: "doubleTargetChance"; value: number }
-  | { kind: "bombExpireCurrencyChance"; value: number }
+  | { kind: "bombExpireCurrencyChance"; value: number; amount?: number }
   | { kind: "comboCap"; value: number }
   | { kind: "currencyPerHitAtComboGte"; combo: number; amount: number }
   | { kind: "startingHPAdd"; value: number }
@@ -30,8 +30,32 @@ export type SkillEffect =
       period: number;
       durationMs: number;
       mul: number;
+      comboProtected?: boolean;
     }
   | { kind: "scoreDoubledNoCurrency" }
+  | { kind: "scoreCurrencyTradeoff"; scoreMul: number; currencyMul: number }
+  | { kind: "bombSpawnZone"; zone: "edge" | "any" }
+  | { kind: "lastChanceMs"; value: number }
+  | {
+      kind: "goldenScoreStack";
+      perStackMul: number;
+      maxStacks: number;
+      durationMs: number;
+    }
+  | {
+      kind: "hpHealAtComboMilestones";
+      milestones: readonly number[];
+      healAmount: number;
+    }
+  | { kind: "phoenixRevive"; iframesMs: number }
+  | {
+      kind: "chainHit";
+      triggerChance: number;
+      maxHops: number;
+      radiusMul: number;
+    }
+  | { kind: "lastStandAtLowHp"; scoreMul: number; lifetimeMul: number }
+  | { kind: "vortexOrbitSpeed"; radPerSec: number }
   | { kind: "targetsFollowCursorSpeed"; value: number }
   | { kind: "slowBloomPhaseMs"; value: number }
   | { kind: "beaconBombs"; growToScale: number }
@@ -44,7 +68,7 @@ export type SkillEffect =
     }
   | { kind: "echoPhantomMs"; duration: number; bonusMul: number }
   | { kind: "magnetSpeed"; value: number }
-  | { kind: "mirrorSpawn" }
+  | { kind: "mirrorSpawn"; bombTwinChance?: number }
   | { kind: "timePulse"; periodMs: number; durationMs: number }
   | { kind: "ultimateUnlock"; id: string };
 

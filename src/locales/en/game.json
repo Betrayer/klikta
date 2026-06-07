@@ -19,7 +19,8 @@
     "resetBody": "Deselects all {{count}} perks and refunds {{refund}} currency. You can re-select them anytime.",
     "bindTitle": "Bind ultimate?",
     "bindBody": "Bind {{name}} as your active ultimate for {{cost}} currency?",
-    "bind": "Bind"
+    "bind": "Bind",
+    "hubPerks": "{{selected}}/{{total}} perks"
   },
   "perk": {
     "active": "Active",

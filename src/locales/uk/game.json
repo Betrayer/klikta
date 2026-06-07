@@ -26,7 +26,8 @@
     "resetView": "Оновити перегляд",
     "title": "ДЕРЕВО НАВИЧОК",
     "zoomIn": "Збільшити",
-    "zoomOut": "Зменшити масштаб"
+    "zoomOut": "Зменшити масштаб",
+    "hubPerks": "{{selected}}/{{total}} бонусів"
   },
   "waveBreak": {
     "chooseBoon": "Оберіть бонус — Wave {{wave}} / {{total}} далі",

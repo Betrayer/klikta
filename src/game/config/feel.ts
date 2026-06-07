@@ -27,4 +27,10 @@ export const FEEL = {
   },
   hitFrameMs: 50,
   hitFrameSlow: 0.1,
+  chainArc: {
+    color: 0xffffff,
+    width: 3,
+    alpha: 0.85,
+    fadeMs: 200,
+  },
 } as const;

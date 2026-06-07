@@ -31,7 +31,8 @@ export const SURVIVAL_BRANCH: SkillBranch = {
         {
           id: "survival-t1-extra-life",
           name: "Extra Life",
-          description: "Start every run with one additional HP.",
+          description:
+            "Start every run with one additional HP. Combine with Survival Phoenix for two recoveries per run.",
           icon: "heart",
           cost: 100,
           effects: [{ kind: "startingHPAdd", value: 1 }],
@@ -45,7 +46,8 @@ export const SURVIVAL_BRANCH: SkillBranch = {
         {
           id: "survival-t2-score-heal",
           name: "Score Heal",
-          description: "Every 1000 score restores 1 HP.",
+          description:
+            "Every 1000 score restores 1 HP. Greed's Score Boost reaches each 1000-score threshold faster.",
           icon: "heart-plus",
           cost: 250,
           effects: [{ kind: "hpRegenPer1000Score", value: 1 }],
@@ -57,6 +59,21 @@ export const SURVIVAL_BRANCH: SkillBranch = {
           icon: "wheat",
           cost: 300,
           effects: [{ kind: "backgroundClickIgnored" }],
+        },
+        {
+          id: "survival-t2-bandage",
+          name: "Bandage",
+          description:
+            "Reaching combo 50 or 100 restores 1 HP. Pairs strongly with Greed's Combo Climb (×8 cap -> more milestones).",
+          icon: "first-aid-kit",
+          cost: 300,
+          effects: [
+            {
+              kind: "hpHealAtComboMilestones",
+              milestones: [50, 100],
+              healAmount: 1,
+            },
+          ],
         },
       ],
     },
@@ -80,6 +97,15 @@ export const SURVIVAL_BRANCH: SkillBranch = {
           icon: "shield-heart",
           cost: 700,
           effects: [{ kind: "shieldedMissNoHPLoss" }],
+        },
+        {
+          id: "survival-t3-phoenix",
+          name: "Phoenix",
+          description:
+            "Once per run, surviving a fatal hit restores you to 1 HP with 3 s of invulnerability. Pair with Wild's Last Stand for high-risk recovery plays.",
+          icon: "flame-heart",
+          cost: 700,
+          effects: [{ kind: "phoenixRevive", iframesMs: 3000 }],
         },
       ],
     },

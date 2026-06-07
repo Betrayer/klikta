@@ -12,11 +12,11 @@
     "name": "Reckless"
   },
   "greed-t1-score-boost": {
-    "description": "Every target awards 25% more score.",
+    "description": "Every target awards 25% more score. Compounds with Greed Combo Climb and Survival Score Heal.",
     "name": "Score Boost"
   },
   "greed-t2-bomb-bounty": {
-    "description": "5% chance an expiring bomb drops currency.",
+    "description": "15% chance an expiring bomb drops 2 currency. Pair with Beacon Bombs to never miss the drops.",
     "name": "Bomb Bounty"
   },
   "greed-t2-double-drops": {
@@ -32,8 +32,12 @@
     "name": "Coin Combo"
   },
   "greed-t3-combo-climb": {
-    "description": "Combo multiplier caps at ×8 instead of ×5.",
+    "description": "Combo multiplier caps at ×8 instead of ×5. Higher cap = more milestones; pair with Survival Bandage for healing scaling.",
     "name": "Combo Climb"
+  },
+  "greed-t3-speculation": {
+    "description": "Each golden hit grants +10% score for 5 s (stacks to ×3). Any miss clears the stack. Pair with Golden Rain to feed the stack faster.",
+    "name": "Speculation"
   },
   "greed-t4-frenzy": {
     "description": "Ultimate: 8 seconds where every hit spawns 2 extras nearby and score is ×2.",
@@ -48,7 +52,7 @@
     "name": "Beacon Bombs"
   },
   "mutation-t1-convergent": {
-    "description": "All targets drift toward screen center at ~30 px/s. Tighter cluster - bombs too.",
+    "description": "All targets drift toward screen center at ~30 px/s. Tighter cluster - bombs too. Stacks with both Magnet perks - Convergent + Cursor Magnet creates a 'gravity well' at the cursor near center.",
     "name": "Convergent"
   },
   "mutation-t1-slow-bloom": {
@@ -60,7 +64,7 @@
     "name": "Echo"
   },
   "mutation-t2-magnet": {
-    "description": "All interactive objects drift toward your cursor at ~18 px/s. Bombs included.",
+    "description": "All interactive objects drift toward your cursor at ~18 px/s. Bombs included. Stacks with Wild's Cursor Magnet for compound drift toward the cursor.",
     "name": "Magnet"
   },
   "mutation-t2-phase-flash": {
@@ -68,12 +72,16 @@
     "name": "Phase Flash"
   },
   "mutation-t3-mirror-spawn": {
-    "description": "Every target spawns with a mirrored twin. Clicking either destroys both; score awarded only for the clicked one.",
+    "description": "Every target spawns with a mirrored twin. Click either to destroy both; only the clicked one scores. 10% of twins are bombs - read carefully.",
     "name": "Mirror Spawn"
   },
   "mutation-t3-time-pulse": {
     "description": "Every 6 s, 2 s of either ×0.6 or ×1.6 game speed. HUD warns 0.5 s before.",
     "name": "Time Pulse"
+  },
+  "mutation-t3-vortex": {
+    "description": "All targets orbit your last successful hit position at their current distance. Bombs included - your focus becomes their attractor.",
+    "name": "Vortex"
   },
   "mutation-t4-bloom": {
     "description": "Ultimate: 5 s where targets and bombs grow from 100% to 200% over their lifetime, current spawn rate doubles, and all scores ×2.",
@@ -95,10 +103,6 @@
     "description": "Every target stays alive 20% longer.",
     "name": "Steady Hand"
   },
-  "reaction-t2-bomb-warning": {
-    "description": "Bombs blink twice as fast in their last second.",
-    "name": "Bomb Warning"
-  },
   "reaction-t2-pre-crack": {
     "description": "Shielded targets lose their shield even on a missed click.",
     "name": "Pre-Crack"
@@ -107,9 +111,17 @@
     "description": "Multi targets only need 2 clicks instead of 3.",
     "name": "Quick Multi"
   },
+  "reaction-t2-steady-bombs": {
+    "description": "Bombs only spawn near the screen edges, never in the center. Pairs with Wild's Concentrated for predictable bomb timing AND placement.",
+    "name": "Steady Bombs"
+  },
   "reaction-t3-golden-patience": {
     "description": "Golden targets stay 50% longer.",
     "name": "Golden Patience"
+  },
+  "reaction-t3-last-chance": {
+    "description": "In the final 0.3 s of a target's lifetime, it stops shrinking and holds. Pairs with Steady Hand for very forgiving runs.",
+    "name": "Last Chance"
   },
   "reaction-t3-slow-spawn": {
     "description": "Spawn animation is 50% slower - you see targets sooner.",
@@ -124,7 +136,7 @@
     "name": "Survival"
   },
   "survival-t1-extra-life": {
-    "description": "Start every run with one additional HP.",
+    "description": "Start every run with one additional HP. Combine with Survival Phoenix for two recoveries per run.",
     "name": "Extra Life"
   },
   "survival-t1-soft-bombs": {
@@ -135,17 +147,25 @@
     "description": "Your first missed target each run is forgiven.",
     "name": "Warm-Up"
   },
+  "survival-t2-bandage": {
+    "description": "Reaching combo 50 or 100 restores 1 HP. Pairs strongly with Greed's Combo Climb (×8 cap -> more milestones).",
+    "name": "Bandage"
+  },
   "survival-t2-open-field": {
     "description": "Clicking the background no longer breaks combo.",
     "name": "Open Field"
   },
   "survival-t2-score-heal": {
-    "description": "Every 1000 score restores 1 HP.",
+    "description": "Every 1000 score restores 1 HP. Greed's Score Boost reaches each 1000-score threshold faster.",
     "name": "Score Heal"
   },
   "survival-t3-mercy": {
     "description": "1 second of invulnerability after taking damage.",
     "name": "Mercy"
+  },
+  "survival-t3-phoenix": {
+    "description": "Once per run, surviving a fatal hit restores you to 1 HP with 3 s of invulnerability. Pair with Wild's Last Stand for high-risk recovery plays.",
+    "name": "Phoenix"
   },
   "survival-t3-shield-forgiveness": {
     "description": "A missed shielded target breaks your combo but costs no HP.",
@@ -160,7 +180,7 @@
     "name": "Wild"
   },
   "wild-t1-concentrated": {
-    "description": "Bomb spawn weight halved, but every 5th target is guaranteed a bomb.",
+    "description": "Bomb spawn weight halved, but every 5th target is guaranteed a bomb. Pair with Reaction Steady Bombs for fully predictable bomb placement.",
     "name": "Concentrated"
   },
   "wild-t1-lucky-big": {
@@ -171,20 +191,28 @@
     "description": "Each target's lifetime varies randomly by ±50%.",
     "name": "Volatile Time"
   },
-  "wild-t2-decoy-gold": {
-    "description": "15% of bombs disguise themselves as golden targets.",
-    "name": "Decoy Gold"
+  "wild-t2-greedy-spawn": {
+    "description": "20% chance a target spawns at 60% size and awards ×2 score. Stacks well with Reaction's Bigger Targets.",
+    "name": "Greedy Spawn"
   },
   "wild-t2-rush-pulse": {
-    "description": "Every 30 seconds, spawn rate triples for 5 seconds.",
+    "description": "Every 30 s, spawn rate triples for 5 s. During the surge, misses don't break your combo.",
     "name": "Rush Pulse"
   },
+  "wild-t2-spark": {
+    "description": "7% chance a hit chains to a nearby target, which chains again - up to 7 hops. Bombs are skipped. Pure chaos cascade.",
+    "name": "Spark"
+  },
   "wild-t3-cursor-magnet": {
-    "description": "Targets drift toward your cursor at ~25 px/s - stacks with mutation magnet.",
+    "description": "Targets drift toward your cursor at ~25 px/s - stacks with mutation magnet. Also stacks with Mutation Convergent for triple pull.",
     "name": "Cursor Magnet"
   },
+  "wild-t3-last-stand": {
+    "description": "While at 1 HP: ×3 score, but lifetimes are 20% shorter. Pair with Survival's Phoenix to enter Last Stand on demand.",
+    "name": "Last Stand"
+  },
   "wild-t3-mortgage": {
-    "description": "All scores ×2 this run, but you earn no currency.",
+    "description": "+50% score this run, but currency earned is halved. Stack with Reckless to push high-risk leaderboard runs.",
     "name": "Mortgage"
   },
   "wild-t4-chaos-storm": {

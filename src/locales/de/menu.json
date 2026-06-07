@@ -7,5 +7,20 @@
   "musicSection": "Musik",
   "sfxSection": "SFX",
   "skills": "Fähigkeiten",
-  "themeSection": "Thema"
+  "themeSection": "Thema",
+  "hudStyle": {
+    "framed": "Rahmen",
+    "ringed": "Ring",
+    "minimal": "Minimal"
+  },
+  "backgroundKind": {
+    "solid": "Einfarbig",
+    "gradient": "Verlauf",
+    "image": "Bild",
+    "tiled": "Gekachelt",
+    "animated_gradient": "Animierter Verlauf",
+    "bokeh": "Bokeh",
+    "noise": "Rauschen",
+    "custom": "Benutzerdefiniert"
+  }
 }

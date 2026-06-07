@@ -14,7 +14,8 @@ export const GREED_BRANCH: SkillBranch = {
         {
           id: "greed-t1-score-boost",
           name: "Score Boost",
-          description: "Every target awards 25% more score.",
+          description:
+            "Every target awards 25% more score. Compounds with Greed Combo Climb and Survival Score Heal.",
           icon: "trending-up",
           cost: 50,
           effects: [{ kind: "scoreMul", value: 1.25 }],
@@ -61,10 +62,13 @@ export const GREED_BRANCH: SkillBranch = {
         {
           id: "greed-t2-bomb-bounty",
           name: "Bomb Bounty",
-          description: "5% chance an expiring bomb drops currency.",
+          description:
+            "15% chance an expiring bomb drops 2 currency. Pair with Beacon Bombs to never miss the drops.",
           icon: "coins",
           cost: 350,
-          effects: [{ kind: "bombExpireCurrencyChance", value: 0.05 }],
+          effects: [
+            { kind: "bombExpireCurrencyChance", value: 0.15, amount: 2 },
+          ],
         },
       ],
     },
@@ -75,7 +79,8 @@ export const GREED_BRANCH: SkillBranch = {
         {
           id: "greed-t3-combo-climb",
           name: "Combo Climb",
-          description: "Combo multiplier caps at ×8 instead of ×5.",
+          description:
+            "Combo multiplier caps at ×8 instead of ×5. Higher cap = more milestones; pair with Survival Bandage for healing scaling.",
           icon: "stairs",
           cost: 600,
           effects: [{ kind: "comboCap", value: 8 }],
@@ -88,6 +93,22 @@ export const GREED_BRANCH: SkillBranch = {
           cost: 700,
           effects: [
             { kind: "currencyPerHitAtComboGte", combo: 50, amount: 2 },
+          ],
+        },
+        {
+          id: "greed-t3-speculation",
+          name: "Speculation",
+          description:
+            "Each golden hit grants +10% score for 5 s (stacks to ×3). Any miss clears the stack. Pair with Golden Rain to feed the stack faster.",
+          icon: "trending-up-2",
+          cost: 700,
+          effects: [
+            {
+              kind: "goldenScoreStack",
+              perStackMul: 0.1,
+              maxStacks: 3,
+              durationMs: 5000,
+            },
           ],
         },
       ],

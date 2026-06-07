@@ -26,7 +26,8 @@
     "resetView": "Zresetuj widok",
     "title": "DRZEWKO UMIEJĘTNOŚCI",
     "zoomIn": "Powiększ",
-    "zoomOut": "Powiększyć"
+    "zoomOut": "Powiększyć",
+    "hubPerks": "{{selected}}/{{total}} atutów"
   },
   "waveBreak": {
     "chooseBoon": "Wybierz bonus – Wave {{wave}} / {{total}} dalej",

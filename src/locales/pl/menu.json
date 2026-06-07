@@ -7,5 +7,20 @@
   "musicSection": "Muzyka",
   "sfxSection": "Efekty dźwiękowe",
   "skills": "Umiejętności",
-  "themeSection": "Temat"
+  "themeSection": "Temat",
+  "hudStyle": {
+    "framed": "Ramka",
+    "ringed": "Pierścień",
+    "minimal": "Minimalny"
+  },
+  "backgroundKind": {
+    "solid": "Jednolite",
+    "gradient": "Gradient",
+    "image": "Obraz",
+    "tiled": "Kafelki",
+    "animated_gradient": "Animowany gradient",
+    "bokeh": "Bokeh",
+    "noise": "Szum",
+    "custom": "Niestandardowe"
+  }
 }

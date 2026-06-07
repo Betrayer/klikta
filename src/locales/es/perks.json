@@ -12,11 +12,11 @@
     "name": "Temerario"
   },
   "greed-t1-score-boost": {
-    "description": "Cada objetivo otorga un 25% más de puntuación.",
+    "description": "Cada objetivo otorga un 25% más de puntuación. Se acumula con Escalada de Combo de Codicia y Cura por Puntos de Supervivencia.",
     "name": "Impulso de Puntos"
   },
   "greed-t2-bomb-bounty": {
-    "description": "5% de probabilidad de que una bomba al expirar suelte moneda.",
+    "description": "15% de probabilidad de que una bomba al expirar suelte 2 de moneda. Combina con Bombas Faro para no fallar nunca los botines.",
     "name": "Botín de Bomba"
   },
   "greed-t2-double-drops": {
@@ -32,8 +32,12 @@
     "name": "Combo de Monedas"
   },
   "greed-t3-combo-climb": {
-    "description": "El multiplicador de combo llega hasta ×8 en lugar de ×5.",
+    "description": "El multiplicador de combo llega hasta ×8 en lugar de ×5. Tope más alto = más hitos; combina con Vendaje de Supervivencia para escalar la curación.",
     "name": "Escalada de Combo"
+  },
+  "greed-t3-speculation": {
+    "description": "Cada acierto dorado otorga +10% de puntuación durante 5 s (acumula hasta ×3). Cualquier fallo limpia la pila. Combina con Lluvia Dorada para alimentar la pila más rápido.",
+    "name": "Especulación"
   },
   "greed-t4-frenzy": {
     "description": "Definitiva: 8 segundos en los que cada acierto genera 2 extras cerca y la puntuación es ×2.",
@@ -48,7 +52,7 @@
     "name": "Bombas Faro"
   },
   "mutation-t1-convergent": {
-    "description": "Todos los objetivos derivan hacia el centro de la pantalla a ~30 px/s. Grupo más apretado, las bombas también.",
+    "description": "Todos los objetivos derivan hacia el centro de la pantalla a ~30 px/s. Grupo más apretado, las bombas también. Se acumula con ambos imanes: Convergente + Imán de Cursor crea un 'pozo de gravedad' en el cursor cerca del centro.",
     "name": "Convergente"
   },
   "mutation-t1-slow-bloom": {
@@ -60,7 +64,7 @@
     "name": "Eco"
   },
   "mutation-t2-magnet": {
-    "description": "Todos los objetos interactivos derivan hacia tu cursor a ~18 px/s. Bombas incluidas.",
+    "description": "Todos los objetos interactivos derivan hacia tu cursor a ~18 px/s. Bombas incluidas. Se acumula con Imán de Cursor de Salvaje para una deriva combinada hacia el cursor.",
     "name": "Imán"
   },
   "mutation-t2-phase-flash": {
@@ -68,12 +72,16 @@
     "name": "Destello de Fase"
   },
   "mutation-t3-mirror-spawn": {
-    "description": "Cada objetivo aparece con un gemelo espejo. Clicar cualquiera destruye ambos; la puntuación se otorga solo por el clicado.",
+    "description": "Cada objetivo aparece con un gemelo espejo. Clica cualquiera para destruir ambos; solo el clicado puntúa. El 10% de los gemelos son bombas: lee con cuidado.",
     "name": "Aparición Espejo"
   },
   "mutation-t3-time-pulse": {
     "description": "Cada 6 s, 2 s de velocidad de juego ×0.6 o ×1.6. El HUD avisa 0.5 s antes.",
     "name": "Pulso Temporal"
+  },
+  "mutation-t3-vortex": {
+    "description": "Todos los objetivos orbitan la posición de tu último acierto a su distancia actual. Bombas incluidas: tu foco se vuelve su atractor.",
+    "name": "Vórtice"
   },
   "mutation-t4-bloom": {
     "description": "Definitiva: 5 s en los que objetivos y bombas crecen del 100% al 200% durante su vida, la tasa de aparición actual se duplica y todas las puntuaciones ×2.",
@@ -95,10 +103,6 @@
     "description": "Cada objetivo permanece vivo un 20% más.",
     "name": "Pulso Firme"
   },
-  "reaction-t2-bomb-warning": {
-    "description": "Las bombas parpadean el doble de rápido en su último segundo.",
-    "name": "Aviso de Bomba"
-  },
   "reaction-t2-pre-crack": {
     "description": "Los objetivos con escudo pierden su escudo incluso con un clic fallido.",
     "name": "Pre-Rotura"
@@ -107,9 +111,17 @@
     "description": "Los objetivos múltiples solo necesitan 2 clics en lugar de 3.",
     "name": "Multi Rápido"
   },
+  "reaction-t2-steady-bombs": {
+    "description": "Las bombas solo aparecen cerca de los bordes de la pantalla, nunca en el centro. Combina con Concentrado de Salvaje para un ritmo Y colocación de bombas predecibles.",
+    "name": "Bombas Estables"
+  },
   "reaction-t3-golden-patience": {
     "description": "Los objetivos dorados permanecen un 50% más.",
     "name": "Paciencia Dorada"
+  },
+  "reaction-t3-last-chance": {
+    "description": "En los últimos 0.3 s de vida de un objetivo, deja de encogerse y se mantiene. Combina con Pulso Firme para partidas muy indulgentes.",
+    "name": "Última Oportunidad"
   },
   "reaction-t3-slow-spawn": {
     "description": "La animación de aparición es un 50% más lenta: ves los objetivos antes.",
@@ -124,7 +136,7 @@
     "name": "Supervivencia"
   },
   "survival-t1-extra-life": {
-    "description": "Empieza cada partida con un HP adicional.",
+    "description": "Empieza cada partida con un HP adicional. Combina con Fénix de Supervivencia para dos recuperaciones por partida.",
     "name": "Vida Extra"
   },
   "survival-t1-soft-bombs": {
@@ -135,17 +147,25 @@
     "description": "Tu primer objetivo fallado en cada partida se perdona.",
     "name": "Calentamiento"
   },
+  "survival-t2-bandage": {
+    "description": "Llegar a combo 50 o 100 restaura 1 HP. Combina muy bien con Escalada de Combo de Codicia (tope ×8 -> más hitos).",
+    "name": "Vendaje"
+  },
   "survival-t2-open-field": {
     "description": "Clicar el fondo ya no rompe el combo.",
     "name": "Campo Abierto"
   },
   "survival-t2-score-heal": {
-    "description": "Cada 1000 de puntuación restaura 1 HP.",
+    "description": "Cada 1000 de puntuación restaura 1 HP. Impulso de Puntos de Codicia alcanza cada umbral de 1000 más rápido.",
     "name": "Cura por Puntos"
   },
   "survival-t3-mercy": {
     "description": "1 segundo de invulnerabilidad tras recibir daño.",
     "name": "Clemencia"
+  },
+  "survival-t3-phoenix": {
+    "description": "Una vez por partida, sobrevivir a un golpe mortal te restaura a 1 HP con 3 s de invulnerabilidad. Combina con Última Resistencia de Salvaje para jugadas de recuperación de alto riesgo.",
+    "name": "Fénix"
   },
   "survival-t3-shield-forgiveness": {
     "description": "Fallar un objetivo con escudo rompe tu combo pero no cuesta HP.",
@@ -160,7 +180,7 @@
     "name": "Salvaje"
   },
   "wild-t1-concentrated": {
-    "description": "El peso de aparición de bombas se reduce a la mitad, pero cada 5º objetivo es una bomba garantizada.",
+    "description": "El peso de aparición de bombas se reduce a la mitad, pero cada 5º objetivo es una bomba garantizada. Combina con Bombas Estables de Reacción para una colocación de bombas totalmente predecible.",
     "name": "Concentrado"
   },
   "wild-t1-lucky-big": {
@@ -171,20 +191,28 @@
     "description": "La vida de cada objetivo varía aleatoriamente en ±50%.",
     "name": "Tiempo Volátil"
   },
-  "wild-t2-decoy-gold": {
-    "description": "15% de las bombas se disfrazan de objetivos dorados.",
-    "name": "Señuelo Dorado"
+  "wild-t2-greedy-spawn": {
+    "description": "20% de probabilidad de que un objetivo aparezca al 60% de tamaño y otorgue ×2 puntuación. Combina bien con Objetivos Grandes de Reacción.",
+    "name": "Aparición Codiciosa"
   },
   "wild-t2-rush-pulse": {
-    "description": "Cada 30 segundos, la tasa de aparición se triplica durante 5 segundos.",
+    "description": "Cada 30 s, la tasa de aparición se triplica durante 5 s. Durante la oleada, los fallos no rompen tu combo.",
     "name": "Pulso de Avalancha"
   },
+  "wild-t2-spark": {
+    "description": "7% de probabilidad de que un acierto encadene a un objetivo cercano, que vuelve a encadenar, hasta 7 saltos. Las bombas se omiten. Cascada de puro caos.",
+    "name": "Chispa"
+  },
   "wild-t3-cursor-magnet": {
-    "description": "Los objetivos derivan hacia tu cursor a ~25 px/s; se acumula con el imán de mutación.",
+    "description": "Los objetivos derivan hacia tu cursor a ~25 px/s; se acumula con el imán de mutación. También se acumula con Convergente de Mutación para un triple tirón.",
     "name": "Imán de Cursor"
   },
+  "wild-t3-last-stand": {
+    "description": "Con 1 HP: ×3 puntuación, pero las vidas son un 20% más cortas. Combina con Fénix de Supervivencia para entrar en Última Resistencia a voluntad.",
+    "name": "Última Resistencia"
+  },
   "wild-t3-mortgage": {
-    "description": "Todas las puntuaciones ×2 esta partida, pero no ganas moneda.",
+    "description": "+50% de puntuación esta partida, pero la moneda ganada se reduce a la mitad. Combina con Temerario para impulsar partidas de alto riesgo en la clasificación.",
     "name": "Hipoteca"
   },
   "wild-t4-chaos-storm": {
