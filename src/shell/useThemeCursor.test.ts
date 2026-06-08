@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveCursorValue } from "./useThemeCursor";
+import { resolveCursorValue } from "../data/themes/cursorTextures";
 
 describe("resolveCursorValue", () => {
   it("returns undefined when no cursor key is set", () => {

@@ -1,5 +1,21 @@
 {
+  "backgroundKind": {
+    "animated_gradient": "Animierter Verlauf",
+    "bokeh": "Bokeh",
+    "custom": "Benutzerdefiniert",
+    "gradient": "Verlauf",
+    "image": "Bild",
+    "noise": "Rauschen",
+    "solid": "Einfarbig",
+    "tiled": "Gekachelt"
+  },
   "customize": "Anpassen",
+  "hudSection": "HUD",
+  "hudStyle": {
+    "framed": "Rahmen",
+    "minimal": "Minimal",
+    "ringed": "Ring"
+  },
   "modeSelect": {
     "noRecord": "Noch keine Einträge",
     "title": "MODUS AUSWÄHLEN"
@@ -7,20 +23,5 @@
   "musicSection": "Musik",
   "sfxSection": "SFX",
   "skills": "Fähigkeiten",
-  "themeSection": "Thema",
-  "hudStyle": {
-    "framed": "Rahmen",
-    "ringed": "Ring",
-    "minimal": "Minimal"
-  },
-  "backgroundKind": {
-    "solid": "Einfarbig",
-    "gradient": "Verlauf",
-    "image": "Bild",
-    "tiled": "Gekachelt",
-    "animated_gradient": "Animierter Verlauf",
-    "bokeh": "Bokeh",
-    "noise": "Rauschen",
-    "custom": "Benutzerdefiniert"
-  }
+  "themeSection": "Thema"
 }

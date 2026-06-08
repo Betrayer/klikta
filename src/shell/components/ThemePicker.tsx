@@ -55,9 +55,6 @@ export const ThemePicker = () => {
                 </Text>
                 <Group gap={6}>
                   <Badge size="xs" variant="light" color="gray">
-                    {t(`menu:hudStyle.${theme.hud.style}`)}
-                  </Badge>
-                  <Badge size="xs" variant="light" color="gray">
                     {t(`menu:backgroundKind.${theme.background.kind}`)}
                   </Badge>
                   {musicPackName !== undefined && (

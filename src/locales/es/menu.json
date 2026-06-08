@@ -1,5 +1,21 @@
 {
+  "backgroundKind": {
+    "animated_gradient": "Degradado animado",
+    "bokeh": "Bokeh",
+    "custom": "Personalizado",
+    "gradient": "Degradado",
+    "image": "Imagen",
+    "noise": "Ruido",
+    "solid": "Sólido",
+    "tiled": "Mosaico"
+  },
   "customize": "Personalizar",
+  "hudSection": "HUD",
+  "hudStyle": {
+    "framed": "Con marco",
+    "minimal": "Mínimo",
+    "ringed": "Anillo"
+  },
   "modeSelect": {
     "noRecord": "Aún no hay registros",
     "title": "SELECCIONAR MODO"
@@ -7,20 +23,5 @@
   "musicSection": "Música",
   "sfxSection": "Efectos especiales",
   "skills": "Habilidades",
-  "themeSection": "Tema",
-  "hudStyle": {
-    "framed": "Con marco",
-    "ringed": "Anillo",
-    "minimal": "Mínimo"
-  },
-  "backgroundKind": {
-    "solid": "Sólido",
-    "gradient": "Degradado",
-    "image": "Imagen",
-    "tiled": "Mosaico",
-    "animated_gradient": "Degradado animado",
-    "bokeh": "Bokeh",
-    "noise": "Ruido",
-    "custom": "Personalizado"
-  }
+  "themeSection": "Tema"
 }

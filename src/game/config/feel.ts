@@ -16,6 +16,17 @@ export const FEEL = {
     bomb: { count: 28, speed: 0.34, lifeMs: 600 },
     subhit: { count: 5, speed: 0.12, lifeMs: 220 },
     milestone: { count: 36, speed: 0.4, lifeMs: 700 },
+    vfxVariants: {
+      golden: {
+        starburst: { countMul: 0.45, speedMul: 1.8, lifeMul: 0.8, gravity: 0 },
+        pollen: { countMul: 2, speedMul: 0.35, lifeMul: 1.6, gravity: -0.00008 },
+      },
+      bomb: {
+        fireworkRing: { countMul: 1, speedMul: 1.15, lifeMul: 1, gravity: 0 },
+        fireworkSparks: { countMul: 0.5, speedMul: 0.55, lifeMul: 1.4, gravity: 0.00014 },
+        wilt: { countMul: 1, speedMul: 0.6, lifeMul: 1.3, gravity: 0.0002 },
+      },
+    },
   },
   shake: {
     goldenIntensity: 2,

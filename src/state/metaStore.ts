@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import type { ModeId } from "../data/modes";
-import { DEFAULT_THEME_ID } from "../data/themes";
+import { DEFAULT_THEME, DEFAULT_THEME_ID, THEMES } from "../data/themes";
 import { DEFAULT_SOUND_PACK_ID } from "../data/sound";
+import type { HudStyle } from "../data/themes/types";
 
 export interface MetaSnapshot {
   currency: number;
@@ -16,6 +17,7 @@ export interface MetaSnapshot {
   activeThemeId: string;
   activeMusicPackId: string;
   activeSfxPackId: string;
+  activeHudStyle: HudStyle;
   updatedAt: number;
 }
 
@@ -32,6 +34,7 @@ export interface MetaState {
   activeThemeId: string;
   activeMusicPackId: string;
   activeSfxPackId: string;
+  activeHudStyle: HudStyle;
   updatedAt: number;
 
   awardCurrency: (amount: number) => void;
@@ -45,11 +48,12 @@ export interface MetaState {
   setActiveTheme: (id: string) => void;
   setActiveMusicPack: (id: string) => void;
   setActiveSfxPack: (id: string) => void;
+  setActiveHudStyle: (value: HudStyle) => void;
   resetAllProgress: () => void;
   hydrateFromCloud: (snapshot: MetaSnapshot) => void;
 }
 
-const META_VERSION = 3;
+const META_VERSION = 5;
 
 export const migrateMeta = (persisted: unknown, version: number): MetaState => {
   const data: Record<string, unknown> = {
@@ -72,6 +76,14 @@ export const migrateMeta = (persisted: unknown, version: number): MetaState => {
       data.activeSfxPackId = DEFAULT_SOUND_PACK_ID;
     }
   }
+  if (version < 5) {
+    const prev = data.hudStyleOverride;
+    data.activeHudStyle =
+      prev === "framed" || prev === "minimal" || prev === "ringed"
+        ? prev
+        : DEFAULT_THEME.hud.style;
+    delete data.hudStyleOverride;
+  }
   return data as unknown as MetaState;
 };
 
@@ -87,6 +99,7 @@ const initialMeta = {
   activeThemeId: DEFAULT_THEME_ID,
   activeMusicPackId: DEFAULT_SOUND_PACK_ID,
   activeSfxPackId: DEFAULT_SOUND_PACK_ID,
+  activeHudStyle: DEFAULT_THEME.hud.style,
   updatedAt: 0,
 };
 
@@ -102,6 +115,7 @@ export const selectMetaSnapshot = (state: MetaState): MetaSnapshot => ({
   activeThemeId: state.activeThemeId,
   activeMusicPackId: state.activeMusicPackId,
   activeSfxPackId: state.activeSfxPackId,
+  activeHudStyle: state.activeHudStyle,
   updatedAt: state.updatedAt,
 });
 
@@ -209,7 +223,11 @@ export const useMetaStore = create<MetaState>()(
 
         setActiveTheme: (id) =>
           set(
-            { activeThemeId: id, updatedAt: Date.now() },
+            {
+              activeThemeId: id,
+              activeHudStyle: (THEMES[id] ?? DEFAULT_THEME).hud.style,
+              updatedAt: Date.now(),
+            },
             false,
             "setActiveTheme",
           ),
@@ -226,6 +244,13 @@ export const useMetaStore = create<MetaState>()(
             { activeSfxPackId: id, updatedAt: Date.now() },
             false,
             "setActiveSfxPack",
+          ),
+
+        setActiveHudStyle: (value) =>
+          set(
+            { activeHudStyle: value, updatedAt: Date.now() },
+            false,
+            "setActiveHudStyle",
           ),
 
         resetAllProgress: () =>
@@ -249,6 +274,7 @@ export const useMetaStore = create<MetaState>()(
               activeThemeId: snapshot.activeThemeId,
               activeMusicPackId: snapshot.activeMusicPackId,
               activeSfxPackId: snapshot.activeSfxPackId,
+              activeHudStyle: snapshot.activeHudStyle,
               updatedAt: snapshot.updatedAt,
             },
             false,
@@ -271,6 +297,7 @@ export const useMetaStore = create<MetaState>()(
           activeThemeId: state.activeThemeId,
           activeMusicPackId: state.activeMusicPackId,
           activeSfxPackId: state.activeSfxPackId,
+          activeHudStyle: state.activeHudStyle,
           updatedAt: state.updatedAt,
         }),
       },

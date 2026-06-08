@@ -29,7 +29,15 @@ import {
   loadThemeAssets,
 } from "../assets/loadThemeAssets";
 import { BackgroundLayer } from "../background/BackgroundLayer";
-import { getActiveTheme, getBackgroundSpec } from "../../state/themeSelectors";
+import {
+  getActiveTheme,
+  getBackgroundSpec,
+  getCursorSpec,
+} from "../../state/themeSelectors";
+import {
+  CURSOR_TEXTURES,
+  resolveCursorValue,
+} from "../../data/themes/cursorTextures";
 import { useSettingsStore } from "../../state/settingsStore";
 import { FpsMonitor, reduceBackgroundSpec } from "../util/performance";
 import type { BackgroundSpec, TargetVisual } from "../../data/themes/types";
@@ -121,6 +129,7 @@ export class Game {
   private autoReduceMotion = false;
   private vfx: VFXSystem | null = null;
   private camera: CameraSystem | null = null;
+  private clickCursorValue: string | null = null;
   private background: BackgroundLayer | null = null;
   private hitFrameUntil = 0;
   private clockMs = 0;
@@ -285,6 +294,17 @@ export class Game {
     app.stage.on("pointerdown", this.handleStagePointerDown);
     app.stage.on("pointermove", this.handleStagePointerMove);
 
+    const cursorSpec = getCursorSpec();
+    const hoverCursor = resolveCursorValue(cursorSpec?.hover, CURSOR_TEXTURES);
+    if (hoverCursor !== undefined) {
+      app.renderer.events.cursorStyles.pointer = hoverCursor;
+    }
+    this.clickCursorValue =
+      resolveCursorValue(cursorSpec?.click, CURSOR_TEXTURES) ?? null;
+    app.stage.on("pointerdown", this.handleCursorPress);
+    app.stage.on("pointerup", this.handleCursorRelease);
+    app.stage.on("pointerupoutside", this.handleCursorRelease);
+
     tweenManager.clear();
     const screen = app.renderer.screen;
     this.cursorX = screen.width / 2;
@@ -389,6 +409,16 @@ export class Game {
   private handleStagePointerMove = (event: FederatedPointerEvent): void => {
     this.cursorX = event.global.x;
     this.cursorY = event.global.y;
+  };
+
+  private handleCursorPress = (): void => {
+    if (this.clickCursorValue === null || this.app === null) return;
+    this.app.canvas.style.cursor = this.clickCursorValue;
+  };
+
+  private handleCursorRelease = (): void => {
+    if (this.clickCursorValue === null || this.app === null) return;
+    this.app.canvas.style.cursor = "";
   };
 
   private handleStagePointerDown = (event: FederatedPointerEvent): void => {
@@ -1385,6 +1415,9 @@ export class Game {
     this.app.renderer.off("resize", this.handleResize);
     this.app.stage.off("pointerdown", this.handleStagePointerDown);
     this.app.stage.off("pointermove", this.handleStagePointerMove);
+    this.app.stage.off("pointerdown", this.handleCursorPress);
+    this.app.stage.off("pointerup", this.handleCursorRelease);
+    this.app.stage.off("pointerupoutside", this.handleCursorRelease);
     tweenManager.clear();
     this.vfx?.clear();
     this.camera?.reset();

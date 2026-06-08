@@ -1,9 +1,9 @@
 import type { SfxName, SoundPack } from "../themes/types";
 import { defaultSoundPack } from "./defaultPack";
 
-export const TEST_SOUND_PACK_ID = "test";
+export const GEMS_SOUND_PACK_ID = "gems";
 
-const urls = import.meta.glob("../../assets/audio/packs/test/*.{mp3,wav,ogg}", {
+const urls = import.meta.glob("../../assets/audio/packs/gems/*.{mp3,wav,ogg}", {
   eager: true,
   query: "?url",
   import: "default",
@@ -45,10 +45,10 @@ if (shieldBreak.length > 0) sfx.hit_shielded_break = shieldBreak;
 
 const music = byName.get("bg1");
 
-export const testSoundPack: SoundPack = {
+export const gemsSoundPack: SoundPack = {
   ...defaultSoundPack,
-  id: TEST_SOUND_PACK_ID,
-  name: "Test",
+  id: GEMS_SOUND_PACK_ID,
+  name: "Gems",
   sfx,
   music: { src: music ?? defaultSoundPack.music.src },
 };

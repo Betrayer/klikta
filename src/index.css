@@ -14,7 +14,15 @@ body,
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+html,
+body {
   background: #1a0033;
+}
+
+#root {
+  background: transparent;
 }
 
 @keyframes klikta-pulse-warn {

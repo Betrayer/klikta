@@ -1,10 +1,8 @@
 import { Box } from '@mantine/core';
 import type { ReactNode } from 'react';
-import { MenuBackgroundLayer } from './MenuBackgroundLayer';
 
 export const MenuShell = ({ children }: { children: ReactNode }) => (
   <Box pos="relative" mih="100vh" style={{ overflow: 'hidden' }}>
-    <MenuBackgroundLayer />
     <Box
       pos="absolute"
       inset={0}

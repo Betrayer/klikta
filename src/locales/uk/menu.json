@@ -1,5 +1,21 @@
 {
+  "backgroundKind": {
+    "animated_gradient": "Анімований градієнт",
+    "bokeh": "Боке",
+    "custom": "Власний",
+    "gradient": "Градієнт",
+    "image": "Зображення",
+    "noise": "Шум",
+    "solid": "Суцільний",
+    "tiled": "Плитка"
+  },
   "customize": "Налаштувати",
+  "hudSection": "HUD",
+  "hudStyle": {
+    "framed": "Рамка",
+    "minimal": "Мінімальний",
+    "ringed": "Кільце"
+  },
   "modeSelect": {
     "noRecord": "Поки що немає записів",
     "title": "ВИБРАТИ РЕЖИМ"
@@ -7,20 +23,5 @@
   "musicSection": "Музика",
   "sfxSection": "Звукові ефекти",
   "skills": "Навички",
-  "themeSection": "Тема",
-  "hudStyle": {
-    "framed": "Рамка",
-    "ringed": "Кільце",
-    "minimal": "Мінімальний"
-  },
-  "backgroundKind": {
-    "solid": "Суцільний",
-    "gradient": "Градієнт",
-    "image": "Зображення",
-    "tiled": "Плитка",
-    "animated_gradient": "Анімований градієнт",
-    "bokeh": "Боке",
-    "noise": "Шум",
-    "custom": "Власний"
-  }
+  "themeSection": "Тема"
 }

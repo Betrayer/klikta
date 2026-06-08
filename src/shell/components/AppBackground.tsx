@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { Box } from '@mantine/core';
 import { Application } from 'pixi.js';
-import { BackgroundLayer } from '../../../game/background/BackgroundLayer';
-import { getBackgroundSpec } from '../../../state/themeSelectors';
-import { useMetaStore } from '../../../state/metaStore';
-import { useSettingsStore } from '../../../state/settingsStore';
+import { BackgroundLayer } from '../../game/background/BackgroundLayer';
+import { getBackgroundSpec } from '../../state/themeSelectors';
+import { useMetaStore } from '../../state/metaStore';
+import { useSettingsStore } from '../../state/settingsStore';
 
-export const MenuBackgroundLayer = () => {
+export const AppBackground = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export const MenuBackgroundLayer = () => {
           });
         },
         (err: unknown) => {
-          console.error('MenuBackgroundLayer init failed', err);
+          console.error('AppBackground init failed', err);
         },
       );
 
@@ -81,7 +81,7 @@ export const MenuBackgroundLayer = () => {
   return (
     <Box
       ref={containerRef}
-      pos="absolute"
+      pos="fixed"
       inset={0}
       style={{ zIndex: 0, pointerEvents: 'none' }}
     />

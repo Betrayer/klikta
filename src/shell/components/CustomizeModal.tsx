@@ -1,6 +1,7 @@
 import { Divider, Modal, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ThemePicker } from './ThemePicker';
+import { HudStylePicker } from './HudStylePicker';
 import { SoundPackPicker } from './SoundPackPicker';
 import { LanguagePicker } from './LanguagePicker';
 
@@ -24,6 +25,8 @@ export const CustomizeModal = ({ opened, onClose }: CustomizeModalProps) => {
         <LanguagePicker />
         <Divider />
         <ThemePicker />
+        <Divider />
+        <HudStylePicker />
         <Divider />
         <SoundPackPicker />
       </Stack>

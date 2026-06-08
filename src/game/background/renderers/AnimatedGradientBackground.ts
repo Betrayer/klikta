@@ -10,6 +10,7 @@ import {
 const DEFAULT_CYCLE_SEC = 8;
 const STRIP_WIDTH = 64;
 const STRIP_HEIGHT = 4096;
+const ANIM_EPOCH = performance.now();
 const BAYER_4X4 = [
   0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5,
 ] as const;
@@ -74,10 +75,11 @@ export class AnimatedGradientBackground implements BackgroundRenderer {
     this.layout(viewport.w, viewport.h);
   }
 
-  update(deltaMs: number): void {
+  update(): void {
     if (this.sprite === null) return;
-    this.sprite.tilePosition.y +=
-      (this.segmentLocalPx / this.stepMs) * deltaMs;
+    const cycleMs = this.stepMs * this.stops.length;
+    const elapsed = (performance.now() - ANIM_EPOCH) % cycleMs;
+    this.sprite.tilePosition.y = (this.segmentLocalPx / this.stepMs) * elapsed;
   }
 
   resize(w: number, h: number): void {

@@ -7,6 +7,7 @@ import {
 } from '../../game/assets/loadThemeAssets';
 import { backgroundCss } from './themePreviewStyle';
 import { ThemePreviewCanvas } from './ThemePreviewCanvas';
+import { ThemeHudPreview } from './ThemeHudPreview';
 
 const PREVIEW_HEIGHT = 120;
 
@@ -31,6 +32,7 @@ export const ThemePreview = ({ theme }: ThemePreviewProps) => {
   return (
     <Box
       style={{
+        position: 'relative',
         width: '100%',
         height: PREVIEW_HEIGHT,
         borderRadius: 8,
@@ -39,6 +41,7 @@ export const ThemePreview = ({ theme }: ThemePreviewProps) => {
       }}
     >
       {ready && <ThemePreviewCanvas theme={theme} height={PREVIEW_HEIGHT} />}
+      <ThemeHudPreview theme={theme} />
     </Box>
   );
 };

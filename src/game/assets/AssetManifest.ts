@@ -1,21 +1,16 @@
-import auroraRegular from "../../assets/themes/aurora/regular.png";
-import auroraGolden from "../../assets/themes/aurora/golden.png";
-import auroraBomb from "../../assets/themes/aurora/bomb.png";
-import auroraMulti from "../../assets/themes/aurora/multi.png";
-import auroraShielded from "../../assets/themes/aurora/shielded.png";
-import auroraSplitter from "../../assets/themes/aurora/splitter.png";
-import auroraSticky from "../../assets/themes/aurora/sticky.png";
-import bloomRegular from "../../assets/themes/bloom/regular.png";
-import bloomGolden from "../../assets/themes/bloom/golden.png";
-import bloomBomb from "../../assets/themes/bloom/bomb.png";
-import bloomMulti3 from "../../assets/themes/bloom/multi_3.png";
-import bloomMulti2 from "../../assets/themes/bloom/multi_2.png";
-import bloomMulti1 from "../../assets/themes/bloom/multi_1.png";
-import bloomShieldUp from "../../assets/themes/bloom/shield_up.png";
-import bloomShieldDown from "../../assets/themes/bloom/shield_down.png";
-import bloomSplitter from "../../assets/themes/bloom/splitter.png";
-import bloomSticky from "../../assets/themes/bloom/sticky.png";
-import { TEST_THEME_TEXTURES } from "../../data/themes/test";
+import gemsRegular from "../../assets/themes/gems/regular.png";
+import gemsGolden from "../../assets/themes/gems/golden.png";
+import gemsBomb from "../../assets/themes/gems/bomb.png";
+import gemsMulti3 from "../../assets/themes/gems/multi_3.png";
+import gemsMulti2 from "../../assets/themes/gems/multi_2.png";
+import gemsMulti1 from "../../assets/themes/gems/multi_1.png";
+import gemsShieldUp from "../../assets/themes/gems/shield_up.png";
+import gemsShieldDown from "../../assets/themes/gems/shield_down.png";
+import gemsSplitter from "../../assets/themes/gems/splitter.png";
+import gemsSticky from "../../assets/themes/gems/sticky.png";
+import gemsFrag1 from "../../assets/themes/gems/splitter_frag1.png";
+import gemsFrag2 from "../../assets/themes/gems/splitter_frag2.png";
+import gemsFrag3 from "../../assets/themes/gems/splitter_frag3.png";
 
 export interface TextureAsset {
   alias: string;
@@ -24,26 +19,21 @@ export interface TextureAsset {
 
 export const THEME_TEXTURES: Record<string, TextureAsset[]> = {
   synthwave: [],
-  aurora: [
-    { alias: "aurora-regular", src: auroraRegular },
-    { alias: "aurora-golden", src: auroraGolden },
-    { alias: "aurora-bomb", src: auroraBomb },
-    { alias: "aurora-multi", src: auroraMulti },
-    { alias: "aurora-shielded", src: auroraShielded },
-    { alias: "aurora-splitter", src: auroraSplitter },
-    { alias: "aurora-sticky", src: auroraSticky },
+  daybreak: [],
+  slate: [],
+  gems: [
+    { alias: "gems-regular", src: gemsRegular },
+    { alias: "gems-golden", src: gemsGolden },
+    { alias: "gems-bomb", src: gemsBomb },
+    { alias: "gems-multi-3", src: gemsMulti3 },
+    { alias: "gems-multi-2", src: gemsMulti2 },
+    { alias: "gems-multi-1", src: gemsMulti1 },
+    { alias: "gems-shield-up", src: gemsShieldUp },
+    { alias: "gems-shield-down", src: gemsShieldDown },
+    { alias: "gems-splitter", src: gemsSplitter },
+    { alias: "gems-sticky", src: gemsSticky },
+    { alias: "gems-frag1", src: gemsFrag1 },
+    { alias: "gems-frag2", src: gemsFrag2 },
+    { alias: "gems-frag3", src: gemsFrag3 },
   ],
-  bloom: [
-    { alias: "bloom-regular", src: bloomRegular },
-    { alias: "bloom-golden", src: bloomGolden },
-    { alias: "bloom-bomb", src: bloomBomb },
-    { alias: "bloom-multi-3", src: bloomMulti3 },
-    { alias: "bloom-multi-2", src: bloomMulti2 },
-    { alias: "bloom-multi-1", src: bloomMulti1 },
-    { alias: "bloom-shield-up", src: bloomShieldUp },
-    { alias: "bloom-shield-down", src: bloomShieldDown },
-    { alias: "bloom-splitter", src: bloomSplitter },
-    { alias: "bloom-sticky", src: bloomSticky },
-  ],
-  test: TEST_THEME_TEXTURES,
 };
