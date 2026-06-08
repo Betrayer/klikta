@@ -1,7 +1,6 @@
 import {
   Badge,
   Box,
-  Button,
   Center,
   Container,
   Divider,
@@ -13,7 +12,11 @@ import {
   Title,
 } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { startNewRun } from '../../game/runLauncher';
+import { useLocalize } from '../../i18n/useLocalize';
+import { MenuButton } from '../components/menu/MenuButton';
+import { MenuShell } from '../components/menu/MenuShell';
 import {
   findPerk,
   findTierForPerk,
@@ -153,6 +156,8 @@ const handleMainMenu = (): void => {
 };
 
 export const PostRunSummary = () => {
+  const { t } = useTranslation();
+  const loc = useLocalize();
   const score = useRunStore((s) => s.score);
   const maxCombo = useRunStore((s) => s.maxCombo);
   const elapsedMs = useRunStore((s) => s.elapsedMs);
@@ -185,7 +190,7 @@ export const PostRunSummary = () => {
   }, [mode, score, elapsedMs, maxCombo, selectedPerks]);
 
   const isNewBest = score > 0 && score > previousBest;
-  const titleText = victory ? 'VICTORY' : 'RUN OVER';
+  const titleText = victory ? t('summary:victory') : t('summary:runOver');
   const titleColor = victory ? 'gold' : 'primary';
   const displayedScore = useCountUp(score, SCORE_COUNTUP_MS, 0);
   const displayedCombo = useCountUp(maxCombo, SCORE_COUNTUP_MS, 100);
@@ -194,19 +199,23 @@ export const PostRunSummary = () => {
     if (breakdown === null) return [];
     const lines: CurrencyLine[] = [];
     if (breakdown.base > 0) {
-      lines.push({ key: 'base', label: 'Score', amount: breakdown.base });
+      lines.push({
+        key: 'base',
+        label: t('summary:lines.base'),
+        amount: breakdown.base,
+      });
     }
     if (breakdown.comboBonus > 0) {
       lines.push({
         key: 'combo',
-        label: 'Combo Bonus',
+        label: t('summary:lines.comboBonus'),
         amount: breakdown.comboBonus,
       });
     }
     if (breakdown.victoryBonus > 0) {
       lines.push({
         key: 'victory',
-        label: 'Victory Bonus',
+        label: t('summary:lines.victoryBonus'),
         amount: breakdown.victoryBonus,
         highlight: true,
       });
@@ -214,28 +223,29 @@ export const PostRunSummary = () => {
     if (breakdown.bombBounty > 0) {
       lines.push({
         key: 'bombBounty',
-        label: 'Bomb Bounty',
+        label: t('summary:lines.bombBounty'),
         amount: breakdown.bombBounty,
       });
     }
     if (breakdown.comboCoin > 0) {
       lines.push({
         key: 'comboCoin',
-        label: 'Combo Coins',
+        label: t('summary:lines.comboCoin'),
         amount: breakdown.comboCoin,
       });
     }
     for (const ach of breakdown.achievements) {
-      const label = ACHIEVEMENT_NAMES[ach.id] ?? ach.id;
       lines.push({
         key: `ach-${ach.id}`,
-        label: `${label}`,
+        label: t(`summary:achievements.${ach.id}`, {
+          defaultValue: ACHIEVEMENT_NAMES[ach.id] ?? ach.id,
+        }),
         amount: ach.amount,
         highlight: true,
       });
     }
     return lines;
-  }, [breakdown]);
+  }, [breakdown, t]);
 
   const activePerks = useMemo(
     () => collectActivePerks(selectedPerks),
@@ -248,7 +258,7 @@ export const PostRunSummary = () => {
   const displayedTotal = useCountUp(totalEarned, CURRENCY_LINE_MS, totalDelay);
 
   return (
-    <Box bg="background" mih="100vh">
+    <MenuShell>
       <Center mih="100vh" p="md">
         <Container size={720} w="100%">
           <Stack gap="lg">
@@ -268,7 +278,7 @@ export const PostRunSummary = () => {
                       '0 0 24px color-mix(in srgb, var(--mantine-color-gold-filled) 60%, transparent)',
                   }}
                 >
-                  NEW BEST
+                  {t('summary:newBest')}
                 </Badge>
               )}
               <RankLine submitting={submitting} result={submitResult} />
@@ -278,7 +288,7 @@ export const PostRunSummary = () => {
               <Stack gap="md">
                 <Group justify="space-between" align="baseline">
                   <Text size="sm" c="dimmed" tt="uppercase" lts={1}>
-                    Score
+                    {t('common:score')}
                   </Text>
                   <Text ff="monospace" fz={36} fw={700} c="highlight">
                     <NumberFormatter
@@ -289,7 +299,7 @@ export const PostRunSummary = () => {
                 </Group>
                 <Group justify="space-between" align="baseline">
                   <Text size="sm" c="dimmed" tt="uppercase" lts={1}>
-                    Max Combo
+                    {t('common:maxCombo')}
                   </Text>
                   <Text ff="monospace" fz="xl" c="accent">
                     {displayedCombo}
@@ -297,7 +307,7 @@ export const PostRunSummary = () => {
                 </Group>
                 <Group justify="space-between" align="baseline">
                   <Text size="sm" c="dimmed" tt="uppercase" lts={1}>
-                    Time
+                    {t('common:time')}
                   </Text>
                   <Text ff="monospace" fz="xl" c="gray.3">
                     {formatDuration(elapsedMs)}
@@ -306,7 +316,7 @@ export const PostRunSummary = () => {
                 {!isNewBest && previousBest > 0 && (
                   <Group justify="space-between" align="baseline">
                     <Text size="xs" c="dimmed" tt="uppercase" lts={1}>
-                      Best
+                      {t('common:best')}
                     </Text>
                     <Text ff="monospace" size="sm" c="dimmed">
                       <NumberFormatter
@@ -322,11 +332,11 @@ export const PostRunSummary = () => {
             <Paper p="lg" bg="surface" withBorder>
               <Stack gap="sm">
                 <Text size="sm" c="dimmed" tt="uppercase" lts={1}>
-                  Currency Earned
+                  {t('summary:currencyEarned')}
                 </Text>
                 {currencyLines.length === 0 && (
                   <Text size="sm" c="dimmed" ta="center" py="sm">
-                    No currency earned this run.
+                    {t('summary:noCurrency')}
                   </Text>
                 )}
                 {currencyLines.map((line, i) => (
@@ -343,7 +353,7 @@ export const PostRunSummary = () => {
                     <Divider color="border" />
                     <Group justify="space-between" align="baseline">
                       <Text size="sm" fw={700} c="gold" tt="uppercase" lts={1}>
-                        Total
+                        {t('summary:total')}
                       </Text>
                       <Text ff="monospace" fz="xl" fw={700} c="gold">
                         +{displayedTotal}
@@ -358,7 +368,7 @@ export const PostRunSummary = () => {
               <Paper p="lg" bg="surface" withBorder>
                 <Stack gap="sm">
                   <Text size="sm" c="dimmed" tt="uppercase" lts={1}>
-                    Active Perks
+                    {t('summary:activePerks')}
                   </Text>
                   <Group gap="xs">
                     {activePerks.map((row) => (
@@ -381,7 +391,7 @@ export const PostRunSummary = () => {
                           />
                         }
                       >
-                        {row.perkName}
+                        {loc('perks', row.perkId, 'name', row.perkName)}
                       </Badge>
                     ))}
                   </Group>
@@ -389,47 +399,24 @@ export const PostRunSummary = () => {
               </Paper>
             )}
 
-            <Group justify="center" gap="sm" wrap="wrap">
-              <Button
-                size="lg"
-                radius="xl"
-                color="primary"
-                onClick={handlePlayAgain}
-              >
-                Play Again
-              </Button>
-              <Button
-                size="md"
-                radius="xl"
-                variant="outline"
-                color="accent"
-                onClick={handleSkillTree}
-              >
-                Skill Tree
-              </Button>
-              <Button
-                size="md"
-                radius="xl"
-                variant="outline"
-                color="gold"
-                onClick={handleLeaderboard}
-              >
-                Leaderboard
-              </Button>
-              <Button
-                size="md"
-                radius="xl"
-                variant="subtle"
-                color="gray"
-                onClick={handleMainMenu}
-              >
-                Main Menu
-              </Button>
-            </Group>
+            <Stack gap="sm" w="100%" maw={320} mx="auto">
+              <MenuButton variant="primary" onClick={handlePlayAgain}>
+                {t('summary:playAgain')}
+              </MenuButton>
+              <MenuButton variant="secondary" onClick={handleSkillTree}>
+                {t('common:skillTree')}
+              </MenuButton>
+              <MenuButton variant="secondary" onClick={handleLeaderboard}>
+                {t('common:leaderboard')}
+              </MenuButton>
+              <MenuButton variant="tertiary" onClick={handleMainMenu}>
+                {t('common:mainMenu')}
+              </MenuButton>
+            </Stack>
           </Stack>
         </Container>
       </Center>
-    </Box>
+    </MenuShell>
   );
 };
 
@@ -466,32 +453,33 @@ interface RankLineProps {
 }
 
 const RankLine = ({ submitting, result }: RankLineProps) => {
+  const { t } = useTranslation();
   if (result === null) {
     if (!submitting) return null;
     return (
       <Text size="sm" c="dimmed">
-        Submitting score...
+        {t('summary:submitting')}
       </Text>
     );
   }
   if (result.status === 'submitted' && result.rank !== null) {
     return (
       <Text size="sm" fw={700} c="gold">
-        Ranked #{result.rank} globally
+        {t('summary:ranked', { rank: result.rank })}
       </Text>
     );
   }
   if (result.status === 'not-best' && result.rank !== null) {
     return (
       <Text size="sm" c="dimmed">
-        Best rank #{result.rank} globally
+        {t('summary:bestRank', { rank: result.rank })}
       </Text>
     );
   }
   if (result.status === 'failed') {
     return (
       <Text size="xs" c="dimmed">
-        Leaderboard unavailable
+        {t('summary:leaderboardUnavailable')}
       </Text>
     );
   }

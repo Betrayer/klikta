@@ -1,0 +1,22 @@
+{
+  "back": "Volver al menú",
+  "best": "Lo mejor",
+  "cancel": "Cancelar",
+  "combo": "Combo",
+  "gate": {
+    "closedBody": "Klikta se encuentra en fase de pruebas privadas. El acceso está limitado a un grupo reducido de usuarios.",
+    "closedTitle": "Examen a puerta cerrada",
+    "enter": "Introducir",
+    "passwordPlaceholder": "Contraseña",
+    "webPrivate": "Prueba privada. Introduce la contraseña para continuar.",
+    "wrongPassword": "Contraseña incorrecta",
+    "yourTelegramId": "Tu ID de Telegram:"
+  },
+  "leaderboard": "Clasificación",
+  "mainMenu": "Menú principal",
+  "maxCombo": "Combo máximo",
+  "play": "Jugar",
+  "score": "Puntuación",
+  "skillTree": "Árbol de habilidades",
+  "time": "Hora"
+}

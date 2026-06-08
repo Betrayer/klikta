@@ -1,0 +1,42 @@
+{
+  "rp-bigtargets": {
+    "description": "+18% de taille de cible.",
+    "name": "Grandes Cibles"
+  },
+  "rp-defuser": {
+    "description": "Les clics-bombes après le premier ne coûtent aucun HP.",
+    "name": "Démineur"
+  },
+  "rp-echo": {
+    "description": "Les coups laissent un fantôme bonus valant du score supplémentaire.",
+    "name": "Écho"
+  },
+  "rp-goldrush": {
+    "description": "Les cibles dorées apparaissent deux fois plus souvent.",
+    "name": "Ruée vers l'Or"
+  },
+  "rp-medic": {
+    "description": "+1 HP max et soigne 1.",
+    "name": "Médecin de Terrain"
+  },
+  "rp-momentum": {
+    "description": "Relève le plafond du multiplicateur de combo à 7.",
+    "name": "Élan"
+  },
+  "rp-overdrive": {
+    "description": "+25% de score pour le reste de la partie.",
+    "name": "Surrégime"
+  },
+  "rp-regen": {
+    "description": "Soigne 1 HP par 1000 de score.",
+    "name": "Régénération"
+  },
+  "rp-slowmo": {
+    "description": "+20% de durée de vie des cibles.",
+    "name": "Ralenti"
+  },
+  "rp-toughskin": {
+    "description": "Brève invulnérabilité après avoir subi des dégâts.",
+    "name": "Peau Dure"
+  }
+}

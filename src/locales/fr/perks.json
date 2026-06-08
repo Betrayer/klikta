@@ -1,0 +1,222 @@
+{
+  "greed": {
+    "description": "Plus de risque, plus de récompense, plus de trucs qui brillent.",
+    "name": "Cupidité"
+  },
+  "greed-t1-high-stakes": {
+    "description": "Cliquer sur une bombe déclenche toujours sa pénalité, mais encaisse d'abord votre combo : 2x le score d'une cible normale à votre multiplicateur actuel. Votre combo est ensuite réinitialisé.",
+    "name": "Gros Enjeux"
+  },
+  "greed-t1-reckless": {
+    "description": "Cliquer sur une bombe ne réinitialise plus votre combo.",
+    "name": "Téméraire"
+  },
+  "greed-t1-score-boost": {
+    "description": "Chaque cible rapporte 25% de score en plus. Se cumule avec Montée de Combo (Cupidité) et Soin par Score (Survie).",
+    "name": "Boost de Score"
+  },
+  "greed-t2-bomb-bounty": {
+    "description": "15% de chance qu'une bombe qui expire lâche 2 de monnaie. Associez à Bombes Phares pour ne jamais rater les butins.",
+    "name": "Prime de Bombe"
+  },
+  "greed-t2-double-drops": {
+    "description": "10% de chance qu'une cible apparaisse en variante à 2× score.",
+    "name": "Double Butin"
+  },
+  "greed-t2-golden-rain": {
+    "description": "Les cibles dorées apparaissent 50% plus souvent.",
+    "name": "Pluie d'Or"
+  },
+  "greed-t3-coin-combo": {
+    "description": "À partir d'un combo de 50, chaque coup rapporte 2 de monnaie.",
+    "name": "Combo de Pièces"
+  },
+  "greed-t3-combo-climb": {
+    "description": "Le multiplicateur de combo plafonne à ×8 au lieu de ×5. Plafond plus haut = plus de paliers ; associez à Bandage (Survie) pour des soins qui montent.",
+    "name": "Montée de Combo"
+  },
+  "greed-t3-speculation": {
+    "description": "Chaque coup doré accorde +10% de score pendant 5 s (cumulable jusqu'à ×3). Tout raté efface le cumul. Associez à Pluie d'Or pour alimenter le cumul plus vite.",
+    "name": "Spéculation"
+  },
+  "greed-t4-frenzy": {
+    "description": "Ultime : 8 secondes où chaque coup fait apparaître 2 cibles bonus à proximité et le score est ×2.",
+    "name": "Frénésie"
+  },
+  "mutation": {
+    "description": "Déforme les règles. Chaque perk a un coût et une récompense - c'est l'habileté qui décide lequel l'emporte.",
+    "name": "Mutation"
+  },
+  "mutation-t1-beacon-bombs": {
+    "description": "Les bombes grossissent jusqu'à 150% au fil de leur vie au lieu de clignoter. Plus visibles, plus encombrantes.",
+    "name": "Bombes Phares"
+  },
+  "mutation-t1-convergent": {
+    "description": "Toutes les cibles dérivent vers le centre de l'écran à ~30 px/s. Amas plus serré - les bombes aussi. Se cumule avec les deux perks Aimant - Convergent + Aimant à Curseur crée un 'puits de gravité' au curseur près du centre.",
+    "name": "Convergent"
+  },
+  "mutation-t1-slow-bloom": {
+    "description": "Les cibles grossissent pendant leur première 0.5 s, puis rétrécissent. Plus grande fenêtre au départ, rythme différent.",
+    "name": "Éclosion Lente"
+  },
+  "mutation-t2-echo": {
+    "description": "Chaque coup laisse un fantôme de 800 ms. Cliquer sur le fantôme ajoute 30% de score bonus sans casser le combo.",
+    "name": "Écho"
+  },
+  "mutation-t2-magnet": {
+    "description": "Tous les objets interactifs dérivent vers votre curseur à ~18 px/s. Les bombes comprises. Se cumule avec Aimant à Curseur (Sauvage) pour une dérive composée vers le curseur.",
+    "name": "Aimant"
+  },
+  "mutation-t2-phase-flash": {
+    "description": "Les cibles s'estompent à 10% d'opacité pendant 150 ms toutes les 700 ms. Cliquer pendant l'invisibilité = ×2 score.",
+    "name": "Flash de Phase"
+  },
+  "mutation-t3-mirror-spawn": {
+    "description": "Chaque cible apparaît avec un jumeau en miroir. Cliquer sur l'un détruit les deux ; seul celui cliqué marque. 10% des jumeaux sont des bombes - lisez bien.",
+    "name": "Apparition Miroir"
+  },
+  "mutation-t3-time-pulse": {
+    "description": "Toutes les 6 s, 2 s de vitesse de jeu ×0.6 ou ×1.6. Le HUD prévient 0.5 s avant.",
+    "name": "Pulsation Temporelle"
+  },
+  "mutation-t3-vortex": {
+    "description": "Toutes les cibles orbitent autour de votre dernier coup réussi à leur distance actuelle. Bombes comprises - votre point de mire devient leur attracteur.",
+    "name": "Vortex"
+  },
+  "mutation-t4-bloom": {
+    "description": "Ultime : 5 s où cibles et bombes grossissent de 100% à 200% au fil de leur vie, le taux d'apparition actuel double, et tous les scores ×2.",
+    "name": "Éclosion"
+  },
+  "reaction": {
+    "description": "Cibles plus faciles, plus de temps, rythme plus calme.",
+    "name": "Réaction"
+  },
+  "reaction-t1-balanced": {
+    "description": "+10% de durée de vie et +8% de taille sur chaque cible.",
+    "name": "Équilibré"
+  },
+  "reaction-t1-bigger-targets": {
+    "description": "Toutes les cibles sont 15% plus grandes.",
+    "name": "Cibles Plus Grandes"
+  },
+  "reaction-t1-steady-hand": {
+    "description": "Chaque cible reste en vie 20% plus longtemps.",
+    "name": "Main Sûre"
+  },
+  "reaction-t2-pre-crack": {
+    "description": "Les cibles blindées perdent leur bouclier même sur un clic raté.",
+    "name": "Pré-Fissure"
+  },
+  "reaction-t2-quick-multi": {
+    "description": "Les cibles multi ne nécessitent que 2 clics au lieu de 3.",
+    "name": "Multi Rapide"
+  },
+  "reaction-t2-steady-bombs": {
+    "description": "Les bombes n'apparaissent que près des bords de l'écran, jamais au centre. S'associe à Concentré (Sauvage) pour un timing ET un placement de bombe prévisibles.",
+    "name": "Bombes Stables"
+  },
+  "reaction-t3-golden-patience": {
+    "description": "Les cibles dorées restent 50% plus longtemps.",
+    "name": "Patience Dorée"
+  },
+  "reaction-t3-last-chance": {
+    "description": "Dans les 0.3 s finales de la vie d'une cible, elle arrête de rétrécir et se fige. S'associe à Main Sûre pour des parties très indulgentes.",
+    "name": "Dernière Chance"
+  },
+  "reaction-t3-slow-spawn": {
+    "description": "L'animation d'apparition est 50% plus lente - vous voyez les cibles plus tôt.",
+    "name": "Apparition Lente"
+  },
+  "reaction-t4-time-slow": {
+    "description": "Ultime : ralentit le monde à mi-vitesse pendant 5 secondes.",
+    "name": "Ralenti Temporel"
+  },
+  "survival": {
+    "description": "Indulgence, secondes chances, plus de HP.",
+    "name": "Survie"
+  },
+  "survival-t1-extra-life": {
+    "description": "Commencez chaque partie avec un HP supplémentaire. Combinez avec Phénix (Survie) pour deux relances par partie.",
+    "name": "Vie Bonus"
+  },
+  "survival-t1-soft-bombs": {
+    "description": "Après le premier clic-bombe par partie, les clics-bombes suivants ne coûtent aucun HP.",
+    "name": "Bombes Douces"
+  },
+  "survival-t1-warm-up": {
+    "description": "Votre première cible ratée à chaque partie est pardonnée.",
+    "name": "Échauffement"
+  },
+  "survival-t2-bandage": {
+    "description": "Atteindre un combo de 50 ou 100 restaure 1 HP. Se marie fort avec Montée de Combo (Cupidité) (plafond ×8 -> plus de paliers).",
+    "name": "Bandage"
+  },
+  "survival-t2-open-field": {
+    "description": "Cliquer sur l'arrière-plan ne casse plus le combo.",
+    "name": "Champ Libre"
+  },
+  "survival-t2-score-heal": {
+    "description": "Tous les 1000 de score restaure 1 HP. Boost de Score (Cupidité) atteint chaque palier de 1000 plus vite.",
+    "name": "Soin par Score"
+  },
+  "survival-t3-mercy": {
+    "description": "1 seconde d'invulnérabilité après avoir subi des dégâts.",
+    "name": "Clémence"
+  },
+  "survival-t3-phoenix": {
+    "description": "Une fois par partie, survivre à un coup fatal vous ramène à 1 HP avec 3 s d'invulnérabilité. Associez à Dernier Rempart (Sauvage) pour des relances à haut risque.",
+    "name": "Phénix"
+  },
+  "survival-t3-shield-forgiveness": {
+    "description": "Une cible blindée ratée casse votre combo mais ne coûte aucun HP.",
+    "name": "Pardon de Bouclier"
+  },
+  "survival-t4-restore": {
+    "description": "Ultime : soigne jusqu'aux HP max. Désactive les perks de régén HP pour le reste de la partie.",
+    "name": "Restauration"
+  },
+  "wild": {
+    "description": "Le chaos récompense les audacieux et punit les paresseux.",
+    "name": "Sauvage"
+  },
+  "wild-t1-concentrated": {
+    "description": "Poids d'apparition des bombes réduit de moitié, mais une cible sur 5 est garantie d'être une bombe. Associez à Bombes Stables (Réaction) pour un placement de bombe entièrement prévisible.",
+    "name": "Concentré"
+  },
+  "wild-t1-lucky-big": {
+    "description": "5% de chance qu'une cible apparaisse à 2× taille et rapporte 2× score.",
+    "name": "Gros Coup de Chance"
+  },
+  "wild-t1-volatile-time": {
+    "description": "La durée de vie de chaque cible varie aléatoirement de ±50%.",
+    "name": "Temps Volatil"
+  },
+  "wild-t2-greedy-spawn": {
+    "description": "20% de chance qu'une cible apparaisse à 60% de taille et rapporte ×2 score. Se cumule bien avec Cibles Plus Grandes (Réaction).",
+    "name": "Apparition Avide"
+  },
+  "wild-t2-rush-pulse": {
+    "description": "Toutes les 30 s, le taux d'apparition triple pendant 5 s. Pendant la poussée, les ratés ne cassent pas votre combo.",
+    "name": "Pulsation de Ruée"
+  },
+  "wild-t2-spark": {
+    "description": "7% de chance qu'un coup enchaîne sur une cible proche, qui enchaîne à son tour - jusqu'à 7 rebonds. Les bombes sont ignorées. Pure cascade de chaos.",
+    "name": "Étincelle"
+  },
+  "wild-t3-cursor-magnet": {
+    "description": "Les cibles dérivent vers votre curseur à ~25 px/s - se cumule avec l'aimant de mutation. Se cumule aussi avec Convergent (Mutation) pour une triple attraction.",
+    "name": "Aimant à Curseur"
+  },
+  "wild-t3-last-stand": {
+    "description": "Tant que vous êtes à 1 HP : ×3 score, mais les durées de vie sont 20% plus courtes. Associez à Phénix (Survie) pour entrer en Dernier Rempart à la demande.",
+    "name": "Dernier Rempart"
+  },
+  "wild-t3-mortgage": {
+    "description": "+50% de score cette partie, mais la monnaie gagnée est réduite de moitié. Cumulez avec Téméraire pour pousser des parties de classement à haut risque.",
+    "name": "Hypothèque"
+  },
+  "wild-t4-chaos-storm": {
+    "description": "Ultime : 4 secondes de taux d'apparition ×4, types de cibles entièrement aléatoires, shader glitch.",
+    "name": "Tempête de Chaos"
+  }
+}

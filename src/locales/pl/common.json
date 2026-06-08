@@ -1,0 +1,22 @@
+{
+  "back": "Powrót do menu",
+  "best": "Najlepsze",
+  "cancel": "Anuluj",
+  "combo": "Zestaw",
+  "gate": {
+    "closedBody": "Klikta znajduje się obecnie w fazie prywatnych testów. Dostęp do niej mają wyłącznie wybrane osoby.",
+    "closedTitle": "Test zamknięty",
+    "enter": "Wpisz",
+    "passwordPlaceholder": "Hasło",
+    "webPrivate": "Test prywatny. Wpisz hasło, aby kontynuować.",
+    "wrongPassword": "Nieprawidłowe hasło",
+    "yourTelegramId": "Twój identyfikator w Telegramie:"
+  },
+  "leaderboard": "Tabela wyników",
+  "mainMenu": "Menu główne",
+  "maxCombo": "Maksymalna kombinacja",
+  "play": "Zagraj",
+  "score": "Wynik",
+  "skillTree": "Drzewko umiejętności",
+  "time": "Czas"
+}

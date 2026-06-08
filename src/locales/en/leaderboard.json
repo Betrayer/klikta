@@ -1,0 +1,7 @@
+{
+  "title": "LEADERBOARD",
+  "player": "Player",
+  "loadError": "Could not load the leaderboard. Check your connection and try again.",
+  "empty": "No scores yet. Be the first to set one.",
+  "you": "you"
+}

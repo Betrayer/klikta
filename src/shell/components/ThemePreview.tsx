@@ -1,46 +1,47 @@
+import { useEffect, useState } from 'react';
+import { Box } from '@mantine/core';
 import type { Theme } from '../../data/themes/types';
-import type { TargetKind } from '../../data/targetConfig';
-import { backgroundCss, targetDotColor } from './themePreviewStyle';
+import {
+  areThemeAssetsLoaded,
+  loadThemeAssets,
+} from '../../game/assets/loadThemeAssets';
+import { backgroundCss } from './themePreviewStyle';
+import { ThemePreviewCanvas } from './ThemePreviewCanvas';
+import { ThemeHudPreview } from './ThemeHudPreview';
 
-const PREVIEW_TARGETS: TargetKind[] = [
-  'regular',
-  'golden',
-  'multi',
-  'shielded',
-  'bomb',
-];
+const PREVIEW_HEIGHT = 120;
 
 interface ThemePreviewProps {
   theme: Theme;
 }
 
-export const ThemePreview = ({ theme }: ThemePreviewProps) => (
-  <div
-    style={{
-      height: 64,
-      borderRadius: 8,
-      background: backgroundCss(theme.background),
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-      overflow: 'hidden',
-    }}
-  >
-    {PREVIEW_TARGETS.map((kind) => {
-      const color = targetDotColor(theme.targets[kind]);
-      return (
-        <span
-          key={kind}
-          style={{
-            width: 16,
-            height: 16,
-            borderRadius: '50%',
-            background: color,
-            boxShadow: `0 0 6px ${color}`,
-          }}
-        />
-      );
-    })}
-  </div>
-);
+export const ThemePreview = ({ theme }: ThemePreviewProps) => {
+  const [ready, setReady] = useState(() => areThemeAssetsLoaded(theme.id));
+
+  useEffect(() => {
+    if (areThemeAssetsLoaded(theme.id)) return;
+    let cancelled = false;
+    void loadThemeAssets(theme.id).then(() => {
+      if (!cancelled) setReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [theme.id]);
+
+  return (
+    <Box
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: PREVIEW_HEIGHT,
+        borderRadius: 8,
+        overflow: 'hidden',
+        background: backgroundCss(theme.background),
+      }}
+    >
+      {ready && <ThemePreviewCanvas theme={theme} height={PREVIEW_HEIGHT} />}
+      <ThemeHudPreview theme={theme} />
+    </Box>
+  );
+};

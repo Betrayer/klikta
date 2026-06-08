@@ -1,14 +1,12 @@
-import { Badge, Card, Group, Stack, Text } from '@mantine/core';
+import { Badge, Card, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { THEMES } from '../../data/themes';
+import { SOUND_PACKS } from '../../data/sound';
 import { useMetaStore } from '../../state/metaStore';
 import { ThemePreview } from './ThemePreview';
 
-const titleCase = (value: string): string =>
-  value.charAt(0).toUpperCase() + value.slice(1);
-
-const bgLabel = (kind: string): string => titleCase(kind.replace(/_/g, ' '));
-
 export const ThemePicker = () => {
+  const { t } = useTranslation();
   const activeThemeId = useMetaStore((s) => s.activeThemeId);
   const setActiveTheme = useMetaStore((s) => s.setActiveTheme);
   const setActiveMusicPack = useMetaStore((s) => s.setActiveMusicPack);
@@ -25,11 +23,12 @@ export const ThemePicker = () => {
   return (
     <Stack gap={8}>
       <Text size="xs" c="dimmed" tt="uppercase" lts={2}>
-        Theme
+        {t('menu:themeSection')}
       </Text>
-      <Group gap="sm">
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
         {Object.values(THEMES).map((theme) => {
           const active = theme.id === activeThemeId;
+          const musicPackName = SOUND_PACKS[theme.defaultSoundPack]?.name;
           return (
             <Card
               key={theme.id}
@@ -39,7 +38,6 @@ export const ThemePicker = () => {
               onClick={() => apply(theme.id)}
               style={{
                 cursor: 'pointer',
-                width: 180,
                 background: theme.ui.surface,
                 borderColor: active ? theme.ui.primary : theme.ui.border,
                 borderWidth: active ? 2 : 1,
@@ -57,17 +55,19 @@ export const ThemePicker = () => {
                 </Text>
                 <Group gap={6}>
                   <Badge size="xs" variant="light" color="gray">
-                    {titleCase(theme.hud.style)}
+                    {t(`menu:backgroundKind.${theme.background.kind}`)}
                   </Badge>
-                  <Badge size="xs" variant="light" color="gray">
-                    {bgLabel(theme.background.kind)}
-                  </Badge>
+                  {musicPackName !== undefined && (
+                    <Badge size="xs" variant="light" color="gray">
+                      {musicPackName}
+                    </Badge>
+                  )}
                 </Group>
               </Stack>
             </Card>
           );
         })}
-      </Group>
+      </SimpleGrid>
     </Stack>
   );
 };

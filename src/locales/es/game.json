@@ -1,0 +1,36 @@
+{
+  "hud": {
+    "active": "ACTIVO",
+    "timePulse": "⏱ IMPULSO DE TIEMPO",
+    "wave": "WAVE {{current}} / {{total}}"
+  },
+  "perk": {
+    "active": "Activo",
+    "cost": "Precio{{cost}}",
+    "deselect": "Deseleccionar (reembolso)",
+    "deselectTierFirst": "Desmarca primero el nivel «{{tier}}».",
+    "locked": "Cerrado: necesito puntos de «{{points}}» en «{{branch}}».",
+    "needMore": "Necesito {{amount}} más.",
+    "select": "Seleccionar",
+    "swapHint": "(reembolso: {{refund}}; cuenta de {{net}})",
+    "tier": "Nivel {{tier}}"
+  },
+  "skillTree": {
+    "bind": "Encuadernar",
+    "bindBody": "¿Asignar «{{name}}» como tu habilidad definitiva activa para conseguir monedas de «{{cost}}»?",
+    "bindTitle": "¿Bind definitivo?",
+    "hint": "Toca una ventaja para verla: arrastra para desplazarte, desplaza el dedo o pellizca para ampliar.",
+    "resetBody": "Desactiva todas las ventajas de «{{count}}» y devuelve la moneda de «{{refund}}». Puedes volver a activarlas en cualquier momento.",
+    "resetPerks": "Restablecer ventajas",
+    "resetTitle": "¿Restablecer todas las ventajas?",
+    "resetView": "Restablecer vista",
+    "title": "ÁRBOL DE HABILIDADES",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar la imagen",
+    "hubPerks": "{{selected}}/{{total}} ventajas"
+  },
+  "waveBreak": {
+    "chooseBoon": "Elige una ventaja: Wave {{wave}} / {{total}} siguiente",
+    "cleared": "ONDA DESPEJADA"
+  }
+}

@@ -23,7 +23,10 @@ export const getActiveMusicPack = (): SoundPack =>
 export const getActiveSfxPack = (): SoundPack =>
   SOUND_PACKS[useMetaStore.getState().activeSfxPackId] ?? DEFAULT_SOUND_PACK;
 
-export const getHudSpec = (): HudSpec => getActiveTheme().hud;
+export const getHudSpec = (): HudSpec => ({
+  ...getActiveTheme().hud,
+  style: useMetaStore.getState().activeHudStyle,
+});
 
 export const getBackgroundSpec = (): BackgroundSpec =>
   getActiveTheme().background;

@@ -1,0 +1,27 @@
+{
+  "backgroundKind": {
+    "animated_gradient": "Dégradé animé",
+    "bokeh": "Bokeh",
+    "custom": "Personnalisé",
+    "gradient": "Dégradé",
+    "image": "Image",
+    "noise": "Bruit",
+    "solid": "Uni",
+    "tiled": "Mosaïque"
+  },
+  "customize": "Personnaliser",
+  "hudSection": "HUD",
+  "hudStyle": {
+    "framed": "Encadré",
+    "minimal": "Minimal",
+    "ringed": "Anneau"
+  },
+  "modeSelect": {
+    "noRecord": "Aucune entrée pour l'instant",
+    "title": "SÉLECTIONNER LE MODE"
+  },
+  "musicSection": "Musique",
+  "sfxSection": "Effets spéciaux",
+  "skills": "Compétences",
+  "themeSection": "Thème"
+}

@@ -13,10 +13,20 @@ import type { SoundPack } from "../../data/themes/types";
 
 const clamp01 = (v: number): number => Math.min(Math.max(v, 0), 1);
 
-const formatOf = (src: string): string[] | undefined => {
+const extOf = (src: string): string | undefined => {
   const clean = src.split("?")[0] ?? src;
   const ext = clean.split(".").pop();
-  return ext !== undefined && ext.length > 0 ? [ext] : undefined;
+  return ext !== undefined && ext.length > 0 ? ext : undefined;
+};
+
+const formatsOf = (srcs: string[]): string[] | undefined => {
+  const exts: string[] = [];
+  for (const src of srcs) {
+    const ext = extOf(src);
+    if (ext === undefined) return undefined;
+    exts.push(ext);
+  }
+  return exts;
 };
 
 const FILTER_MIN_HZ = 500;
@@ -259,10 +269,12 @@ class AudioSystem {
 
   private buildSfx(pack: SoundPack): Map<string, Howl[]> {
     const map = new Map<string, Howl[]>();
-    for (const [name, srcs] of Object.entries(pack.sfx)) {
+    for (const [name, variants] of Object.entries(pack.sfx)) {
       map.set(
         name,
-        srcs.map((src) => new Howl({ src: [src], format: formatOf(src) })),
+        variants
+          .filter((srcs) => srcs.length > 0)
+          .map((srcs) => new Howl({ src: srcs, format: formatsOf(srcs) })),
       );
     }
     return map;

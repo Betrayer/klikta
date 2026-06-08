@@ -1,0 +1,222 @@
+{
+  "greed": {
+    "description": "Mehr Risiko, mehr Belohnung, mehr glänzende Dinge.",
+    "name": "Gier"
+  },
+  "greed-t1-high-stakes": {
+    "description": "Ein Bomben-Klick löst weiterhin seine Strafe aus, kassiert aber zuerst dein Combo: 2x den Score eines normalen Ziels bei deinem aktuellen Multiplikator. Dein Combo wird danach zurückgesetzt.",
+    "name": "Hoher Einsatz"
+  },
+  "greed-t1-reckless": {
+    "description": "Ein Bomben-Klick setzt dein Combo nicht mehr zurück.",
+    "name": "Leichtsinn"
+  },
+  "greed-t1-score-boost": {
+    "description": "Jedes Ziel gibt 25% mehr Score. Verstärkt sich mit Giers Combo-Aufstieg und Überlebens Score-Heilung.",
+    "name": "Score-Boost"
+  },
+  "greed-t2-bomb-bounty": {
+    "description": "15% Chance, dass eine ablaufende Bombe 2 Währung fallen lässt. Kombiniere mit Leuchtbomben, um die Drops nie zu verpassen.",
+    "name": "Bomben-Beute"
+  },
+  "greed-t2-double-drops": {
+    "description": "10% Chance, dass ein Ziel als 2×-Score-Variante erscheint.",
+    "name": "Doppelte Drops"
+  },
+  "greed-t2-golden-rain": {
+    "description": "Goldene Ziele erscheinen 50% häufiger.",
+    "name": "Goldregen"
+  },
+  "greed-t3-coin-combo": {
+    "description": "Ab Combo 50+ gibt jeder Treffer 2 Währung.",
+    "name": "Münz-Combo"
+  },
+  "greed-t3-combo-climb": {
+    "description": "Combo-Multiplikator deckelt bei ×8 statt ×5. Höherer Deckel = mehr Meilensteine; kombiniere mit Überlebens Verband für skalierende Heilung.",
+    "name": "Combo-Aufstieg"
+  },
+  "greed-t3-speculation": {
+    "description": "Jeder goldene Treffer gibt 5 s lang +10% Score (stapelt bis ×3). Jeder Fehler löscht den Stapel. Kombiniere mit Goldregen, um den Stapel schneller zu füttern.",
+    "name": "Spekulation"
+  },
+  "greed-t4-frenzy": {
+    "description": "Ultimate: 8 Sekunden, in denen jeder Treffer 2 Extras in der Nähe spawnt und der Score ×2 ist.",
+    "name": "Rausch"
+  },
+  "mutation": {
+    "description": "Verbieg die Regeln. Jeder Perk hat Kosten und Belohnung - dein Können entscheidet, was überwiegt.",
+    "name": "Mutation"
+  },
+  "mutation-t1-beacon-bombs": {
+    "description": "Bomben wachsen über ihre Lebensdauer auf 150%, statt zu blinken. Sichtbarer, aber mehr Platz.",
+    "name": "Leuchtbomben"
+  },
+  "mutation-t1-convergent": {
+    "description": "Alle Ziele driften mit ~30 px/s zur Bildschirmmitte. Engerer Cluster - Bomben auch. Stapelt sich mit beiden Magnet-Perks - Konvergent + Cursor-Magnet erzeugt einen 'Gravitationssog' am Cursor nahe der Mitte.",
+    "name": "Konvergent"
+  },
+  "mutation-t1-slow-bloom": {
+    "description": "Ziele wachsen in den ersten 0.5 s, dann schrumpfen sie. Größeres Zeitfenster zu Beginn, anderer Rhythmus.",
+    "name": "Langsame Blüte"
+  },
+  "mutation-t2-echo": {
+    "description": "Jeder Treffer hinterlässt ein 800 ms langes Phantom. Ein Klick auf das Phantom gibt 30% Bonus-Score, ohne das Combo zu brechen.",
+    "name": "Echo"
+  },
+  "mutation-t2-magnet": {
+    "description": "Alle interaktiven Objekte driften mit ~18 px/s zu deinem Cursor. Bomben inklusive. Stapelt sich mit Wilds Cursor-Magnet für verstärktes Driften zum Cursor.",
+    "name": "Magnet"
+  },
+  "mutation-t2-phase-flash": {
+    "description": "Ziele verblassen alle 700 ms für 150 ms auf 10% Alpha. Ein Klick im unsichtbaren Zustand = ×2 Score.",
+    "name": "Phasen-Blitz"
+  },
+  "mutation-t3-mirror-spawn": {
+    "description": "Jedes Ziel erscheint mit einem gespiegelten Zwilling. Ein Klick auf eines zerstört beide; Score gibt es nur für das geklickte. 10% der Zwillinge sind Bomben - lies genau.",
+    "name": "Spiegel-Spawn"
+  },
+  "mutation-t3-time-pulse": {
+    "description": "Alle 6 s gibt es 2 s lang entweder ×0.6 oder ×1.6 Spielgeschwindigkeit. Das HUD warnt 0.5 s vorher.",
+    "name": "Zeitpuls"
+  },
+  "mutation-t3-vortex": {
+    "description": "Alle Ziele umkreisen deine letzte erfolgreiche Trefferposition in ihrer aktuellen Distanz. Bomben inklusive - dein Fokus wird zu ihrem Anziehungspunkt.",
+    "name": "Wirbel"
+  },
+  "mutation-t4-bloom": {
+    "description": "Ultimate: 5 s, in denen Ziele und Bomben über ihre Lebensdauer von 100% auf 200% wachsen, die aktuelle Spawn-Rate sich verdoppelt und alle Scores ×2 sind.",
+    "name": "Blüte"
+  },
+  "reaction": {
+    "description": "Leichtere Ziele, mehr Zeit, ruhigerer Rhythmus.",
+    "name": "Reaktion"
+  },
+  "reaction-t1-balanced": {
+    "description": "+10% Lebensdauer und +8% Größe auf jedem Ziel.",
+    "name": "Ausgewogen"
+  },
+  "reaction-t1-bigger-targets": {
+    "description": "Alle Ziele sind 15% größer.",
+    "name": "Größere Ziele"
+  },
+  "reaction-t1-steady-hand": {
+    "description": "Jedes Ziel bleibt 20% länger am Leben.",
+    "name": "Ruhige Hand"
+  },
+  "reaction-t2-pre-crack": {
+    "description": "Geschützte Ziele verlieren ihren Schild auch bei einem Fehlklick.",
+    "name": "Vorab-Knack"
+  },
+  "reaction-t2-quick-multi": {
+    "description": "Multi-Ziele brauchen nur 2 Klicks statt 3.",
+    "name": "Schnell-Multi"
+  },
+  "reaction-t2-steady-bombs": {
+    "description": "Bomben spawnen nur am Bildschirmrand, nie in der Mitte. Passt zu Wilds Konzentriert für vorhersehbares Bomben-Timing UND -Platzierung.",
+    "name": "Stabile Bomben"
+  },
+  "reaction-t3-golden-patience": {
+    "description": "Goldene Ziele bleiben 50% länger.",
+    "name": "Goldene Geduld"
+  },
+  "reaction-t3-last-chance": {
+    "description": "In den letzten 0.3 s der Lebensdauer eines Ziels hört es auf zu schrumpfen und hält. Passt zu Ruhige Hand für sehr nachsichtige Runs.",
+    "name": "Letzte Chance"
+  },
+  "reaction-t3-slow-spawn": {
+    "description": "Die Spawn-Animation ist 50% langsamer - du siehst Ziele früher.",
+    "name": "Langsamer Spawn"
+  },
+  "reaction-t4-time-slow": {
+    "description": "Ultimate: verlangsame die Welt für 5 Sekunden auf halbe Geschwindigkeit.",
+    "name": "Zeitlupe"
+  },
+  "survival": {
+    "description": "Nachsicht, zweite Chancen, mehr HP.",
+    "name": "Überleben"
+  },
+  "survival-t1-extra-life": {
+    "description": "Starte jeden Run mit einem zusätzlichen HP. Kombiniere mit Überlebens Phönix für zwei Comebacks pro Run.",
+    "name": "Extra-Leben"
+  },
+  "survival-t1-soft-bombs": {
+    "description": "Nach dem ersten Bomben-Klick pro Run kosten weitere Bomben-Klicks kein HP.",
+    "name": "Sanfte Bomben"
+  },
+  "survival-t1-warm-up": {
+    "description": "Dein erstes verpasstes Ziel pro Run wird verziehen.",
+    "name": "Aufwärmen"
+  },
+  "survival-t2-bandage": {
+    "description": "Combo 50 oder 100 zu erreichen stellt 1 HP wieder her. Passt stark zu Giers Combo-Aufstieg (×8-Deckel -> mehr Meilensteine).",
+    "name": "Verband"
+  },
+  "survival-t2-open-field": {
+    "description": "Ein Klick auf den Hintergrund bricht das Combo nicht mehr.",
+    "name": "Freies Feld"
+  },
+  "survival-t2-score-heal": {
+    "description": "Alle 1000 Score stellt 1 HP wieder her. Giers Score-Boost erreicht jede 1000er-Score-Schwelle schneller.",
+    "name": "Score-Heilung"
+  },
+  "survival-t3-mercy": {
+    "description": "1 Sekunde Unverwundbarkeit nach erlittenem Schaden.",
+    "name": "Gnade"
+  },
+  "survival-t3-phoenix": {
+    "description": "Einmal pro Run überlebst du einen tödlichen Treffer und wirst auf 1 HP mit 3 s Unverwundbarkeit wiederhergestellt. Kombiniere mit Wilds Letztes Gefecht für riskante Comeback-Plays.",
+    "name": "Phönix"
+  },
+  "survival-t3-shield-forgiveness": {
+    "description": "Ein verpasstes geschütztes Ziel bricht dein Combo, kostet aber kein HP.",
+    "name": "Schild-Nachsicht"
+  },
+  "survival-t4-restore": {
+    "description": "Ultimate: heile auf volle HP. Deaktiviert HP-Regen-Perks für den Rest des Runs.",
+    "name": "Wiederherstellung"
+  },
+  "wild": {
+    "description": "Chaos belohnt die Mutigen und bestraft die Faulen.",
+    "name": "Wild"
+  },
+  "wild-t1-concentrated": {
+    "description": "Bomben-Spawn-Gewicht halbiert, aber jedes 5. Ziel ist garantiert eine Bombe. Kombiniere mit Reaktions Stabile Bomben für völlig vorhersehbare Bomben-Platzierung.",
+    "name": "Konzentriert"
+  },
+  "wild-t1-lucky-big": {
+    "description": "5% Chance, dass ein Ziel in 2×-Größe erscheint und 2× Score gibt.",
+    "name": "Glücksgriff"
+  },
+  "wild-t1-volatile-time": {
+    "description": "Die Lebensdauer jedes Ziels schwankt zufällig um ±50%.",
+    "name": "Volatile Zeit"
+  },
+  "wild-t2-greedy-spawn": {
+    "description": "20% Chance, dass ein Ziel in 60% Größe erscheint und ×2 Score gibt. Stapelt sich gut mit Reaktions Größere Ziele.",
+    "name": "Gieriger Spawn"
+  },
+  "wild-t2-rush-pulse": {
+    "description": "Alle 30 s verdreifacht sich die Spawn-Rate für 5 s. Während des Sturms brechen Fehler dein Combo nicht.",
+    "name": "Sturm-Puls"
+  },
+  "wild-t2-spark": {
+    "description": "7% Chance, dass ein Treffer auf ein nahes Ziel überspringt, das erneut überspringt - bis zu 7 Sprünge. Bomben werden übersprungen. Reine Chaos-Kaskade.",
+    "name": "Funke"
+  },
+  "wild-t3-cursor-magnet": {
+    "description": "Ziele driften mit ~25 px/s zu deinem Cursor - stapelt sich mit Mutations-Magnet. Stapelt sich auch mit Mutations Konvergent für dreifachen Sog.",
+    "name": "Cursor-Magnet"
+  },
+  "wild-t3-last-stand": {
+    "description": "Bei 1 HP: ×3 Score, aber Lebensdauern sind 20% kürzer. Kombiniere mit Überlebens Phönix, um Letztes Gefecht nach Wunsch auszulösen.",
+    "name": "Letztes Gefecht"
+  },
+  "wild-t3-mortgage": {
+    "description": "+50% Score in diesem Run, aber verdiente Währung wird halbiert. Kombiniere mit Leichtsinn für riskante Bestenlisten-Runs.",
+    "name": "Verpfändung"
+  },
+  "wild-t4-chaos-storm": {
+    "description": "Ultimate: 4 Sekunden ×4 Spawn-Rate, völlig zufällige Zieltypen, Glitch-Shader.",
+    "name": "Chaossturm"
+  }
+}

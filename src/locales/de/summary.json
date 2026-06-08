@@ -1,0 +1,29 @@
+{
+  "achievements": {
+    "combo-100": "Kombipaket 100",
+    "combo-25": "Kombi 25",
+    "combo-50": "Kombipaket 50",
+    "first-run": "Erstaufführung",
+    "first-skill": "Erste Fähigkeit freigeschaltet",
+    "no-bomb-clicks": "Keine Bomben-Klicks"
+  },
+  "activePerks": "Aktive Vorteile",
+  "bestRank": "Beste Platzierung weltweit: Platz {{rank}}",
+  "currencyEarned": "Verdiente Währung",
+  "leaderboardUnavailable": "Rangliste nicht verfügbar",
+  "lines": {
+    "base": "Ergebnis",
+    "bombBounty": "Bombenprämie",
+    "comboBonus": "Kombibonus",
+    "comboCoin": "Kombi-Münzen",
+    "victoryBonus": "Siegprämie"
+  },
+  "newBest": "NEUES TOP",
+  "noCurrency": "Bei diesem Durchlauf wurde keine Währung verdient.",
+  "playAgain": "Noch einmal abspielen",
+  "ranked": "Platz {{rank}} weltweit",
+  "runOver": "ÜBERFAHREN",
+  "submitting": "Ergebnis wird übermittelt...",
+  "total": "Insgesamt",
+  "victory": "SIEG"
+}

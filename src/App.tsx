@@ -10,10 +10,13 @@ import { LeaderboardView } from './shell/pages/LeaderboardView';
 import { ClosedTest } from './shell/pages/ClosedTest';
 import { WebGate } from './shell/pages/WebGate';
 import { ScreenTransition } from './shell/components/ScreenTransition';
+import { AppBackground } from './shell/components/AppBackground';
+import { Box } from '@mantine/core';
 import { useRunStore } from './state/runStore';
 import { useAppStore } from './state/appStore';
 import { getTelegramSession, isTelegramAccessAllowed } from './services/telegram';
 import { isWebGateEnabled, isWebUnlocked } from './services/webAccess';
+import { useTelegramRuntime } from './shell/useTelegramRuntime';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -21,6 +24,7 @@ export const App = () => {
   const status = useRunStore((s) => s.status);
   const screen = useAppStore((s) => s.screen);
   const [webUnlocked, setWebUnlocked] = useState(isWebUnlocked);
+  useTelegramRuntime();
 
   if (!isTelegramAccessAllowed()) return <ClosedTest />;
 
@@ -59,5 +63,12 @@ export const App = () => {
     content = <MainMenu />;
   }
 
-  return <ScreenTransition screenKey={screenKey}>{content}</ScreenTransition>;
+  return (
+    <>
+      <AppBackground />
+      <Box pos="relative" style={{ zIndex: 1, minHeight: '100vh' }}>
+        <ScreenTransition screenKey={screenKey}>{content}</ScreenTransition>
+      </Box>
+    </>
+  );
 };

@@ -35,12 +35,14 @@ export interface TargetVisual {
   texture?: string;
   tint?: number;
   states?: TargetStateTextures;
+  fragmentTextures?: string[];
 }
 
 export type BackgroundKind =
   | "solid"
   | "gradient"
   | "image"
+  | "tiled"
   | "animated_gradient"
   | "bokeh"
   | "noise"
@@ -52,6 +54,7 @@ export interface BackgroundSpec {
   gradientFrom?: number;
   gradientTo?: number;
   texture?: string;
+  tileScale?: number;
   animationSpeedSec?: number;
   colorStops?: number[];
   bokehColor?: number;
@@ -193,7 +196,7 @@ export interface SoundPack {
   id: string;
   name: string;
   music: SoundPackMusic;
-  sfx: Record<SfxName, string[]>;
+  sfx: Record<SfxName, string[][]>;
   gain?: number;
   rate?: number;
 }

@@ -70,7 +70,7 @@ export const TARGET_CONFIG: Record<TargetKind, TargetTypeConfig> = {
     color: 0xfb5607,
     shrinks: true,
     clicksRequired: 1,
-    spawnWeight: 0,
+    spawnWeight: 5,
   },
   sticky: {
     score: 15,

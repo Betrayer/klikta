@@ -6,17 +6,30 @@ import {
   Modal,
   Slider,
   Stack,
+  Switch,
   Text,
 } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { useRunStore } from '../../state/runStore';
 import { useSettingsStore } from '../../state/settingsStore';
 import { useMetaStore } from '../../state/metaStore';
 import { useCampaignStore } from '../../state/campaignStore';
 import { audioSystem } from '../../game/systems/AudioSystem';
+import { isTouchDevice } from '../../game/util/device';
+import {
+  enterFullscreen,
+  exitFullscreen,
+  isFullscreenActive,
+  isFullscreenSupported,
+  isTelegramEnvironment,
+} from '../../services/telegram';
+import { LanguagePicker } from './LanguagePicker';
+import { MenuButton } from './menu/MenuButton';
 
 const toPercent = (v: number): number => Math.round(v * 100);
 
 export const SettingsOverlay = () => {
+  const { t } = useTranslation();
   const paused = useRunStore((s) => s.paused);
   const setPaused = useRunStore((s) => s.setPaused);
   const waveBreakActive = useCampaignStore((s) => s.breakActive);
@@ -27,8 +40,23 @@ export const SettingsOverlay = () => {
   const setMasterVolume = useSettingsStore((s) => s.setMasterVolume);
   const setSFXVolume = useSettingsStore((s) => s.setSFXVolume);
   const setMusicVolume = useSettingsStore((s) => s.setMusicVolume);
+  const hapticsEnabled = useSettingsStore((s) => s.hapticsEnabled);
+  const setHapticsEnabled = useSettingsStore((s) => s.setHapticsEnabled);
+  const useTelegramTheme = useSettingsStore((s) => s.useTelegramTheme);
+  const setUseTelegramTheme = useSettingsStore((s) => s.setUseTelegramTheme);
+  const reduceMotion = useSettingsStore((s) => s.reduceMotion);
+  const setReduceMotion = useSettingsStore((s) => s.setReduceMotion);
 
   const [confirmReset, setConfirmReset] = useState(false);
+  const inTelegram = isTelegramEnvironment();
+  const fullscreenAvailable = inTelegram && isFullscreenSupported();
+  const [fullscreen, setFullscreen] = useState(isFullscreenActive);
+
+  const toggleFullscreen = (on: boolean) => {
+    if (on) enterFullscreen();
+    else exitFullscreen();
+    setFullscreen(on);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -59,8 +87,8 @@ export const SettingsOverlay = () => {
         <ActionIcon
           variant="subtle"
           color="gray"
-          size="lg"
-          aria-label="Settings"
+          size={isTouchDevice() ? 'xl' : 'lg'}
+          aria-label={t('settings:title')}
           pos="fixed"
           bottom={8}
           left={12}
@@ -74,14 +102,16 @@ export const SettingsOverlay = () => {
       <Modal
         opened={paused}
         onClose={() => setPaused(false)}
-        title="Settings"
+        title={t('settings:title')}
         centered
         closeOnEscape={false}
         overlayProps={{ backgroundOpacity: 0.6, blur: 2 }}
       >
         <Stack gap="lg">
           <Stack gap={4}>
-            <Text size="sm">Master - {toPercent(masterVolume)}%</Text>
+            <Text size="sm">
+              {t('settings:master')} - {toPercent(masterVolume)}%
+            </Text>
             <Slider
               value={toPercent(masterVolume)}
               onChange={(v) => setMasterVolume(v / 100)}
@@ -91,7 +121,9 @@ export const SettingsOverlay = () => {
           </Stack>
 
           <Stack gap={4}>
-            <Text size="sm">SFX - {toPercent(sfxVolume)}%</Text>
+            <Text size="sm">
+              {t('settings:sfx')} - {toPercent(sfxVolume)}%
+            </Text>
             <Slider
               value={toPercent(sfxVolume)}
               onChange={(v) => setSFXVolume(v / 100)}
@@ -101,7 +133,9 @@ export const SettingsOverlay = () => {
           </Stack>
 
           <Stack gap={4}>
-            <Text size="sm">Music - {toPercent(musicVolume)}%</Text>
+            <Text size="sm">
+              {t('settings:music')} - {toPercent(musicVolume)}%
+            </Text>
             <Slider
               value={toPercent(musicVolume)}
               onChange={(v) => setMusicVolume(v / 100)}
@@ -110,41 +144,71 @@ export const SettingsOverlay = () => {
             />
           </Stack>
 
-          <Button fullWidth color="primary" onClick={() => setPaused(false)}>
-            Resume
-          </Button>
+          <LanguagePicker />
+
+          <Switch
+            checked={reduceMotion}
+            onChange={(e) => setReduceMotion(e.currentTarget.checked)}
+            label={t('settings:reduceMotion')}
+          />
+
+          {inTelegram && (
+            <Switch
+              checked={hapticsEnabled}
+              onChange={(e) => setHapticsEnabled(e.currentTarget.checked)}
+              label={t('settings:haptics')}
+            />
+          )}
+
+          {inTelegram && (
+            <Switch
+              checked={useTelegramTheme}
+              onChange={(e) => setUseTelegramTheme(e.currentTarget.checked)}
+              label={t('settings:useTelegramTheme')}
+            />
+          )}
+
+          {fullscreenAvailable && (
+            <Switch
+              checked={fullscreen}
+              onChange={(e) => toggleFullscreen(e.currentTarget.checked)}
+              label={t('settings:fullscreen')}
+            />
+          )}
+
+          <MenuButton variant="primary" onClick={() => setPaused(false)}>
+            {t('settings:resume')}
+          </MenuButton>
           <Button
             fullWidth
             variant="outline"
             color="red"
             onClick={() => setConfirmReset(true)}
           >
-            Reset Progress
+            {t('settings:resetProgress')}
           </Button>
-          <Button fullWidth variant="default" onClick={quitToMenu}>
-            Quit to Menu
-          </Button>
+          <MenuButton variant="secondary" onClick={quitToMenu}>
+            {t('settings:quitToMenu')}
+          </MenuButton>
         </Stack>
       </Modal>
 
       <Modal
         opened={confirmReset}
         onClose={() => setConfirmReset(false)}
-        title="Delete all progress?"
+        title={t('settings:deleteTitle')}
         centered
         zIndex={1100}
         overlayProps={{ backgroundOpacity: 0.7 }}
       >
         <Stack>
-          <Text size="sm">
-            This erases currency, perks, achievements, and settings. Cannot be undone.
-          </Text>
+          <Text size="sm">{t('settings:deleteBody')}</Text>
           <Group justify="flex-end">
             <Button variant="default" onClick={() => setConfirmReset(false)}>
-              Cancel
+              {t('common:cancel')}
             </Button>
             <Button color="red" onClick={performReset}>
-              Delete everything
+              {t('settings:deleteConfirm')}
             </Button>
           </Group>
         </Stack>

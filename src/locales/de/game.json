@@ -1,0 +1,36 @@
+{
+  "hud": {
+    "active": "AKTIV",
+    "timePulse": "⏱ ZEITIMPULS",
+    "wave": "WAVE {{current}} / {{total}}"
+  },
+  "perk": {
+    "active": "Aktiv",
+    "cost": "Kosten-{{cost}}",
+    "deselect": "Abmelden (Rückerstattung)",
+    "deselectTierFirst": "Deaktivieren Sie zunächst „Tier-{{tier}}“.",
+    "locked": "Gesperrt – benötige {{points}} Punkte in {{branch}}.",
+    "needMore": "Benötigst du „{{amount}}“ noch?",
+    "select": "Auswählen",
+    "swapHint": "(Rückerstattungs-{{refund}}, Netto-{{net}})",
+    "tier": "Stufe {{tier}}"
+  },
+  "skillTree": {
+    "bind": "Binden",
+    "bindBody": "„{{name}}“ als aktive ultimative Fähigkeit für „{{cost}}“-Währung festlegen?",
+    "bindTitle": "Bind Ultimate?",
+    "hint": "Tippe auf einen Vorteil, um ihn anzusehen – ziehe, um die Ansicht zu verschieben, scrolle oder zoome mit zwei Fingern.",
+    "resetBody": "Deaktiviert alle „{{count}}“-Vorteile und erstattet die „{{refund}}“-Währung zurück. Du kannst sie jederzeit wieder aktivieren.",
+    "resetPerks": "Vorteile zurücksetzen",
+    "resetTitle": "Alle Vorteile zurücksetzen?",
+    "resetView": "Ansicht zurücksetzen",
+    "title": "FÄHIGKEITSBÄUME",
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Vergrößern",
+    "hubPerks": "{{selected}}/{{total}} Vorteile"
+  },
+  "waveBreak": {
+    "chooseBoon": "Wähle einen Segen – Wave {{wave}} / {{total}} Weiter",
+    "cleared": "WELLE ÜBERWUNDEN"
+  }
+}

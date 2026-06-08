@@ -1,0 +1,42 @@
+{
+  "rp-bigtargets": {
+    "description": "+18% de tamaño de objetivo.",
+    "name": "Objetivos Grandes"
+  },
+  "rp-defuser": {
+    "description": "Los clics en bomba tras el primero no cuestan HP.",
+    "name": "Desactivador"
+  },
+  "rp-echo": {
+    "description": "Los aciertos dejan un fantasma extra que vale puntuación adicional.",
+    "name": "Eco"
+  },
+  "rp-goldrush": {
+    "description": "Los objetivos dorados aparecen el doble de a menudo.",
+    "name": "Fiebre del Oro"
+  },
+  "rp-medic": {
+    "description": "+1 HP máximo y cura 1.",
+    "name": "Médico de Campo"
+  },
+  "rp-momentum": {
+    "description": "Sube el tope del multiplicador de combo a 7.",
+    "name": "Impulso"
+  },
+  "rp-overdrive": {
+    "description": "+25% de puntuación durante el resto de la partida.",
+    "name": "Sobremarcha"
+  },
+  "rp-regen": {
+    "description": "Cura 1 HP por cada 1000 de puntuación.",
+    "name": "Regeneración"
+  },
+  "rp-slowmo": {
+    "description": "+20% de vida de objetivo.",
+    "name": "Cámara Lenta"
+  },
+  "rp-toughskin": {
+    "description": "Breve invulnerabilidad tras recibir daño.",
+    "name": "Piel Dura"
+  }
+}

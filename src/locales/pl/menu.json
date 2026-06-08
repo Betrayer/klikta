@@ -1,0 +1,27 @@
+{
+  "backgroundKind": {
+    "animated_gradient": "Animowany gradient",
+    "bokeh": "Bokeh",
+    "custom": "Niestandardowe",
+    "gradient": "Gradient",
+    "image": "Obraz",
+    "noise": "Szum",
+    "solid": "Jednolite",
+    "tiled": "Kafelki"
+  },
+  "customize": "Dostosuj",
+  "hudSection": "HUD",
+  "hudStyle": {
+    "framed": "Ramka",
+    "minimal": "Minimalny",
+    "ringed": "Pierścień"
+  },
+  "modeSelect": {
+    "noRecord": "Nie ma jeszcze żadnych wpisów",
+    "title": "WYBIERZ TRYB"
+  },
+  "musicSection": "Muzyka",
+  "sfxSection": "Efekty dźwiękowe",
+  "skills": "Umiejętności",
+  "themeSection": "Temat"
+}

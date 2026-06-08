@@ -1,0 +1,36 @@
+{
+  "hud": {
+    "active": "ACTIVE",
+    "wave": "WAVE {{current}} / {{total}}",
+    "timePulse": "⏱ TIME PULSE"
+  },
+  "waveBreak": {
+    "cleared": "WAVE CLEARED",
+    "chooseBoon": "Choose a boon - Wave {{wave}} / {{total}} next"
+  },
+  "skillTree": {
+    "title": "SKILL TREE",
+    "resetPerks": "Reset Perks",
+    "hint": "Tap a perk to inspect - drag to pan, scroll or pinch to zoom.",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "resetView": "Reset view",
+    "resetTitle": "Reset all perks?",
+    "resetBody": "Deselects all {{count}} perks and refunds {{refund}} currency. You can re-select them anytime.",
+    "bindTitle": "Bind ultimate?",
+    "bindBody": "Bind {{name}} as your active ultimate for {{cost}} currency?",
+    "bind": "Bind",
+    "hubPerks": "{{selected}}/{{total}} perks"
+  },
+  "perk": {
+    "active": "Active",
+    "select": "Select",
+    "deselect": "Deselect (refund)",
+    "cost": "Cost {{cost}}",
+    "swapHint": "(refund {{refund}}, net {{net}})",
+    "tier": "Tier {{tier}}",
+    "deselectTierFirst": "Deselect Tier {{tier}} first.",
+    "locked": "Locked - need {{points}} pts in {{branch}}.",
+    "needMore": "Need {{amount}} more."
+  }
+}

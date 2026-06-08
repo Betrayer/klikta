@@ -1,8 +1,11 @@
+import { useTranslation } from "react-i18next";
 import type { BranchId } from "../../../data/skillTree";
 import { findPerk, tierKey } from "../../../data/skillTree";
+import { useLocalize } from "../../../i18n/useLocalize";
 import type { PanZoomController } from "./usePanZoom";
 import type { BranchLayout, SkillTreeLayout } from "./layout";
 import { PerkNode } from "./PerkNode";
+import { touchRadiusMul } from "../../../game/util/device";
 
 export interface SkillTreeCanvasProps {
   layout: SkillTreeLayout;
@@ -86,8 +89,11 @@ export const SkillTreeCanvas = ({
   onHover,
   onNodeClick,
 }: SkillTreeCanvasProps) => {
+  const { t } = useTranslation();
+  const loc = useLocalize();
   const { containerRef, transform, onPointerDown, onPointerMove, onPointerUp } =
     panZoom;
+  const nodeRadius = layout.nodeRadius * touchRadiusMul();
   const totalSelected = layout.branches.reduce(
     (sum, branch) => sum + (branchPoints[branch.id] ?? 0),
     0,
@@ -177,7 +183,10 @@ export const SkillTreeCanvas = ({
               color: "color-mix(in srgb, white 55%, transparent)",
             }}
           >
-            {totalSelected}/{totalPerks} perks
+            {t("game:skillTree.hubPerks", {
+              selected: totalSelected,
+              total: totalPerks,
+            })}
           </span>
         </div>
 
@@ -207,7 +216,7 @@ export const SkillTreeCanvas = ({
                 color: branch.color,
               }}
             >
-              {branch.name}
+              {loc("perks", branch.id, "name", branch.name)}
             </div>
             <div
               style={{
@@ -247,7 +256,7 @@ export const SkillTreeCanvas = ({
                   key={node.perkId}
                   perkId={node.perkId}
                   pos={node.pos}
-                  radius={layout.nodeRadius}
+                  radius={nodeRadius}
                   icon={option.icon}
                   branchColor={branch.color}
                   costLabel={isSelected || isLocked ? "" : String(effectiveCost)}

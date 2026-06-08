@@ -14,7 +14,15 @@ body,
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+html,
+body {
   background: #1a0033;
+}
+
+#root {
+  background: transparent;
 }
 
 @keyframes klikta-pulse-warn {
@@ -54,4 +62,19 @@ body,
   from {
     clip-path: inset(0 100% 0 0);
   }
+}
+
+@keyframes klikta-menu-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.klikta-menu-rise {
+  animation: klikta-menu-rise 320ms ease both;
 }

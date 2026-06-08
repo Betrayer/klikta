@@ -1,0 +1,22 @@
+{
+  "campaign": {
+    "description": "A scripted run of escalating waves with a run-scoped perk choice between each. Clear wave 15 to win.",
+    "name": "Campaign",
+    "tagline": "15 waves."
+  },
+  "endless_hp": {
+    "description": "The original loop. Miss a target and lose HP. Run ends when HP hits zero. Stack combos for score.",
+    "name": "Endless",
+    "tagline": "Survive. Score."
+  },
+  "endless_timer": {
+    "description": "Start with a shrinking timer. Every hit buys you more time. Greed keeps you alive; hesitation kills.",
+    "name": "Time Attack",
+    "tagline": "Race the clock."
+  },
+  "physics_chaos": {
+    "description": "Targets drift, bounce, and merge. Clicks shove the nearby ones. Reaction under motion.",
+    "name": "Chaos",
+    "tagline": "Everything moves."
+  }
+}

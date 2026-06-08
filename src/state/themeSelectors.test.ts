@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { synthwaveTheme } from "../data/themes/synthwave";
-import { auroraTheme } from "../data/themes/aurora";
+import { gemsTheme } from "../data/themes/gems";
 import { DEFAULT_HUD_SPEC, DEFAULT_VFX_STYLE } from "../data/themes/defaults";
 import {
   getBackgroundSpec,
@@ -12,9 +12,9 @@ import {
 } from "./themeSelectors";
 
 describe("theme defaults preserve current behavior", () => {
-  it("uses the framed HUD preset for both bundled themes", () => {
+  it("uses the framed HUD preset for the vector bundled themes", () => {
     expect(synthwaveTheme.hud.style).toBe("framed");
-    expect(auroraTheme.hud.style).toBe("framed");
+    expect(gemsTheme.hud.style).toBe("framed");
   });
 
   it("keeps the heart-based HP readout in the default HUD", () => {

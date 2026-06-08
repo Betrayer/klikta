@@ -1,0 +1,36 @@
+{
+  "hud": {
+    "active": "AKTYWNE",
+    "timePulse": "⏱ IMPULS CZASOWY",
+    "wave": "WAVE {{current}} / {{total}}"
+  },
+  "perk": {
+    "active": "Aktywne",
+    "cost": "Koszt {{cost}}",
+    "deselect": "Anuluj wybór (zwrot pieniędzy)",
+    "deselectTierFirst": "Najpierw odznacz poziom „{{tier}}”.",
+    "locked": "Zablokowane – potrzebuję {{points}} pkt w {{branch}}.",
+    "needMore": "Potrzebuję więcej informacji na temat „{{amount}}”.",
+    "select": "Wybierz",
+    "swapHint": "(zwrot kosztów: {{refund}}, kwota netto: {{net}})",
+    "tier": "Poziom {{tier}}"
+  },
+  "skillTree": {
+    "bind": "Związać",
+    "bindBody": "Czy warto przypisać umiejętność „{{name}}” jako aktywną superumiejętność w zamian za walutę „{{cost}}”?",
+    "bindTitle": "Ostateczna umiejętność Binda?",
+    "hint": "Dotknij korzyści, aby ją obejrzeć – przeciągnij, aby przesuwać widok, przewiń lub zsuwaj palce, aby powiększyć.",
+    "resetBody": "Cofnie wszystkie korzyści z pakietu „{{count}}” i zwróci walutę z pakietu „{{refund}}”. Możesz je ponownie wybrać w dowolnym momencie.",
+    "resetPerks": "Zresetuj atuty",
+    "resetTitle": "Zresetować wszystkie atuty?",
+    "resetView": "Zresetuj widok",
+    "title": "DRZEWKO UMIEJĘTNOŚCI",
+    "zoomIn": "Powiększ",
+    "zoomOut": "Powiększyć",
+    "hubPerks": "{{selected}}/{{total}} atutów"
+  },
+  "waveBreak": {
+    "chooseBoon": "Wybierz bonus – Wave {{wave}} / {{total}} dalej",
+    "cleared": "FALA PRZESZŁA"
+  }
+}

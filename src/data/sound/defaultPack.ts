@@ -1,17 +1,29 @@
 import type { SoundPack } from "../themes/types";
 
 import musicUrl from "../../assets/audio/music/music_synthwave_loop_1.mp3";
-import hitRegular1 from "../../assets/audio/sfx/hit_regular_1.ogg?url";
-import hitRegular2 from "../../assets/audio/sfx/hit_regular_2.ogg?url";
-import hitRegular3 from "../../assets/audio/sfx/hit_regular_3.ogg?url";
-import hitRegular4 from "../../assets/audio/sfx/hit_regular_4.ogg?url";
-import hitGolden from "../../assets/audio/sfx/hit_golden.ogg?url";
-import hitMultiPartial from "../../assets/audio/sfx/hit_multi_partial.ogg?url";
-import hitMultiComplete from "../../assets/audio/sfx/hit_multi_complete.ogg?url";
-import hitShieldedBreak from "../../assets/audio/sfx/hit_shielded_break.ogg?url";
-import bombClick from "../../assets/audio/sfx/bomb_click.ogg?url";
-import miss from "../../assets/audio/sfx/miss.ogg?url";
-import comboMilestone from "../../assets/audio/sfx/combo_milestone.ogg?url";
+
+const sfxUrls = import.meta.glob("../../assets/audio/sfx/*.{mp3,ogg}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+}) as Record<string, string>;
+
+const urlByFile = new Map<string, string>();
+for (const [path, url] of Object.entries(sfxUrls)) {
+  const file = path.split("/").pop();
+  if (file !== undefined) urlByFile.set(file, url);
+}
+
+const sources = (baseName: string): string[] => {
+  const ordered: string[] = [];
+  const mp3 = urlByFile.get(`${baseName}.mp3`);
+  const ogg = urlByFile.get(`${baseName}.ogg`);
+  if (mp3 !== undefined) ordered.push(mp3);
+  if (ogg !== undefined) ordered.push(ogg);
+  return ordered;
+};
+
+const variants = (baseNames: string[]): string[][] => baseNames.map(sources);
 
 export const DEFAULT_SOUND_PACK_ID = "default";
 
@@ -20,14 +32,19 @@ export const defaultSoundPack: SoundPack = {
   name: "Synthwave",
   music: { src: musicUrl },
   sfx: {
-    hit_regular: [hitRegular1, hitRegular2, hitRegular3, hitRegular4],
-    hit_golden: [hitGolden],
-    hit_multi_partial: [hitMultiPartial],
-    hit_multi_complete: [hitMultiComplete],
-    hit_shielded_break: [hitShieldedBreak],
-    bomb_click: [bombClick],
-    miss: [miss],
-    combo_milestone: [comboMilestone],
-    game_over: [],
+    hit_regular: variants([
+      "hit_regular_1",
+      "hit_regular_2",
+      "hit_regular_3",
+      "hit_regular_4",
+    ]),
+    hit_golden: variants(["hit_golden"]),
+    hit_multi_partial: variants(["hit_multi_partial"]),
+    hit_multi_complete: variants(["hit_multi_complete"]),
+    hit_shielded_break: variants(["hit_shielded_break"]),
+    bomb_click: variants(["bomb_click"]),
+    miss: variants(["miss"]),
+    combo_milestone: variants(["combo_milestone"]),
+    game_over: variants([]),
   },
 };

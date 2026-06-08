@@ -1,0 +1,222 @@
+{
+  "greed": {
+    "description": "Więcej ryzyka, więcej nagrody, więcej błyskotek.",
+    "name": "Chciwość"
+  },
+  "greed-t1-high-stakes": {
+    "description": "Kliknięcie bomby wciąż uruchamia karę, ale najpierw spienięża combo: 2x wynik zwykłego celu przy obecnym mnożniku. Twoje combo zostaje zresetowane.",
+    "name": "Wysoka Stawka"
+  },
+  "greed-t1-reckless": {
+    "description": "Kliknięcie bomby nie resetuje już twojego combo.",
+    "name": "Lekkomyślność"
+  },
+  "greed-t1-score-boost": {
+    "description": "Każdy cel daje 25% więcej punktów. Sumuje się ze Wspinaczką Combo z Chciwości i Leczeniem Wynikiem z Przetrwania.",
+    "name": "Doładowanie Wyniku"
+  },
+  "greed-t2-bomb-bounty": {
+    "description": "15% szansy, że wygasająca bomba upuści 2 waluty. Łącz z Bombami-Latarniami, by nigdy nie przegapić łupu.",
+    "name": "Nagroda za Bombę"
+  },
+  "greed-t2-double-drops": {
+    "description": "10% szansy, że cel pojawi się jako wariant z 2× wynikiem.",
+    "name": "Podwójny Łup"
+  },
+  "greed-t2-golden-rain": {
+    "description": "Złote cele pojawiają się 50% częściej.",
+    "name": "Złoty Deszcz"
+  },
+  "greed-t3-coin-combo": {
+    "description": "Przy combo 50+ każde trafienie daje 2 waluty.",
+    "name": "Monetowe Combo"
+  },
+  "greed-t3-combo-climb": {
+    "description": "Mnożnik combo sięga ×8 zamiast ×5. Wyższy limit = więcej progów; łącz z Bandażem z Przetrwania dla skalowania leczenia.",
+    "name": "Wspinaczka Combo"
+  },
+  "greed-t3-speculation": {
+    "description": "Każde złote trafienie daje +10% wyniku na 5 s (kumuluje się do ×3). Każde chybienie kasuje stos. Łącz ze Złotym Deszczem, by szybciej zasilać stos.",
+    "name": "Spekulacja"
+  },
+  "greed-t4-frenzy": {
+    "description": "Ultimate: 8 sekund, gdzie każde trafienie tworzy 2 dodatkowe cele obok, a wynik jest ×2.",
+    "name": "Szał"
+  },
+  "mutation": {
+    "description": "Zniekształć zasady. Każdy perk daje koszt i nagrodę - umiejętność decyduje, co przeważy.",
+    "name": "Mutacja"
+  },
+  "mutation-t1-beacon-bombs": {
+    "description": "Bomby rosną do 150% w trakcie swojego życia zamiast migać. Lepiej widoczne, więcej miejsca.",
+    "name": "Bomby-Latarnie"
+  },
+  "mutation-t1-convergent": {
+    "description": "Wszystkie cele dryfują ku środkowi ekranu z prędkością ~30 px/s. Ciaśniejsze skupisko - bomby też. Kumuluje się z oboma perkami Magnesu - Zbieżność + Magnes Kursora tworzy 'studnię grawitacyjną' przy kursorze blisko centrum.",
+    "name": "Zbieżność"
+  },
+  "mutation-t1-slow-bloom": {
+    "description": "Cele rosną przez pierwsze 0.5 s, a potem maleją. Większe okno na start, inny rytm.",
+    "name": "Powolny Rozkwit"
+  },
+  "mutation-t2-echo": {
+    "description": "Każde trafienie zostawia fantom na 800 ms. Kliknięcie fantomu dodaje 30% bonusowego wyniku bez przerywania combo.",
+    "name": "Echo"
+  },
+  "mutation-t2-magnet": {
+    "description": "Wszystkie interaktywne obiekty dryfują ku kursorowi z prędkością ~18 px/s. Bomby wliczone. Kumuluje się z Magnesem Kursora z Dziczy dla złożonego dryfu ku kursorowi.",
+    "name": "Magnes"
+  },
+  "mutation-t2-phase-flash": {
+    "description": "Cele blakną do 10% przezroczystości na 150 ms co 700 ms. Kliknięcie podczas niewidzialności = ×2 wynik.",
+    "name": "Błysk Fazowy"
+  },
+  "mutation-t3-mirror-spawn": {
+    "description": "Każdy cel pojawia się z lustrzanym bliźniakiem. Kliknij któregokolwiek, by zniszczyć oba; wynik liczy się tylko za kliknięty. 10% bliźniaków to bomby - czytaj uważnie.",
+    "name": "Lustrzane Odbicie"
+  },
+  "mutation-t3-time-pulse": {
+    "description": "Co 6 s, 2 s prędkości gry ×0.6 lub ×1.6. HUD ostrzega 0.5 s wcześniej.",
+    "name": "Puls Czasu"
+  },
+  "mutation-t3-vortex": {
+    "description": "Wszystkie cele krążą wokół pozycji twojego ostatniego udanego trafienia w obecnej odległości. Bomby wliczone - twój cel staje się ich punktem przyciągania.",
+    "name": "Wir"
+  },
+  "mutation-t4-bloom": {
+    "description": "Ultimate: 5 s, gdzie cele i bomby rosną od 100% do 200% w trakcie życia, obecne tempo pojawiania się podwaja się, a wszystkie wyniki ×2.",
+    "name": "Rozkwit"
+  },
+  "reaction": {
+    "description": "Łatwiejsze cele, więcej czasu, spokojniejszy rytm.",
+    "name": "Reakcja"
+  },
+  "reaction-t1-balanced": {
+    "description": "+10% czasu życia i +8% rozmiaru każdego celu.",
+    "name": "Zrównoważenie"
+  },
+  "reaction-t1-bigger-targets": {
+    "description": "Wszystkie cele są 15% większe.",
+    "name": "Większe Cele"
+  },
+  "reaction-t1-steady-hand": {
+    "description": "Każdy cel pozostaje aktywny 20% dłużej.",
+    "name": "Pewna Ręka"
+  },
+  "reaction-t2-pre-crack": {
+    "description": "Cele z tarczą tracą tarczę nawet przy chybionym kliknięciu.",
+    "name": "Wstępne Pęknięcie"
+  },
+  "reaction-t2-quick-multi": {
+    "description": "Cele wielokrotne wymagają tylko 2 kliknięć zamiast 3.",
+    "name": "Szybkie Multi"
+  },
+  "reaction-t2-steady-bombs": {
+    "description": "Bomby pojawiają się tylko przy krawędziach ekranu, nigdy w centrum. Łączy się ze Skoncentrowaniem z Dziczy dla przewidywalnego czasu I miejsca bomb.",
+    "name": "Stałe Bomby"
+  },
+  "reaction-t3-golden-patience": {
+    "description": "Złote cele pozostają 50% dłużej.",
+    "name": "Złota Cierpliwość"
+  },
+  "reaction-t3-last-chance": {
+    "description": "W ostatnich 0.3 s życia celu przestaje on maleć i zastyga. Łączy się z Pewną Ręką dla bardzo wyrozumiałych rund.",
+    "name": "Ostatnia Szansa"
+  },
+  "reaction-t3-slow-spawn": {
+    "description": "Animacja pojawiania się jest 50% wolniejsza - widzisz cele wcześniej.",
+    "name": "Powolne Pojawianie"
+  },
+  "reaction-t4-time-slow": {
+    "description": "Ultimate: zwolnij świat do połowy prędkości na 5 sekund.",
+    "name": "Spowolnienie Czasu"
+  },
+  "survival": {
+    "description": "Wyrozumiałość, drugie szanse, więcej HP.",
+    "name": "Przetrwanie"
+  },
+  "survival-t1-extra-life": {
+    "description": "Zaczynaj każdą rundę z jednym dodatkowym HP. Połącz z Feniksem z Przetrwania dla dwóch odbić na rundę.",
+    "name": "Dodatkowe Życie"
+  },
+  "survival-t1-soft-bombs": {
+    "description": "Po pierwszym kliknięciu bomby w rundzie kolejne kliknięcia bomb nie kosztują HP.",
+    "name": "Miękkie Bomby"
+  },
+  "survival-t1-warm-up": {
+    "description": "Twój pierwszy chybiony cel w każdej rundzie jest wybaczony.",
+    "name": "Rozgrzewka"
+  },
+  "survival-t2-bandage": {
+    "description": "Osiągnięcie combo 50 lub 100 przywraca 1 HP. Świetnie łączy się ze Wspinaczką Combo z Chciwości (limit ×8 -> więcej progów).",
+    "name": "Bandaż"
+  },
+  "survival-t2-open-field": {
+    "description": "Kliknięcie tła nie przerywa już combo.",
+    "name": "Otwarte Pole"
+  },
+  "survival-t2-score-heal": {
+    "description": "Każde 1000 punktów przywraca 1 HP. Doładowanie Wyniku z Chciwości szybciej osiąga każdy próg 1000 punktów.",
+    "name": "Leczenie Wynikiem"
+  },
+  "survival-t3-mercy": {
+    "description": "1 sekunda nietykalności po otrzymaniu obrażeń.",
+    "name": "Litość"
+  },
+  "survival-t3-phoenix": {
+    "description": "Raz na rundę przeżycie śmiertelnego trafienia przywraca cię do 1 HP z 3 s nietykalności. Łącz z Ostatnim Bastionem z Dziczy dla ryzykownych odbić.",
+    "name": "Feniks"
+  },
+  "survival-t3-shield-forgiveness": {
+    "description": "Chybiony cel z tarczą przerywa combo, ale nie kosztuje HP.",
+    "name": "Wybaczenie Tarczy"
+  },
+  "survival-t4-restore": {
+    "description": "Ultimate: ulecz do pełnego HP. Wyłącza perki regeneracji HP do końca rundy.",
+    "name": "Odnowienie"
+  },
+  "wild": {
+    "description": "Chaos nagradza śmiałych i karze leniwych.",
+    "name": "Dzicz"
+  },
+  "wild-t1-concentrated": {
+    "description": "Waga pojawiania się bomb zmniejszona o połowę, ale co 5. cel jest gwarantowaną bombą. Łącz ze Stałymi Bombami z Reakcji dla w pełni przewidywalnego miejsca bomb.",
+    "name": "Skoncentrowanie"
+  },
+  "wild-t1-lucky-big": {
+    "description": "5% szansy, że cel pojawi się w 2× rozmiarze i da 2× wynik.",
+    "name": "Szczęśliwy Wielki"
+  },
+  "wild-t1-volatile-time": {
+    "description": "Czas życia każdego celu zmienia się losowo o ±50%.",
+    "name": "Niestabilny Czas"
+  },
+  "wild-t2-greedy-spawn": {
+    "description": "20% szansy, że cel pojawi się w 60% rozmiaru i da ×2 wynik. Dobrze kumuluje się z Większymi Celami z Reakcji.",
+    "name": "Chciwe Pojawienie"
+  },
+  "wild-t2-rush-pulse": {
+    "description": "Co 30 s tempo pojawiania się potraja się na 5 s. Podczas napływu chybienia nie przerywają twojego combo.",
+    "name": "Puls Napływu"
+  },
+  "wild-t2-spark": {
+    "description": "7% szansy, że trafienie przeskoczy na pobliski cel, który przeskakuje dalej - aż do 7 skoków. Bomby są pomijane. Czysta kaskada chaosu.",
+    "name": "Iskra"
+  },
+  "wild-t3-cursor-magnet": {
+    "description": "Cele dryfują ku kursorowi z prędkością ~25 px/s - kumuluje się z magnesem mutacji. Sumuje się też ze Zbieżnością z Mutacji dla potrójnego przyciągania.",
+    "name": "Magnes Kursora"
+  },
+  "wild-t3-last-stand": {
+    "description": "Przy 1 HP: ×3 wynik, ale czasy życia są 20% krótsze. Łącz z Feniksem z Przetrwania, by wejść w Ostatni Bastion na żądanie.",
+    "name": "Ostatni Bastion"
+  },
+  "wild-t3-mortgage": {
+    "description": "+50% wyniku w tej rundzie, ale zdobywana waluta jest o połowę mniejsza. Łącz z Lekkomyślnością, by forsować ryzykowne rundy w tabeli wyników.",
+    "name": "Zastaw"
+  },
+  "wild-t4-chaos-storm": {
+    "description": "Ultimate: 4 sekundy ×4 tempa pojawiania się, w pełni losowe typy celów, shader glitch.",
+    "name": "Burza Chaosu"
+  }
+}

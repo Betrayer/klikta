@@ -6,6 +6,7 @@ import {
 import { SolidBackground } from "./renderers/SolidBackground";
 import { GradientBackground } from "./renderers/GradientBackground";
 import { ImageBackground } from "./renderers/ImageBackground";
+import { TiledBackground } from "./renderers/TiledBackground";
 import { AnimatedGradientBackground } from "./renderers/AnimatedGradientBackground";
 import { BokehBackground } from "./renderers/BokehBackground";
 import { NoiseBackground } from "./renderers/NoiseBackground";
@@ -20,6 +21,9 @@ describe("background renderer registry", () => {
     );
     expect(createBackgroundRenderer({ kind: "image" })).toBeInstanceOf(
       ImageBackground,
+    );
+    expect(createBackgroundRenderer({ kind: "tiled" })).toBeInstanceOf(
+      TiledBackground,
     );
     expect(
       createBackgroundRenderer({ kind: "animated_gradient" }),

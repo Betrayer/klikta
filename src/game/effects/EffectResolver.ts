@@ -17,8 +17,27 @@ export interface RunModifiers {
   readonly shieldedShieldBreaksOnMiss: boolean;
   readonly hpRegenPer1000Score: number;
   readonly bombExpireCurrencyChance: number;
+  readonly bombExpireCurrencyAmount: number;
+  readonly currencyMul: number;
   readonly currencyPerHit: { combo: number; amount: number } | null;
   readonly echoPhantom: { durationMs: number; bonusMul: number } | null;
+  readonly goldenScoreStack: {
+    perStackMul: number;
+    maxStacks: number;
+    durationMs: number;
+  } | null;
+  readonly comboHealMilestones: {
+    milestones: readonly number[];
+    healAmount: number;
+  } | null;
+  readonly phoenix: { iframesMs: number } | null;
+  readonly chainHit: {
+    triggerChance: number;
+    maxHops: number;
+    radiusMul: number;
+  } | null;
+  readonly lastStand: { scoreMul: number; lifetimeMul: number } | null;
+  readonly vortexRadPerSec: number;
 }
 
 export interface TargetSpawnModifiers {
@@ -26,6 +45,7 @@ export interface TargetSpawnModifiers {
   readonly sizeMul: number;
   readonly scoreMul: number;
   readonly spawnAnimMul: number;
+  readonly lastChanceMs: number;
   readonly slowBloomPhaseMs: number;
   readonly convergentDriftSpeed: number;
   readonly magnetSpeed: number;
@@ -50,10 +70,13 @@ export interface SpawnPolicy {
   readonly doubleTargetChance: number;
   readonly doubleTargetScoreMul: number;
   readonly mirrorSpawn: boolean;
+  readonly mirrorBombTwinChance: number;
+  readonly bombEdgeOnly: boolean;
   readonly spawnRateSurge: {
     periodMs: number;
     durationMs: number;
     mul: number;
+    comboProtected: boolean;
   } | null;
   readonly timePulse: { periodMs: number; durationMs: number } | null;
 }
@@ -74,8 +97,16 @@ const DEFAULT_RUN_MODIFIERS: RunModifiers = {
   shieldedShieldBreaksOnMiss: false,
   hpRegenPer1000Score: 0,
   bombExpireCurrencyChance: 0,
+  bombExpireCurrencyAmount: 1,
+  currencyMul: 1,
   currencyPerHit: null,
   echoPhantom: null,
+  goldenScoreStack: null,
+  comboHealMilestones: null,
+  phoenix: null,
+  chainHit: null,
+  lastStand: null,
+  vortexRadPerSec: 0,
 };
 
 export const DEFAULT_TARGET_MODIFIERS: TargetSpawnModifiers = {
@@ -83,6 +114,7 @@ export const DEFAULT_TARGET_MODIFIERS: TargetSpawnModifiers = {
   sizeMul: 1,
   scoreMul: 1,
   spawnAnimMul: 1,
+  lastChanceMs: 0,
   slowBloomPhaseMs: 0,
   convergentDriftSpeed: 0,
   magnetSpeed: 0,
@@ -103,6 +135,8 @@ export const DEFAULT_SPAWN_POLICY: SpawnPolicy = {
   doubleTargetChance: 0,
   doubleTargetScoreMul: 2,
   mirrorSpawn: false,
+  mirrorBombTwinChance: 0,
+  bombEdgeOnly: false,
   spawnRateSurge: null,
   timePulse: null,
 };
@@ -155,8 +189,16 @@ export class EffectResolver {
     let shieldedShieldBreaksOnMiss = false;
     let hpRegenPer1000Score = 0;
     let bombExpireCurrencyChance = 0;
+    let bombExpireCurrencyAmount = 1;
+    let currencyMul = 1;
     let currencyPerHit: { combo: number; amount: number } | null = null;
     let echoPhantom: RunModifiers["echoPhantom"] = null;
+    let goldenScoreStack: RunModifiers["goldenScoreStack"] = null;
+    let comboHealMilestones: RunModifiers["comboHealMilestones"] = null;
+    let phoenix: RunModifiers["phoenix"] = null;
+    let chainHit: RunModifiers["chainHit"] = null;
+    let lastStand: RunModifiers["lastStand"] = null;
+    let vortexRadPerSec = 0;
 
     for (const eff of this.effects) {
       switch (eff.kind) {
@@ -166,6 +208,10 @@ export class EffectResolver {
         case "scoreDoubledNoCurrency":
           scoreMul *= 2;
           currencyDisabled = true;
+          break;
+        case "scoreCurrencyTradeoff":
+          scoreMul *= eff.scoreMul;
+          currencyMul *= eff.currencyMul;
           break;
         case "comboCap":
           comboCap = Math.max(comboCap, eff.value);
@@ -204,9 +250,12 @@ export class EffectResolver {
           hpRegenPer1000Score = Math.max(hpRegenPer1000Score, eff.value);
           break;
         case "bombExpireCurrencyChance":
-          bombExpireCurrencyChance = Math.max(
-            bombExpireCurrencyChance,
-            eff.value,
+          if (eff.value > bombExpireCurrencyChance) {
+            bombExpireCurrencyChance = eff.value;
+          }
+          bombExpireCurrencyAmount = Math.max(
+            bombExpireCurrencyAmount,
+            eff.amount ?? 1,
           );
           break;
         case "currencyPerHitAtComboGte":
@@ -214,6 +263,35 @@ export class EffectResolver {
           break;
         case "echoPhantomMs":
           echoPhantom = { durationMs: eff.duration, bonusMul: eff.bonusMul };
+          break;
+        case "goldenScoreStack":
+          goldenScoreStack = {
+            perStackMul: eff.perStackMul,
+            maxStacks: eff.maxStacks,
+            durationMs: eff.durationMs,
+          };
+          break;
+        case "hpHealAtComboMilestones":
+          comboHealMilestones = {
+            milestones: eff.milestones,
+            healAmount: eff.healAmount,
+          };
+          break;
+        case "phoenixRevive":
+          phoenix = { iframesMs: eff.iframesMs };
+          break;
+        case "chainHit":
+          chainHit = {
+            triggerChance: eff.triggerChance,
+            maxHops: eff.maxHops,
+            radiusMul: eff.radiusMul,
+          };
+          break;
+        case "lastStandAtLowHp":
+          lastStand = { scoreMul: eff.scoreMul, lifetimeMul: eff.lifetimeMul };
+          break;
+        case "vortexOrbitSpeed":
+          vortexRadPerSec = Math.max(vortexRadPerSec, eff.radPerSec);
           break;
         default:
           break;
@@ -236,8 +314,16 @@ export class EffectResolver {
       shieldedShieldBreaksOnMiss,
       hpRegenPer1000Score,
       bombExpireCurrencyChance,
+      bombExpireCurrencyAmount,
+      currencyMul,
       currencyPerHit,
       echoPhantom,
+      goldenScoreStack,
+      comboHealMilestones,
+      phoenix,
+      chainHit,
+      lastStand,
+      vortexRadPerSec,
     };
   }
 
@@ -253,6 +339,8 @@ export class EffectResolver {
     let doubleTargetChance = 0;
     const doubleTargetScoreMul = 2;
     let mirrorSpawn = false;
+    let mirrorBombTwinChance = 0;
+    let bombEdgeOnly = false;
     let spawnRateSurge: SpawnPolicy["spawnRateSurge"] = null;
     let timePulse: SpawnPolicy["timePulse"] = null;
 
@@ -269,9 +357,11 @@ export class EffectResolver {
           lifetimeJitterPct = Math.max(lifetimeJitterPct, eff.value);
           break;
         case "oversizeChance":
-          oversizeChance = Math.max(oversizeChance, eff.value);
-          oversizeSizeMul = Math.max(oversizeSizeMul, eff.sizeMul);
-          oversizeScoreMul = Math.max(oversizeScoreMul, eff.scoreMul);
+          if (eff.value >= oversizeChance) {
+            oversizeChance = eff.value;
+            oversizeSizeMul = eff.sizeMul;
+            oversizeScoreMul = eff.scoreMul;
+          }
           break;
         case "bombDecoyChance":
           bombDecoyChance = Math.max(bombDecoyChance, eff.value);
@@ -281,12 +371,20 @@ export class EffectResolver {
           break;
         case "mirrorSpawn":
           mirrorSpawn = true;
+          mirrorBombTwinChance = Math.max(
+            mirrorBombTwinChance,
+            eff.bombTwinChance ?? 0,
+          );
+          break;
+        case "bombSpawnZone":
+          if (eff.zone === "edge") bombEdgeOnly = true;
           break;
         case "spawnRateSurgeEveryMs":
           spawnRateSurge = {
             periodMs: eff.period,
             durationMs: eff.durationMs,
             mul: eff.mul,
+            comboProtected: eff.comboProtected ?? false,
           };
           break;
         case "timePulse":
@@ -309,6 +407,8 @@ export class EffectResolver {
       doubleTargetChance,
       doubleTargetScoreMul,
       mirrorSpawn,
+      mirrorBombTwinChance,
+      bombEdgeOnly,
       spawnRateSurge,
       timePulse,
     };
@@ -318,6 +418,7 @@ export class EffectResolver {
     let lifetimeMul = 1;
     let sizeMul = 1;
     let spawnAnimMul = 1;
+    let lastChanceMs = 0;
     let slowBloomPhaseMs = 0;
     let convergentDriftSpeed = 0;
     let magnetSpeed = 0;
@@ -336,6 +437,9 @@ export class EffectResolver {
         case "spawnAnimMul":
           spawnAnimMul = Math.max(spawnAnimMul, eff.value);
           break;
+        case "lastChanceMs":
+          lastChanceMs = Math.max(lastChanceMs, eff.value);
+          break;
         case "slowBloomPhaseMs":
           slowBloomPhaseMs = Math.max(slowBloomPhaseMs, eff.value);
           break;
@@ -343,10 +447,10 @@ export class EffectResolver {
           convergentDriftSpeed = Math.max(convergentDriftSpeed, eff.value);
           break;
         case "magnetSpeed":
-          magnetSpeed = Math.max(magnetSpeed, eff.value);
+          magnetSpeed += eff.value;
           break;
         case "targetsFollowCursorSpeed":
-          magnetSpeed = Math.max(magnetSpeed, eff.value);
+          magnetSpeed += eff.value;
           break;
         case "phaseFlashCycle":
           phaseFlash = {
@@ -377,6 +481,7 @@ export class EffectResolver {
       sizeMul,
       scoreMul: 1,
       spawnAnimMul,
+      lastChanceMs,
       slowBloomPhaseMs,
       convergentDriftSpeed,
       magnetSpeed,

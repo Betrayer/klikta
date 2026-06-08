@@ -34,7 +34,7 @@ export const MUTATION_BRANCH: SkillBranch = {
           id: "mutation-t1-convergent",
           name: "Convergent",
           description:
-            "All targets drift toward screen center at ~30 px/s. Tighter cluster - bombs too.",
+            "All targets drift toward screen center at ~30 px/s. Tighter cluster - bombs too. Stacks with both Magnet perks - Convergent + Cursor Magnet creates a 'gravity well' at the cursor near center.",
           icon: "converge",
           cost: 100,
           effects: [{ kind: "convergentDriftSpeed", value: 30 }],
@@ -74,7 +74,7 @@ export const MUTATION_BRANCH: SkillBranch = {
           id: "mutation-t2-magnet",
           name: "Magnet",
           description:
-            "All interactive objects drift toward your cursor at ~18 px/s. Bombs included.",
+            "All interactive objects drift toward your cursor at ~18 px/s. Bombs included. Stacks with Wild's Cursor Magnet for compound drift toward the cursor.",
           icon: "compass",
           cost: 350,
           effects: [{ kind: "magnetSpeed", value: 18 }],
@@ -89,10 +89,10 @@ export const MUTATION_BRANCH: SkillBranch = {
           id: "mutation-t3-mirror-spawn",
           name: "Mirror Spawn",
           description:
-            "Every target spawns with a mirrored twin. Clicking either destroys both; score awarded only for the clicked one.",
+            "Every target spawns with a mirrored twin. Click either to destroy both; only the clicked one scores. 10% of twins are bombs - read carefully.",
           icon: "mirror",
           cost: 600,
-          effects: [{ kind: "mirrorSpawn" }],
+          effects: [{ kind: "mirrorSpawn", bombTwinChance: 0.1 }],
         },
         {
           id: "mutation-t3-time-pulse",
@@ -102,6 +102,15 @@ export const MUTATION_BRANCH: SkillBranch = {
           icon: "stopwatch",
           cost: 700,
           effects: [{ kind: "timePulse", periodMs: 6000, durationMs: 2000 }],
+        },
+        {
+          id: "mutation-t3-vortex",
+          name: "Vortex",
+          description:
+            "All targets orbit your last successful hit position at their current distance. Bombs included - your focus becomes their attractor.",
+          icon: "tornado",
+          cost: 700,
+          effects: [{ kind: "vortexOrbitSpeed", radPerSec: 0.78 }],
         },
       ],
     },

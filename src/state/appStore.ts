@@ -10,14 +10,19 @@ export type Screen =
 
 export interface AppState {
   screen: Screen;
+  customizeOpen: boolean;
   setScreen: (screen: Screen) => void;
+  setCustomizeOpen: (open: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
   devtools(
     (set) => ({
       screen: "menu",
+      customizeOpen: false,
       setScreen: (screen) => set({ screen }, false, "setScreen"),
+      setCustomizeOpen: (customizeOpen) =>
+        set({ customizeOpen }, false, "setCustomizeOpen"),
     }),
     { name: "appStore" },
   ),

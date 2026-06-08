@@ -72,6 +72,22 @@ describe("migrateMeta", () => {
     expect(r.activeSfxPackId).toBe("default");
   });
 
+  it("backfills activeHudStyle to the default theme style on pre-v5 state", () => {
+    expect(migrateMeta({ bestScores: {} }, 3).activeHudStyle).toBe("framed");
+  });
+
+  it("converts a legacy hudStyleOverride into activeHudStyle", () => {
+    expect(migrateMeta({ hudStyleOverride: "minimal" }, 4).activeHudStyle).toBe(
+      "minimal",
+    );
+  });
+
+  it("maps the legacy 'theme' override to the default style", () => {
+    expect(migrateMeta({ hudStyleOverride: "theme" }, 4).activeHudStyle).toBe(
+      "framed",
+    );
+  });
+
   it("does not bump updatedAt when only backfilling v2 to v3", () => {
     const r = migrateMeta({ bestScores: {}, updatedAt: 1234 }, 2) as unknown as {
       updatedAt: number;

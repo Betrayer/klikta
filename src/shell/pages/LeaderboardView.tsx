@@ -1,6 +1,4 @@
 import {
-  Box,
-  Button,
   Center,
   Container,
   Group,
@@ -14,6 +12,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MODES, MODE_BY_ID, type ModeId } from '../../data/modes';
 import { useAppStore } from '../../state/appStore';
 import { useAuthStore } from '../../state/authStore';
@@ -21,6 +20,9 @@ import {
   getTopScores,
   type LeaderboardEntry,
 } from '../../services/leaderboard';
+import { useLocalize } from '../../i18n/useLocalize';
+import { MenuButton } from '../components/menu/MenuButton';
+import { MenuShell } from '../components/menu/MenuShell';
 
 const formatDuration = (ms: number): string => {
   const totalSec = Math.max(0, Math.floor(ms / 1000));
@@ -37,6 +39,8 @@ const isModeId = (value: string): value is ModeId =>
 type LoadState = 'loading' | 'ready' | 'error';
 
 export const LeaderboardView = () => {
+  const { t } = useTranslation();
+  const loc = useLocalize();
   const [activeMode, setActiveMode] = useState<ModeId>(MODES[0]?.id ?? 'endless_hp');
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loadState, setLoadState] = useState<LoadState>('loading');
@@ -63,21 +67,21 @@ export const LeaderboardView = () => {
   const isDuration = mode.leaderboardSort === 'duration_desc';
 
   return (
-    <Box bg="background" mih="100vh">
+    <MenuShell>
       <ScrollArea h="100vh" type="auto">
         <Container size={720} p="md">
           <Stack gap="lg">
             <Group justify="space-between" align="center">
               <Title order={1} fz={36} fw={900} c="primary" lts={4}>
-                LEADERBOARD
+                {t('leaderboard:title')}
               </Title>
-              <Button
-                variant="subtle"
-                color="gray"
+              <MenuButton
+                variant="tertiary"
+                fullWidth={false}
                 onClick={() => useAppStore.getState().setScreen('menu')}
               >
-                Back to Menu
-              </Button>
+                {t('common:back')}
+              </MenuButton>
             </Group>
 
             <Tabs
@@ -96,7 +100,7 @@ export const LeaderboardView = () => {
               <Tabs.List>
                 {MODES.map((m) => (
                   <Tabs.Tab key={m.id} value={m.id}>
-                    {m.name}
+                    {loc('modes', m.id, 'name', m.name)}
                   </Tabs.Tab>
                 ))}
               </Tabs.List>
@@ -110,14 +114,13 @@ export const LeaderboardView = () => {
 
             {loadState === 'error' && (
               <Text c="dimmed" ta="center" py={64}>
-                Could not load the leaderboard. Check your connection and try
-                again.
+                {t('leaderboard:loadError')}
               </Text>
             )}
 
             {loadState === 'ready' && entries.length === 0 && (
               <Text c="dimmed" ta="center" py={64}>
-                No scores yet. Be the first to set one.
+                {t('leaderboard:empty')}
               </Text>
             )}
 
@@ -131,12 +134,12 @@ export const LeaderboardView = () => {
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th w={56}>#</Table.Th>
-                    <Table.Th>Player</Table.Th>
+                    <Table.Th>{t('leaderboard:player')}</Table.Th>
                     <Table.Th ta="right" w={96}>
-                      Combo
+                      {t('common:combo')}
                     </Table.Th>
                     <Table.Th ta="right" w={120}>
-                      {isDuration ? 'Time' : 'Score'}
+                      {isDuration ? t('common:time') : t('common:score')}
                     </Table.Th>
                   </Table.Tr>
                 </Table.Thead>
@@ -163,7 +166,7 @@ export const LeaderboardView = () => {
                             c={isOwn ? 'highlight' : 'gray.2'}
                           >
                             {entry.displayName}
-                            {isOwn ? ' (you)' : ''}
+                            {isOwn ? ` (${t('leaderboard:you')})` : ''}
                           </Text>
                         </Table.Td>
                         <Table.Td ta="right">
@@ -192,6 +195,6 @@ export const LeaderboardView = () => {
           </Stack>
         </Container>
       </ScrollArea>
-    </Box>
+    </MenuShell>
   );
 };

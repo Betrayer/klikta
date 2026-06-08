@@ -3,6 +3,7 @@ import type { BackgroundRenderer } from "./BackgroundRenderer";
 import { SolidBackground } from "./renderers/SolidBackground";
 import { GradientBackground } from "./renderers/GradientBackground";
 import { ImageBackground } from "./renderers/ImageBackground";
+import { TiledBackground } from "./renderers/TiledBackground";
 import { AnimatedGradientBackground } from "./renderers/AnimatedGradientBackground";
 import { BokehBackground } from "./renderers/BokehBackground";
 import { NoiseBackground } from "./renderers/NoiseBackground";
@@ -30,6 +31,8 @@ export const createBackgroundRenderer = (
       return new GradientBackground(spec);
     case "image":
       return new ImageBackground(spec);
+    case "tiled":
+      return new TiledBackground(spec);
     case "animated_gradient":
       return new AnimatedGradientBackground(spec);
     case "bokeh":

@@ -1,5 +1,6 @@
 import { memo, useMemo } from 'react';
 import { Box, Paper, Progress, Text, UnstyledButton } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { useMetaStore } from '../../state/metaStore';
 import { useRunStore } from '../../state/runStore';
 import {
@@ -8,12 +9,14 @@ import {
   type BranchId,
 } from '../../data/skillTree';
 import { requestUltimateActivation } from '../../game/systems/ultimateActivation';
+import { useLocalize } from '../../i18n/useLocalize';
 import { useHudSpec } from './hud/useHudSpec';
 
 interface UltimateSlot {
   hotkey: number;
   ultimateId: string;
   ultimateName: string;
+  perkId: string;
   branchId: BranchId;
   color: string;
 }
@@ -36,6 +39,7 @@ export const UltimateBar = memo(() => {
         hotkey: index + 1,
         ultimateId: ult.id,
         ultimateName: ult.name,
+        perkId,
         branchId: branch.id,
         color: branch.color,
       });
@@ -56,7 +60,9 @@ export const UltimateBar = memo(() => {
         transform: 'translateX(-50%)',
         zIndex: 10,
         display: 'flex',
-        gap: 8,
+        gap: 'clamp(4px, 1.5vw, 8px)',
+        maxWidth: '100vw',
+        padding: '0 8px',
       }}
     >
       {slots.map((slot) => (
@@ -88,6 +94,8 @@ const UltimateCard = ({
   isBlocked,
   surface,
 }: UltimateCardProps) => {
+  const { t } = useTranslation();
+  const loc = useLocalize();
   const ready = charge >= 100 && !isActive && !isBlocked;
   const canClick = ready;
   const dim = isBlocked && !isActive;
@@ -111,7 +119,7 @@ const UltimateCard = ({
         radius="md"
         bg={surface}
         style={{
-          width: 96,
+          width: 'clamp(64px, 18vw, 96px)',
           border: `1px solid ${isActive ? slot.color : 'rgba(255,255,255,0.08)'}`,
           boxShadow: ready
             ? `0 0 16px ${slot.color}`
@@ -146,7 +154,7 @@ const UltimateCard = ({
             c={slot.color}
             style={{ letterSpacing: 1 }}
           >
-            {isActive ? 'ACTIVE' : `${Math.floor(charge)}%`}
+            {isActive ? t('game:hud.active') : `${Math.floor(charge)}%`}
           </Text>
         </Box>
         <Progress
@@ -171,7 +179,7 @@ const UltimateCard = ({
               : 'none',
           }}
         >
-          {slot.ultimateName.toUpperCase()}
+          {loc('perks', slot.perkId, 'name', slot.ultimateName).toUpperCase()}
         </Text>
       </Paper>
     </UnstyledButton>

@@ -10,6 +10,7 @@ import { rendererFor } from "./render/TargetRenderer";
 import { resolveStateTexture } from "./render/SpriteRenderer";
 import { Tween } from "../util/Tween";
 import { tweenManager } from "../util/TweenManager";
+import { touchRadiusMul } from "../util/device";
 import {
   easeInOutQuad,
   easeOutBack,
@@ -65,6 +66,7 @@ export abstract class Target {
   protected readonly decoration: Graphics;
   protected base!: Container;
   protected visual: TargetVisual;
+  protected visualOverride: TargetVisual | null = null;
   protected readonly initialSize: number;
   protected elapsedMs = 0;
   protected lifeScale = 1;
@@ -89,7 +91,7 @@ export abstract class Target {
     this.y = spawn.y;
     this.lifetimeMs = config.lifetimeMs * modifiers.lifetimeMul;
     this.spawnTime = performance.now();
-    this.initialSize = config.radius * modifiers.sizeMul;
+    this.initialSize = config.radius * modifiers.sizeMul * touchRadiusMul();
     this.currentSize = this.initialSize;
     this.scoreMul = modifiers.scoreMul;
     this.visual = { mode: "vector", shape: "circle", color: config.color };
@@ -153,7 +155,7 @@ export abstract class Target {
   }
 
   protected resolveVisual(): TargetVisual {
-    return getActiveTheme().targets[this.kind];
+    return this.visualOverride ?? getActiveTheme().targets[this.kind];
   }
 
   protected baseSize(): number {
@@ -242,7 +244,15 @@ export abstract class Target {
           this.lifeScale = this.elapsedMs / phaseMs;
         } else {
           const tail = Math.max(this.lifetimeMs - phaseMs, 1);
-          this.lifeScale = Math.max(1 - (this.elapsedMs - phaseMs) / tail, 0);
+          const lastChance = this.modifiers.lastChanceMs;
+          const shrinkElapsed =
+            lastChance > 0
+              ? Math.min(
+                  this.elapsedMs,
+                  Math.max(this.lifetimeMs - lastChance, phaseMs),
+                )
+              : this.elapsedMs;
+          this.lifeScale = Math.max(1 - (shrinkElapsed - phaseMs) / tail, 0);
         }
       }
       this.currentSize = this.initialSize * this.lifeScale;

@@ -1,0 +1,36 @@
+{
+  "hud": {
+    "active": "ACTIF",
+    "timePulse": "⏱ IMPULSION TEMPORELLE",
+    "wave": "WAVE {{current}} / {{total}}"
+  },
+  "perk": {
+    "active": "Actif",
+    "cost": "{{cost}} des coûts",
+    "deselect": "Annuler la sélection (remboursement)",
+    "deselectTierFirst": "Désélectionnez d'abord « Tier {{tier}} ».",
+    "locked": "Fermé – il faut des points d'{{points}}s sur {{branch}}.",
+    "needMore": "Besoin d'{{amount}}s supplémentaires.",
+    "select": "Sélectionner",
+    "swapHint": "({{refund}} de remboursement, {{net}})",
+    "tier": "Niveau {{tier}}"
+  },
+  "skillTree": {
+    "bind": "Lier",
+    "bindBody": "Souhaitez-vous attribuer «{{name}}» comme ultime active pour obtenir des points d'{{cost}} ?",
+    "bindTitle": "Lier définitivement ?",
+    "hint": "Appuyez sur un avantage pour l'examiner : faites glisser pour déplacer la vue, faites défiler ou pincez pour zoomer.",
+    "resetBody": "Désactive tous les avantages d'{{count}}s et rembourse les crédits d'{{refund}}s. Vous pouvez les réactiver à tout moment.",
+    "resetPerks": "Réinitialiser les avantages",
+    "resetTitle": "Réinitialiser tous les avantages ?",
+    "resetView": "Réinitialiser l'affichage",
+    "title": "ARBRE DE COMPÉTENCES",
+    "zoomIn": "Agrandir",
+    "zoomOut": "Réduire",
+    "hubPerks": "{{selected}}/{{total}} avantages"
+  },
+  "waveBreak": {
+    "chooseBoon": "Choisissez un avantage - Wave {{wave}} / {{total}} suivant",
+    "cleared": "VAGUE DÉBLOQUÉE"
+  }
+}
