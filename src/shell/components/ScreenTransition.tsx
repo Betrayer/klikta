@@ -29,7 +29,7 @@ export const ScreenTransition = ({ screenKey, children }: ScreenTransitionProps)
       key={screenKey}
       style={{
         width: '100vw',
-        height: '100vh',
+        height: '100dvh',
         animation: `${ANIMATION_NAME[change]} ${duration}ms ease both`,
       }}
     >

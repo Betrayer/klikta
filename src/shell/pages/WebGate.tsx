@@ -17,7 +17,7 @@ export const WebGate = ({ onUnlock }: { onUnlock: () => void }) => {
   };
 
   return (
-    <Center h="100vh" bg="background" p="md">
+    <Center h="100dvh" bg="background" p="md">
       <Stack align="center" gap="md" w={300}>
         <Title order={1} c="primary" lts={4}>
           KLIKTA

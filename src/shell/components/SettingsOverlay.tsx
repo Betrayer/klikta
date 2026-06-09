@@ -9,6 +9,7 @@ import {
   Switch,
   Text,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { useRunStore } from '../../state/runStore';
 import { useSettingsStore } from '../../state/settingsStore';
@@ -30,6 +31,7 @@ const toPercent = (v: number): number => Math.round(v * 100);
 
 export const SettingsOverlay = () => {
   const { t } = useTranslation();
+  const isMobile = useMediaQuery('(max-width: 640px)');
   const paused = useRunStore((s) => s.paused);
   const setPaused = useRunStore((s) => s.setPaused);
   const waveBreakActive = useCampaignStore((s) => s.breakActive);
@@ -104,6 +106,7 @@ export const SettingsOverlay = () => {
         onClose={() => setPaused(false)}
         title={t('settings:title')}
         centered
+        fullScreen={isMobile}
         closeOnEscape={false}
         overlayProps={{ backgroundOpacity: 0.6, blur: 2 }}
       >

@@ -14,22 +14,25 @@ export interface Wave {
 export const WAVES: readonly Wave[] = [
   {
     index: 1,
-    durationMs: 9000,
+    durationMs: 10800,
     density: { intervalMs: 1150, weights: { regular: 100 } },
   },
   {
     index: 2,
-    durationMs: 9000,
+    durationMs: 10800,
     density: { intervalMs: 1050, weights: { regular: 90, golden: 12 } },
   },
   {
     index: 3,
-    durationMs: 10000,
-    density: { intervalMs: 1000, weights: { regular: 80, golden: 12, multi: 16 } },
+    durationMs: 12000,
+    density: {
+      intervalMs: 1000,
+      weights: { regular: 80, golden: 12, multi: 16 },
+    },
   },
   {
     index: 4,
-    durationMs: 10000,
+    durationMs: 12000,
     density: {
       intervalMs: 950,
       weights: { regular: 72, golden: 12, multi: 16, bomb: 14 },
@@ -37,7 +40,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 5,
-    durationMs: 12000,
+    durationMs: 14400,
     density: {
       intervalMs: 800,
       weights: { regular: 64, golden: 14, multi: 22, bomb: 22 },
@@ -45,7 +48,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 6,
-    durationMs: 10500,
+    durationMs: 12600,
     density: {
       intervalMs: 900,
       weights: { regular: 60, golden: 12, multi: 18, bomb: 16, shielded: 16 },
@@ -53,7 +56,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 7,
-    durationMs: 11000,
+    durationMs: 13200,
     density: {
       intervalMs: 850,
       weights: { regular: 54, golden: 12, multi: 20, bomb: 18, shielded: 18 },
@@ -61,7 +64,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 8,
-    durationMs: 11000,
+    durationMs: 13200,
     density: {
       intervalMs: 850,
       weights: {
@@ -76,7 +79,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 9,
-    durationMs: 11500,
+    durationMs: 13800,
     density: {
       intervalMs: 800,
       weights: {
@@ -91,7 +94,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 10,
-    durationMs: 13000,
+    durationMs: 15600,
     density: {
       intervalMs: 700,
       weights: {
@@ -106,7 +109,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 11,
-    durationMs: 11500,
+    durationMs: 13800,
     density: {
       intervalMs: 760,
       weights: {
@@ -121,7 +124,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 12,
-    durationMs: 12000,
+    durationMs: 14400,
     density: {
       intervalMs: 720,
       weights: {
@@ -136,7 +139,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 13,
-    durationMs: 12000,
+    durationMs: 14400,
     density: {
       intervalMs: 700,
       weights: {
@@ -151,7 +154,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 14,
-    durationMs: 12500,
+    durationMs: 15000,
     density: {
       intervalMs: 660,
       weights: {
@@ -166,7 +169,7 @@ export const WAVES: readonly Wave[] = [
   },
   {
     index: 15,
-    durationMs: 14000,
+    durationMs: 16800,
     density: {
       intervalMs: 600,
       weights: {

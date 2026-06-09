@@ -3,7 +3,7 @@ import { initReactI18next } from "react-i18next";
 import { loadLanguageBundles } from "./resources";
 import { SUPPORTED_LANGUAGES, type SupportedLang } from "./languages";
 
-export const I18N_NAMESPACES = [
+const I18N_NAMESPACES = [
   "common",
   "menu",
   "game",
@@ -13,8 +13,6 @@ export const I18N_NAMESPACES = [
   "auth",
   "perks",
   "modes",
-  "runPerks",
-  "cosmetics",
 ] as const;
 
 export const applyLanguageBundles = async (

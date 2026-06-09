@@ -50,7 +50,11 @@ import { createUltimateRegistry } from "../ultimates/registry";
 import type { GameContext } from "../ultimates/types";
 import { SKILL_TREE, findUltimateForBranch } from "../../data/skillTree";
 import { TARGET_CONFIG, type TargetKind } from "../../data/targetConfig";
-import { rollRunPerkChoices, type RunPerk } from "../../data/runPerks";
+import {
+  rollPerkChoices,
+  rollUltimateChoices,
+  type DraftChoice,
+} from "../../data/campaignDraft";
 import type { SkillEffect } from "../effects/types";
 import { tweenManager } from "../util/TweenManager";
 import { linear } from "../util/easings";
@@ -72,6 +76,7 @@ import {
   SPLITTER_FRAGMENT_SIZE_MUL,
   SPLITTER_FRAGMENT_SPREAD_MIN,
   SPLITTER_FRAGMENT_SPREAD_RANGE,
+  SPLITTER_FRAGMENT_DRIFT_SPEED,
   VICTORY_BONUS_CURRENCY,
   comboBonusForMax,
 } from "../config/balance";
@@ -94,6 +99,7 @@ import type {
   ModeContext,
   ModePolicy,
   ModeTickDirective,
+  WaveBreakDraft,
 } from "../modes/ModePolicy";
 import { EndlessHPMode } from "../modes/EndlessHPMode";
 import { getActiveModePolicy } from "../modes/activeModePolicy";
@@ -142,8 +148,9 @@ export class Game {
   private runMods: RunModifiers;
   private spawnPolicy: SpawnPolicy;
   private targetMods: TargetSpawnModifiers;
-  private readonly usedRunPerkIds: string[] = [];
-  private waveBreakChoices: RunPerk[] = [];
+  private readonly usedPerkIds: string[] = [];
+  private readonly usedUltimateIds: string[] = [];
+  private waveBreakChoices: DraftChoice[] = [];
   private readonly ultimateHandler = (id: string): void => {
     this.tryActivateUltimate(id);
   };
@@ -198,7 +205,10 @@ export class Game {
   }
 
   async start(onAssetsLoading?: (loading: boolean) => void): Promise<void> {
-    this.resolver = getActiveResolver();
+    this.mode = getActiveModePolicy();
+    this.resolver = this.mode.usesMetaPerks
+      ? getActiveResolver()
+      : EffectResolver.empty();
     this.runMods = this.resolver.buildRunModifiers();
     this.spawnPolicy = this.resolver.buildSpawnPolicy();
     this.targetMods = this.resolver.buildBaseTargetModifiers();
@@ -218,9 +228,9 @@ export class Game {
     this.phoenixUsedThisRun = false;
     this.phoenixIframesUntil = 0;
     this.physics = null;
-    this.usedRunPerkIds.length = 0;
+    this.usedPerkIds.length = 0;
+    this.usedUltimateIds.length = 0;
     this.waveBreakChoices = [];
-    this.mode = getActiveModePolicy();
 
     const unlockedFromPerks = this.resolver.getUltimateUnlocks();
     this.ultimateSystem = new UltimateSystem(
@@ -762,30 +772,46 @@ export class Game {
       this.spawnSystem.setWavePlan(directive.wavePlan, this.clockMs);
     }
     if (directive.startWaveBreak !== undefined) {
-      this.beginWaveBreak(directive.startWaveBreak.upcomingWave);
+      this.beginWaveBreak(
+        directive.startWaveBreak.upcomingWave,
+        directive.startWaveBreak.draft,
+      );
     }
   }
 
-  private beginWaveBreak(upcomingWave: number): void {
-    const choices = rollRunPerkChoices(this.usedRunPerkIds);
+  private beginWaveBreak(upcomingWave: number, draft: WaveBreakDraft): void {
+    const choices =
+      draft.kind === "ultimate"
+        ? rollUltimateChoices(this.usedUltimateIds)
+        : rollPerkChoices(draft.tier, this.usedPerkIds);
     this.waveBreakChoices = choices;
     useCampaignStore.getState().openBreak(
       upcomingWave,
-      choices.map((p) => ({
-        id: p.id,
-        name: p.name,
-        description: p.description,
+      draft.kind,
+      choices.map((c) => ({
+        id: c.id,
+        name: c.name,
+        description: c.description,
       })),
     );
     audioSystem.playSFX("combo_milestone");
     this.setWaveFrozen(true);
   }
 
-  private onRunPerkChosen(perkId: string): void {
-    const perk = this.waveBreakChoices.find((p) => p.id === perkId);
-    if (perk === undefined) return;
-    this.usedRunPerkIds.push(perkId);
-    this.applyRunEffects(perk.effects);
+  private onRunPerkChosen(choiceId: string): void {
+    const choice = this.waveBreakChoices.find((c) => c.id === choiceId);
+    if (choice === undefined) return;
+    const ultimateIds: string[] = [];
+    for (const effect of choice.effects) {
+      if (effect.kind === "ultimateUnlock") ultimateIds.push(effect.id);
+    }
+    if (ultimateIds.length > 0) {
+      this.usedUltimateIds.push(choice.id);
+      for (const id of ultimateIds) this.ultimateSystem?.unlock(id);
+    } else {
+      this.usedPerkIds.push(choice.id);
+    }
+    this.applyRunEffects(choice.effects);
     this.waveBreakChoices = [];
     useCampaignStore.getState().closeBreak();
     this.mode.resumeFromBreak();
@@ -1114,6 +1140,10 @@ export class Game {
         visualOverride,
       );
       fragment.bindPointerDown(() => this.handleTargetClick(fragment));
+      fragment.setSplitterShard(
+        Math.cos(angle) * SPLITTER_FRAGMENT_DRIFT_SPEED,
+        Math.sin(angle) * SPLITTER_FRAGMENT_DRIFT_SPEED,
+      );
       this.targetLayer.addChild(fragment.view);
       this.targets.push(fragment);
       if (this.physics !== null) this.bindToPhysics(fragment);

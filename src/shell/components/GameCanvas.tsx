@@ -40,7 +40,7 @@ export const GameCanvas = () => {
 
   return (
     <>
-      <Box pos="relative" w="100vw" h="100vh" style={{ overflow: 'hidden' }}>
+      <Box pos="relative" w="100vw" h="100dvh" style={{ overflow: 'hidden' }}>
         <Box ref={containerRef} w="100%" h="100%" />
         <LoadingOverlay
           visible={loading}

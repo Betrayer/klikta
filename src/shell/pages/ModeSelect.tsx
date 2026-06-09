@@ -5,7 +5,6 @@ import {
   Container,
   Group,
   NumberFormatter,
-  ScrollArea,
   SimpleGrid,
   Stack,
   Text,
@@ -26,34 +25,32 @@ export const ModeSelect = () => {
 
   return (
     <MenuShell>
-      <ScrollArea h="100vh" type="auto">
-        <Container size={900} p="md">
-          <Stack gap="lg">
-            <Group justify="space-between" align="center">
-              <Title order={1} fz={36} fw={900} c="primary" lts={4}>
-                {t('menu:modeSelect.title')}
-              </Title>
-              <MenuButton
-                variant="tertiary"
-                fullWidth={false}
-                onClick={() => useAppStore.getState().setScreen('menu')}
-              >
-                {t('common:back')}
-              </MenuButton>
-            </Group>
+      <Container size={900} p="md">
+        <Stack gap="lg">
+          <Group justify="space-between" align="center">
+            <Title order={1} fz={36} fw={900} c="primary" lts={4}>
+              {t('menu:modeSelect.title')}
+            </Title>
+            <MenuButton
+              variant="tertiary"
+              fullWidth={false}
+              onClick={() => useAppStore.getState().setScreen('menu')}
+            >
+              {t('common:back')}
+            </MenuButton>
+          </Group>
 
-            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-              {MODES.map((mode) => (
-                <ModeCard
-                  key={mode.id}
-                  mode={mode}
-                  best={bestScores[mode.id] ?? 0}
-                />
-              ))}
-            </SimpleGrid>
-          </Stack>
-        </Container>
-      </ScrollArea>
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+            {MODES.map((mode) => (
+              <ModeCard
+                key={mode.id}
+                mode={mode}
+                best={bestScores[mode.id] ?? 0}
+              />
+            ))}
+          </SimpleGrid>
+        </Stack>
+      </Container>
     </MenuShell>
   );
 };

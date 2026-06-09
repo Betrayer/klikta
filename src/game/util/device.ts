@@ -12,7 +12,7 @@ export const isTouchDevice = (): boolean => {
   return touchCapable;
 };
 
-export const TOUCH_RADIUS_MUL = 1.25;
+const TOUCH_RADIUS_MUL = 1.25;
 
 export const touchRadiusMul = (): number =>
   isTouchDevice() ? TOUCH_RADIUS_MUL : 1;

@@ -12,14 +12,21 @@ export interface ModeContext {
   readonly liveTargetCount: number;
 }
 
+export type DraftTier = 1 | 2 | 3;
+
+export type WaveBreakDraft =
+  | { kind: "perk"; tier: DraftTier }
+  | { kind: "ultimate" };
+
 export interface ModeTickDirective {
   wavePlan?: WaveDensity | null;
-  startWaveBreak?: { upcomingWave: number };
+  startWaveBreak?: { upcomingWave: number; draft: WaveBreakDraft };
 }
 
 export interface ModePolicy {
   readonly id: ModeId;
   readonly initialTimeMs: number;
+  readonly usesMetaPerks: boolean;
   onRunStart(): void;
   onTick(deltaMs: number, ctx: ModeContext): ModeTickDirective | void;
   isRunOver(ctx: ModeContext): boolean;

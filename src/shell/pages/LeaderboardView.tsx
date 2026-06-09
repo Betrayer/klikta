@@ -4,7 +4,6 @@ import {
   Group,
   Loader,
   NumberFormatter,
-  ScrollArea,
   Stack,
   Table,
   Tabs,
@@ -68,8 +67,7 @@ export const LeaderboardView = () => {
 
   return (
     <MenuShell>
-      <ScrollArea h="100vh" type="auto">
-        <Container size={720} p="md">
+      <Container size={720} p="md">
           <Stack gap="lg">
             <Group justify="space-between" align="center">
               <Title order={1} fz={36} fw={900} c="primary" lts={4}>
@@ -193,8 +191,7 @@ export const LeaderboardView = () => {
               </Table>
             )}
           </Stack>
-        </Container>
-      </ScrollArea>
+      </Container>
     </MenuShell>
   );
 };

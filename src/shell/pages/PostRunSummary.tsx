@@ -259,7 +259,14 @@ export const PostRunSummary = () => {
 
   return (
     <MenuShell>
-      <Center mih="100vh" p="md">
+      <Center
+        mih="100dvh"
+        p="md"
+        style={{
+          paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
+          paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
+        }}
+      >
         <Container size={720} w="100%">
           <Stack gap="lg">
             <Stack gap={4} align="center">

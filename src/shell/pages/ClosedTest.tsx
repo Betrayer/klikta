@@ -6,7 +6,7 @@ export const ClosedTest = () => {
   const { t } = useTranslation();
   const { userId } = getTelegramSession();
   return (
-    <Center h="100vh" bg="background" p="md">
+    <Center h="100dvh" bg="background" p="md">
       <Stack align="center" gap="sm" maw={420}>
         <Title order={2} c="primary">
           {t('common:gate.closedTitle')}

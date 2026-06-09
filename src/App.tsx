@@ -66,7 +66,7 @@ export const App = () => {
   return (
     <>
       <AppBackground />
-      <Box pos="relative" style={{ zIndex: 1, minHeight: '100vh' }}>
+      <Box pos="relative" style={{ zIndex: 1, minHeight: '100dvh' }}>
         <ScreenTransition screenKey={screenKey}>{content}</ScreenTransition>
       </Box>
     </>

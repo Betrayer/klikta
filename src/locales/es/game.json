@@ -20,17 +20,18 @@
     "bindBody": "¿Asignar «{{name}}» como tu habilidad definitiva activa para conseguir monedas de «{{cost}}»?",
     "bindTitle": "¿Bind definitivo?",
     "hint": "Toca una ventaja para verla: arrastra para desplazarte, desplaza el dedo o pellizca para ampliar.",
+    "hubPerks": "{{selected}}/{{total}} ventajas",
     "resetBody": "Desactiva todas las ventajas de «{{count}}» y devuelve la moneda de «{{refund}}». Puedes volver a activarlas en cualquier momento.",
     "resetPerks": "Restablecer ventajas",
     "resetTitle": "¿Restablecer todas las ventajas?",
     "resetView": "Restablecer vista",
     "title": "ÁRBOL DE HABILIDADES",
     "zoomIn": "Acercar",
-    "zoomOut": "Alejar la imagen",
-    "hubPerks": "{{selected}}/{{total}} ventajas"
+    "zoomOut": "Alejar la imagen"
   },
   "waveBreak": {
     "chooseBoon": "Elige una ventaja: Wave {{wave}} / {{total}} siguiente",
+    "chooseUltimate": "Elige un «ultimate»: Wave {{wave}} / {{total}} a continuación",
     "cleared": "ONDA DESPEJADA"
   }
 }

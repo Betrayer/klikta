@@ -1,10 +1,10 @@
-import { Box } from '@mantine/core';
+import { Box, ScrollArea } from '@mantine/core';
 import type { ReactNode } from 'react';
 
 export const MenuShell = ({ children }: { children: ReactNode }) => (
-  <Box pos="relative" mih="100vh" style={{ overflow: 'hidden' }}>
+  <Box pos="relative">
     <Box
-      pos="absolute"
+      pos="fixed"
       inset={0}
       style={{
         zIndex: 1,
@@ -12,8 +12,12 @@ export const MenuShell = ({ children }: { children: ReactNode }) => (
         pointerEvents: 'none',
       }}
     />
-    <Box pos="relative" style={{ zIndex: 2, minHeight: '100vh' }}>
+    <ScrollArea
+      h="100dvh"
+      type="auto"
+      style={{ position: 'relative', zIndex: 2 }}
+    >
       {children}
-    </Box>
+    </ScrollArea>
   </Box>
 );

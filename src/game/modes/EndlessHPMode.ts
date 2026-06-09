@@ -4,6 +4,7 @@ import type { ModeContext, ModePolicy, PenaltyKind } from "./ModePolicy";
 export class EndlessHPMode implements ModePolicy {
   readonly id: ModeId = "endless_hp";
   readonly initialTimeMs = 0;
+  readonly usesMetaPerks = true;
 
   onRunStart(): void {}
 
