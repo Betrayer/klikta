@@ -3,7 +3,6 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SKILL_TREE } from "../src/data/skillTree";
 import { MODES } from "../src/data/modes";
-import { RUN_PERKS } from "../src/data/runPerks";
 
 type Entry = Record<string, string>;
 type Namespace = Record<string, Entry>;
@@ -54,11 +53,5 @@ for (const mode of MODES) {
   };
 }
 
-const runPerks: Namespace = {};
-for (const perk of RUN_PERKS) {
-  runPerks[perk.id] = { name: perk.name, description: perk.description };
-}
-
 writeNamespace("perks", perks);
 writeNamespace("modes", modes);
-writeNamespace("runPerks", runPerks);

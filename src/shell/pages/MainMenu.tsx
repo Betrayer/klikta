@@ -56,7 +56,7 @@ export const MainMenu = () => {
 
   return (
     <MenuShell>
-      <Center mih="100vh" p="md">
+      <Center mih="100dvh" p="md">
         <Stack align="center" gap={32} w="100%" maw={360}>
           <Title
             order={1}

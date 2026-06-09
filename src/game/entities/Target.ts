@@ -72,6 +72,9 @@ export abstract class Target {
   protected lifeScale = 1;
   protected animScale = 0;
   protected phaseInvisible = false;
+  protected suppressLifeShrink = false;
+  protected linearDriftVx = 0;
+  protected linearDriftVy = 0;
 
   private readonly tweens: Tween[] = [];
   private exitedByMiss = false;
@@ -132,6 +135,12 @@ export abstract class Target {
   bindPointerDown(handler: () => void): void {
     this.pointerDownHandler = handler;
     this.base.on("pointerdown", handler);
+  }
+
+  setSplitterShard(vx: number, vy: number): void {
+    this.suppressLifeShrink = true;
+    this.linearDriftVx = vx;
+    this.linearDriftVy = vy;
   }
 
   get isDead(): boolean {
@@ -232,7 +241,7 @@ export abstract class Target {
   }
 
   protected updateLifeAndAlpha(): void {
-    if (this.phase === "active" && this.config.shrinks) {
+    if (this.phase === "active" && this.config.shrinks && !this.suppressLifeShrink) {
       if (bloomState.active) {
         this.lifeScale = Math.min(
           1 + this.elapsedMs / this.lifetimeMs,
@@ -284,10 +293,11 @@ export abstract class Target {
     if (!this.isInteractive) return;
     const conv = this.modifiers.convergentDriftSpeed;
     const mag = this.modifiers.magnetSpeed;
-    if (conv <= 0 && mag <= 0) return;
+    const hasLinear = this.linearDriftVx !== 0 || this.linearDriftVy !== 0;
+    if (conv <= 0 && mag <= 0 && !hasLinear) return;
 
-    let vx = 0;
-    let vy = 0;
+    let vx = this.linearDriftVx;
+    let vy = this.linearDriftVy;
     if (conv > 0) {
       const dx = ctx.centerX - this.x;
       const dy = ctx.centerY - this.y;

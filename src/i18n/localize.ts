@@ -1,6 +1,6 @@
 import i18n from "./index";
 
-export type DataNamespace = "perks" | "modes" | "runPerks" | "cosmetics";
+export type DataNamespace = "perks" | "modes";
 
 export const localize = (
   namespace: DataNamespace,

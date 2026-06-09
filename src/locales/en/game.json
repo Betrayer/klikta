@@ -6,7 +6,8 @@
   },
   "waveBreak": {
     "cleared": "WAVE CLEARED",
-    "chooseBoon": "Choose a boon - Wave {{wave}} / {{total}} next"
+    "chooseBoon": "Choose a boon - Wave {{wave}} / {{total}} next",
+    "chooseUltimate": "Choose an ultimate - Wave {{wave}} / {{total}} next"
   },
   "skillTree": {
     "title": "SKILL TREE",

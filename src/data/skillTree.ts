@@ -86,6 +86,40 @@ export const findUltimateForBranch = (
   return undefined;
 };
 
+export interface UltimateSlotInfo {
+  branchId: BranchId;
+  branchIndex: number;
+  color: string;
+  perkId: string;
+  name: string;
+}
+
+export const findUltimateSlot = (
+  ultimateId: string,
+): UltimateSlotInfo | undefined => {
+  for (let branchIndex = 0; branchIndex < SKILL_TREE.length; branchIndex++) {
+    const branch = SKILL_TREE[branchIndex];
+    if (branch === undefined) continue;
+    for (const tier of branch.tiers) {
+      if (tier.tier !== 4) continue;
+      for (const option of tier.options) {
+        for (const effect of option.effects) {
+          if (effect.kind === "ultimateUnlock" && effect.id === ultimateId) {
+            return {
+              branchId: branch.id,
+              branchIndex,
+              color: branch.color,
+              perkId: option.id,
+              name: option.name,
+            };
+          }
+        }
+      }
+    }
+  }
+  return undefined;
+};
+
 const validateSkillTree = (): void => {
   const seenIds = new Set<string>();
   const ultimateIds = new Set<string>();

@@ -6,7 +6,16 @@ import type {
   ModePolicy,
   ModeTickDirective,
   PenaltyKind,
+  WaveBreakDraft,
 } from "./ModePolicy";
+
+const ULTIMATE_WAVES: readonly number[] = [5, 10];
+
+const draftForUpcomingWave = (upcomingWave: number): WaveBreakDraft => {
+  if (ULTIMATE_WAVES.includes(upcomingWave)) return { kind: "ultimate" };
+  const tier = upcomingWave < 5 ? 1 : upcomingWave < 10 ? 2 : 3;
+  return { kind: "perk", tier };
+};
 
 type Phase = "spawning" | "clearing" | "break";
 type Outcome = "none" | "won";
@@ -14,6 +23,7 @@ type Outcome = "none" | "won";
 export class CampaignMode implements ModePolicy {
   readonly id: ModeId = "campaign";
   readonly initialTimeMs = 0;
+  readonly usesMetaPerks = false;
 
   private waveIndex = 0;
   private waveElapsedMs = 0;
@@ -66,7 +76,10 @@ export class CampaignMode implements ModePolicy {
     }
 
     this.phase = "break";
-    return { startWaveBreak: { upcomingWave: this.waveIndex + 2 } };
+    const upcomingWave = this.waveIndex + 2;
+    return {
+      startWaveBreak: { upcomingWave, draft: draftForUpcomingWave(upcomingWave) },
+    };
   }
 
   isRunOver(ctx: ModeContext): boolean {

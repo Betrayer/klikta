@@ -11,7 +11,7 @@ import type { Theme } from "../data/themes/types";
 import { isTouchDevice } from "../game/util/device";
 import { getTelegramAccentColor } from "../services/telegram";
 
-export const TELEGRAM_BRAND = "#229ed9";
+const TELEGRAM_BRAND = "#229ed9";
 
 const touchComponents: MantineThemeOverride["components"] = {
   Button: { defaultProps: { size: "md" } },

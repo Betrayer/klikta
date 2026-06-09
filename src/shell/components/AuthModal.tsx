@@ -10,6 +10,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../state/authStore";
 import { isTelegramEnvironment } from "../../services/telegram";
@@ -23,6 +24,7 @@ interface AuthModalProps {
 
 export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
   const { t } = useTranslation();
+  const isMobile = useMediaQuery("(max-width: 640px)");
   const messageFor = (code: string): string =>
     t(`auth:errors.${code}`, { defaultValue: code });
   const busy = useAuthStore((s) => s.busy);
@@ -64,6 +66,7 @@ export const AuthModal = ({ opened, onClose }: AuthModalProps) => {
       onClose={onClose}
       title={t("auth:syncTitle")}
       centered
+      fullScreen={isMobile}
     >
       <Stack gap="md">
         {inTelegram ? (

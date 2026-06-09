@@ -32,7 +32,7 @@ const DEEPL_NAMESPACES = new Set([
   "settings",
   "auth",
 ]);
-const LLM_NAMESPACES = new Set(["perks", "modes", "runPerks"]);
+const LLM_NAMESPACES = new Set(["perks", "modes"]);
 
 const DEEPL_BATCH = 50;
 const LLM_BATCH = 30;

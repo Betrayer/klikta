@@ -20,17 +20,18 @@
     "bindBody": "Czy warto przypisać umiejętność „{{name}}” jako aktywną superumiejętność w zamian za walutę „{{cost}}”?",
     "bindTitle": "Ostateczna umiejętność Binda?",
     "hint": "Dotknij korzyści, aby ją obejrzeć – przeciągnij, aby przesuwać widok, przewiń lub zsuwaj palce, aby powiększyć.",
+    "hubPerks": "{{selected}}/{{total}} atutów",
     "resetBody": "Cofnie wszystkie korzyści z pakietu „{{count}}” i zwróci walutę z pakietu „{{refund}}”. Możesz je ponownie wybrać w dowolnym momencie.",
     "resetPerks": "Zresetuj atuty",
     "resetTitle": "Zresetować wszystkie atuty?",
     "resetView": "Zresetuj widok",
     "title": "DRZEWKO UMIEJĘTNOŚCI",
     "zoomIn": "Powiększ",
-    "zoomOut": "Powiększyć",
-    "hubPerks": "{{selected}}/{{total}} atutów"
+    "zoomOut": "Powiększyć"
   },
   "waveBreak": {
     "chooseBoon": "Wybierz bonus – Wave {{wave}} / {{total}} dalej",
+    "chooseUltimate": "Wybierz najlepszą opcję – Wave {{wave}} / {{total}} dalej",
     "cleared": "FALA PRZESZŁA"
   }
 }

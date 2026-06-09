@@ -1,13 +1,8 @@
 import { memo, useMemo } from 'react';
 import { Box, Paper, Progress, Text, UnstyledButton } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { useMetaStore } from '../../state/metaStore';
 import { useRunStore } from '../../state/runStore';
-import {
-  SKILL_TREE,
-  findUltimateForBranch,
-  type BranchId,
-} from '../../data/skillTree';
+import { findUltimateSlot, type BranchId } from '../../data/skillTree';
 import { requestUltimateActivation } from '../../game/systems/ultimateActivation';
 import { useLocalize } from '../../i18n/useLocalize';
 import { useHudSpec } from './hud/useHudSpec';
@@ -22,30 +17,27 @@ interface UltimateSlot {
 }
 
 export const UltimateBar = memo(() => {
-  const selectedPerks = useMetaStore((s) => s.selectedPerks);
   const charges = useRunStore((s) => s.ultimateCharges);
   const activeUltimate = useRunStore((s) => s.activeUltimate);
   const surface = useHudSpec().ultimate.surface;
 
   const slots = useMemo<UltimateSlot[]>(() => {
     const out: UltimateSlot[] = [];
-    SKILL_TREE.forEach((branch, index) => {
-      const t4Key = `${branch.id}-t4`;
-      const perkId = selectedPerks[t4Key];
-      if (perkId === undefined) return;
-      const ult = findUltimateForBranch(branch.id);
-      if (ult === undefined) return;
+    for (const ultimateId of Object.keys(charges)) {
+      const info = findUltimateSlot(ultimateId);
+      if (info === undefined) continue;
       out.push({
-        hotkey: index + 1,
-        ultimateId: ult.id,
-        ultimateName: ult.name,
-        perkId,
-        branchId: branch.id,
-        color: branch.color,
+        hotkey: info.branchIndex + 1,
+        ultimateId,
+        ultimateName: info.name,
+        perkId: info.perkId,
+        branchId: info.branchId,
+        color: info.color,
       });
-    });
+    }
+    out.sort((a, b) => a.hotkey - b.hotkey);
     return out;
-  }, [selectedPerks]);
+  }, [charges]);
 
   if (slots.length === 0) return null;
 

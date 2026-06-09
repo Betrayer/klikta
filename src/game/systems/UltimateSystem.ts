@@ -7,7 +7,7 @@ export class UltimateSystem {
   private activeId: string | null = null;
   private activeStartMs = 0;
   private activeEndsAtMs = 0;
-  private readonly unlocked: readonly string[];
+  private unlocked: string[];
   private readonly registry: Map<string, UltimateImpl>;
 
   constructor(
@@ -23,6 +23,13 @@ export class UltimateSystem {
 
   get unlockedIds(): readonly string[] {
     return this.unlocked;
+  }
+
+  unlock(id: string): void {
+    if (!this.registry.has(id) || this.unlocked.includes(id)) return;
+    this.unlocked = [...this.unlocked, id];
+    this.chargeMap.set(id, 0);
+    this.pushChargesToStore();
   }
 
   get isActive(): boolean {

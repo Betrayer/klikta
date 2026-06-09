@@ -4,6 +4,7 @@ import type { ModeContext, ModePolicy, PenaltyKind } from "./ModePolicy";
 export class PhysicsChaosMode implements ModePolicy {
   readonly id: ModeId = "physics_chaos";
   readonly initialTimeMs = 0;
+  readonly usesMetaPerks = true;
 
   onRunStart(): void {}
 

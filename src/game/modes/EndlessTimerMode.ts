@@ -11,6 +11,7 @@ import type { ModeContext, ModePolicy, PenaltyKind } from "./ModePolicy";
 export class EndlessTimerMode implements ModePolicy {
   readonly id: ModeId = "endless_timer";
   readonly initialTimeMs = TIMER_INITIAL_MS;
+  readonly usesMetaPerks = true;
 
   onRunStart(): void {}
 
