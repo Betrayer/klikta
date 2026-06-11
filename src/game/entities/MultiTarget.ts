@@ -44,7 +44,15 @@ export class MultiTarget extends Target {
       this.refreshVisualState();
       this.render();
       this.pulse();
-      return { destroyed: false, score: 0, effects: [] };
+      return {
+        destroyed: false,
+        score: 0,
+        effects: [],
+        multiPartial: {
+          index: this.clicksRequired - 1 - this.clicksRemaining,
+          total: this.clicksRequired - 1,
+        },
+      };
     }
     return {
       destroyed: true,

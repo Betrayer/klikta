@@ -13,6 +13,7 @@ export interface SkillTreeCanvasProps {
   branchPoints: Record<BranchId, number>;
   currency: number;
   focusedPerkId: string | null;
+  flashIds: readonly string[];
   panZoom: PanZoomController;
   onHover: (id: string | null) => void;
   onNodeClick: (perkId: string) => void;
@@ -85,6 +86,7 @@ export const SkillTreeCanvas = ({
   branchPoints,
   currency,
   focusedPerkId,
+  flashIds,
   panZoom,
   onHover,
   onNodeClick,
@@ -265,6 +267,7 @@ export const SkillTreeCanvas = ({
                   isUnaffordable={isUnaffordable}
                   isFocused={focusedPerkId === node.perkId}
                   isUltimate={isUltimate}
+                  isFlashing={flashIds.includes(node.perkId)}
                   onHover={onHover}
                   onClick={onNodeClick}
                 />

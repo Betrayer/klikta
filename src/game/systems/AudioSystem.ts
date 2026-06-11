@@ -151,10 +151,17 @@ class AudioSystem {
     else void this.ctx.resume();
   }
 
-  playSFX(name: string): void {
+  playSFX(name: string, seq?: { index: number; total: number }): void {
     const list = this.sfx.get(name);
     if (list === undefined || list.length === 0) return;
-    const howl = list[Math.floor(Math.random() * list.length)];
+    const pick =
+      seq !== undefined
+        ? Math.min(
+            Math.max(list.length - seq.total + seq.index, 0),
+            list.length - 1,
+          )
+        : Math.floor(Math.random() * list.length);
+    const howl = list[pick];
     if (howl === undefined) return;
     howl.volume(this.effectiveSfx() * this.sfxPackGain);
     howl.rate(this.sfxPackRate);

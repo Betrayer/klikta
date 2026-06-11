@@ -32,6 +32,7 @@ export interface ClickResult {
   destroyed: boolean;
   score: number;
   effects: TargetEffect[];
+  multiPartial?: { index: number; total: number };
 }
 
 export interface TargetSpawn {
