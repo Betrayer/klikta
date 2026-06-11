@@ -28,19 +28,15 @@ import {
   areThemeAssetsLoaded,
   loadThemeAssets,
 } from "../assets/loadThemeAssets";
-import { BackgroundLayer } from "../background/BackgroundLayer";
 import {
   getActiveTheme,
-  getBackgroundSpec,
   getCursorSpec,
 } from "../../state/themeSelectors";
 import {
   CURSOR_TEXTURES,
   resolveCursorValue,
 } from "../../data/themes/cursorTextures";
-import { useSettingsStore } from "../../state/settingsStore";
-import { FpsMonitor, reduceBackgroundSpec } from "../util/performance";
-import type { BackgroundSpec, TargetVisual } from "../../data/themes/types";
+import type { TargetVisual } from "../../data/themes/types";
 import { UltimateSystem } from "../systems/UltimateSystem";
 import {
   setUltimateActivationHandler,
@@ -129,14 +125,9 @@ export class Game {
   private readonly phantoms: PhantomTarget[] = [];
   private spawnSystem: SpawnSystem | null = null;
   private unsubPause: (() => void) | null = null;
-  private unsubTheme: (() => void) | null = null;
-  private unsubReduceMotion: (() => void) | null = null;
-  private readonly fpsMonitor = new FpsMonitor();
-  private autoReduceMotion = false;
   private vfx: VFXSystem | null = null;
   private camera: CameraSystem | null = null;
   private clickCursorValue: string | null = null;
-  private background: BackgroundLayer | null = null;
   private hitFrameUntil = 0;
   private clockMs = 0;
   private destroyed = false;
@@ -254,7 +245,7 @@ export class Game {
     const app = new Application();
     await app.init({
       resizeTo: this.parent,
-      background: getActiveTheme().background.color ?? 0x1a0033,
+      backgroundAlpha: 0,
       antialias: true,
       autoDensity: true,
       resolution: window.devicePixelRatio || 1,
@@ -268,15 +259,6 @@ export class Game {
 
     this.app = app;
     this.parent.appendChild(app.canvas);
-
-    this.autoReduceMotion = false;
-    this.fpsMonitor.reset();
-    const background = new BackgroundLayer(this.currentBackgroundSpec(), {
-      w: app.renderer.screen.width,
-      h: app.renderer.screen.height,
-    });
-    this.background = background;
-    app.stage.addChild(background.view);
 
     const phantomLayer = new Container();
     this.phantomLayer = phantomLayer;
@@ -367,18 +349,6 @@ export class Game {
 
     this.unsubPause = useRunStore.subscribe((state, prev) => {
       if (state.paused !== prev.paused) this.applyPaused(state.paused);
-    });
-
-    this.unsubTheme = useMetaStore.subscribe((state, prev) => {
-      if (state.activeThemeId !== prev.activeThemeId) {
-        this.refreshBackground();
-      }
-    });
-
-    this.unsubReduceMotion = useSettingsStore.subscribe((state, prev) => {
-      if (state.reduceMotion !== prev.reduceMotion) {
-        this.refreshBackground();
-      }
     });
   }
 
@@ -493,7 +463,6 @@ export class Game {
   private handleResize = (): void => {
     if (this.app === null) return;
     const { width, height } = this.app.renderer.screen;
-    this.background?.resize(width, height);
     if (this.physics !== null) {
       this.physics.resize({ width, height });
     }
@@ -569,19 +538,6 @@ export class Game {
     this.app.ticker.speed = base * this.ultimateTimeScale;
   }
 
-  private reduceMotionActive(): boolean {
-    return this.autoReduceMotion || useSettingsStore.getState().reduceMotion;
-  }
-
-  private currentBackgroundSpec(): BackgroundSpec {
-    const spec = getBackgroundSpec();
-    return this.reduceMotionActive() ? reduceBackgroundSpec(spec) : spec;
-  }
-
-  private refreshBackground(): void {
-    this.background?.applySpec(this.currentBackgroundSpec());
-  }
-
   private tick = (ticker: Ticker): void => {
     if (
       this.app === null ||
@@ -595,11 +551,6 @@ export class Game {
     this.clockMs += deltaMs;
     useRunStore.getState().tickElapsed(deltaMs);
     tweenManager.update(deltaMs);
-    this.background?.update(deltaMs);
-    if (!this.reduceMotionActive() && this.fpsMonitor.sample(deltaMs)) {
-      this.autoReduceMotion = true;
-      this.refreshBackground();
-    }
     this.vfx?.update(deltaMs);
     this.camera?.update(deltaMs);
     this.updateHitFrame();
@@ -953,7 +904,10 @@ export class Game {
       target.beginHitExit();
       this.killPair(target);
       if (target.kind !== "bomb") this.maybeChain(target);
-    } else if (target.kind === "multi" || target.kind === "sticky") {
+    } else if (target.kind === "multi") {
+      audioSystem.playSFX("hit_multi_partial", result.multiPartial);
+      this.vfx?.emitSubHit(target.x, target.y, target.color);
+    } else if (target.kind === "sticky") {
       audioSystem.playSFX("hit_multi_partial");
       this.vfx?.emitSubHit(target.x, target.y, target.color);
     } else if (target.kind === "shielded") {
@@ -1128,6 +1082,7 @@ export class Game {
         lifetimeMul,
         sizeMul: this.targetMods.sizeMul * SPLITTER_FRAGMENT_SIZE_MUL,
         scoreMul: this.targetMods.scoreMul * SPLITTER_FRAGMENT_SCORE_MUL,
+        slowBloomPhaseMs: 0,
       };
       const fragmentAlias = fragmentTextures?.[i];
       const visualOverride: TargetVisual | null =
@@ -1423,10 +1378,6 @@ export class Game {
   destroy(): void {
     this.destroyed = true;
     window.removeEventListener("keydown", this.handleKeydown);
-    this.unsubTheme?.();
-    this.unsubTheme = null;
-    this.unsubReduceMotion?.();
-    this.unsubReduceMotion = null;
     clearUltimateActivationHandler(this.ultimateHandler);
     clearRunPerkPickHandler(this.runPerkHandler);
     if (this.ultimateSystem !== null) {
@@ -1455,11 +1406,6 @@ export class Game {
     this.targets.length = 0;
     for (const phantom of this.phantoms) phantom.destroy();
     this.phantoms.length = 0;
-    if (this.background !== null) {
-      this.app.stage.removeChild(this.background.view);
-      this.background.destroy();
-      this.background = null;
-    }
     this.app.destroy(true, { children: true });
     this.app = null;
     this.targetLayer = null;

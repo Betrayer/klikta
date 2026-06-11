@@ -78,3 +78,13 @@ body {
 .klikta-menu-rise {
   animation: klikta-menu-rise 320ms ease both;
 }
+
+@keyframes klikta-perk-flash {
+  from,
+  to {
+    box-shadow: 0 0 0 0 rgba(255, 70, 70, 0);
+  }
+  50% {
+    box-shadow: 0 0 18px 4px rgba(255, 70, 70, 0.9);
+  }
+}

@@ -9,7 +9,7 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
   BranchId,
@@ -86,7 +86,24 @@ export const SkillTreeView = () => {
   const [pinnedPerkId, setPinnedPerkId] = useState<string | null>(null);
   const [pending, setPending] = useState<PendingSelection | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [flashIds, setFlashIds] = useState<readonly string[]>([]);
+  const flashTimeout = useRef<number | null>(null);
   const focusedPerkId = hoveredPerkId ?? pinnedPerkId;
+
+  const flashDownstream = useCallback((ids: readonly string[]) => {
+    setFlashIds(ids);
+    if (flashTimeout.current !== null) window.clearTimeout(flashTimeout.current);
+    flashTimeout.current = window.setTimeout(() => setFlashIds([]), 600);
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (flashTimeout.current !== null) {
+        window.clearTimeout(flashTimeout.current);
+      }
+    },
+    [],
+  );
 
   const selectedPerks = useMetaStore((s) => s.selectedPerks);
   const currency = useMetaStore((s) => s.currency);
@@ -167,6 +184,7 @@ export const SkillTreeView = () => {
         branchPoints={branchPoints}
         currency={currency}
         focusedPerkId={focusedPerkId}
+        flashIds={flashIds}
         panZoom={panZoom}
         onHover={setHoveredPerkId}
         onNodeClick={handleNodeClick}
@@ -269,6 +287,7 @@ export const SkillTreeView = () => {
       <PerkDetails
         focusedPerkId={focusedPerkId}
         onTrySelect={handleTrySelect}
+        onFlashDownstream={flashDownstream}
         onClose={() => setPinnedPerkId(null)}
       />
 

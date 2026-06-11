@@ -15,6 +15,7 @@ export interface PerkNodeProps {
   isUnaffordable: boolean;
   isFocused: boolean;
   isUltimate: boolean;
+  isFlashing: boolean;
   onHover: (id: string | null) => void;
   onClick: (id: string) => void;
 }
@@ -31,18 +32,21 @@ const PerkNodeImpl = ({
   isUnaffordable,
   isFocused,
   isUltimate,
+  isFlashing,
   onHover,
   onClick,
 }: PerkNodeProps) => {
-  const border = isSelected
-    ? `3px solid ${branchColor}`
-    : isFocused
-      ? `2px solid color-mix(in srgb, ${branchColor} 85%, transparent)`
-      : isLocked
-        ? "1.5px dashed color-mix(in srgb, white 18%, transparent)"
-        : isUnaffordable
-          ? `1.5px solid color-mix(in srgb, ${branchColor} 28%, transparent)`
-          : `2px solid color-mix(in srgb, ${branchColor} 48%, transparent)`;
+  const border = isFlashing
+    ? "3px solid var(--mantine-color-red-6)"
+    : isSelected
+      ? `3px solid ${branchColor}`
+      : isFocused
+        ? `2px solid color-mix(in srgb, ${branchColor} 85%, transparent)`
+        : isLocked
+          ? "1.5px dashed color-mix(in srgb, white 18%, transparent)"
+          : isUnaffordable
+            ? `1.5px solid color-mix(in srgb, ${branchColor} 28%, transparent)`
+            : `2px solid color-mix(in srgb, ${branchColor} 48%, transparent)`;
 
   const glow = isSelected
     ? `0 0 22px color-mix(in srgb, ${branchColor} 70%, transparent)`
@@ -91,6 +95,9 @@ const PerkNodeImpl = ({
           transform: `scale(${scale})`,
           transition:
             "transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease, opacity 140ms ease",
+          animation: isFlashing
+            ? "klikta-perk-flash 320ms ease 2"
+            : undefined,
           touchAction: "none",
         }}
       >

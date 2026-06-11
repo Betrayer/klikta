@@ -28,12 +28,14 @@ export interface PerkDetailsProps {
     branchId: BranchId,
     tier: TierLevel,
   ) => void;
+  onFlashDownstream: (ids: readonly string[]) => void;
   onClose?: () => void;
 }
 
 export const PerkDetails = ({
   focusedPerkId,
   onTrySelect,
+  onFlashDownstream,
   onClose,
 }: PerkDetailsProps) => {
   const { t } = useTranslation();
@@ -69,25 +71,34 @@ export const PerkDetails = ({
   const effectiveCost = isSelected ? 0 : option.cost - prevCost;
   const canAfford = currency >= effectiveCost;
 
-  const deselectBlockReason: string | null = (() => {
-    if (!isSelected) return null;
-    const afterPoints = branchPoints - 1;
+  const blockingDownstreamIds: string[] = (() => {
+    if (!isSelected) return [];
+    const ids: string[] = [];
     for (const tierItem of branch.tiers) {
       if (tierItem.tier <= tier.tier) continue;
-      const stillSelected = selectedPerks[tierKey(branch.id, tierItem.tier)];
-      if (
-        stillSelected !== undefined &&
-        afterPoints < tierItem.requiresPointsInBranch
-      ) {
-        return t('game:perk.deselectTierFirst', { tier: tierItem.tier });
+      const sel = selectedPerks[tierKey(branch.id, tierItem.tier)];
+      if (sel !== undefined) ids.push(sel);
+    }
+    return ids;
+  })();
+  const deselectBlocked = blockingDownstreamIds.length > 0;
+  const highestBlockingTier = (() => {
+    let max = 0;
+    for (const tierItem of branch.tiers) {
+      if (tierItem.tier <= tier.tier) continue;
+      if (selectedPerks[tierKey(branch.id, tierItem.tier)] !== undefined) {
+        max = Math.max(max, tierItem.tier);
       }
     }
-    return null;
+    return max;
   })();
 
   const handleAction = () => {
     if (isSelected) {
-      if (deselectBlockReason !== null) return;
+      if (deselectBlocked) {
+        onFlashDownstream(blockingDownstreamIds);
+        return;
+      }
       const meta = useMetaStore.getState();
       meta.awardCurrency(option.cost);
       meta.unselectPerk(key);
@@ -97,16 +108,18 @@ export const PerkDetails = ({
     onTrySelect(option, branch.id, tier.tier);
   };
 
-  const actionDisabled = isSelected
-    ? deselectBlockReason !== null
-    : !tierGateMet || !canAfford;
+  const actionDisabled = isSelected ? false : !tierGateMet || !canAfford;
 
   const actionLabel = isSelected
     ? t('game:perk.deselect')
     : t('game:perk.select');
 
   const reasonText: string | null = (() => {
-    if (isSelected) return deselectBlockReason;
+    if (isSelected) {
+      return deselectBlocked
+        ? t('game:perk.deselectTierFirst', { tier: highestBlockingTier })
+        : null;
+    }
     if (!tierGateMet) {
       return t('game:perk.locked', {
         points: tier.requiresPointsInBranch,
