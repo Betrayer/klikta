@@ -42,6 +42,13 @@ export const defaultSoundPack: SoundPack = {
     hit_multi_partial: variants(["hit_multi_partial_1", "hit_multi_partial_2"]),
     hit_multi_complete: variants(["hit_multi_partial_complete"]),
     hit_shielded_break: variants(["hit_shielded_break"]),
+    hit_shielded: variants(["hit_shielded"]),
+    hit_splitter: variants(["hit_splitter"]),
+    hit_splitter_frag: variants([
+      "hit_splitter_frag_1",
+      "hit_splitter_frag_2",
+      "hit_splitter_frag_3",
+    ]),
     bomb_click: variants(["bomb_click"]),
     miss: variants(["miss"]),
     combo_milestone: variants(["combo_milestone"]),

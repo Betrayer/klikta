@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { Container, Graphics, type FederatedPointerEvent } from "pixi.js";
 import {
   TARGET_CONFIG,
   type TargetKind,
@@ -62,6 +62,7 @@ export abstract class Target {
   phase: TargetPhase = "spawning";
   pairTarget: Target | null = null;
   physicsControlled = false;
+  splitterFragmentIndex: number | null = null;
 
   protected readonly config: TargetTypeConfig;
   protected readonly decoration: Graphics;
@@ -79,7 +80,7 @@ export abstract class Target {
 
   private readonly tweens: Tween[] = [];
   private exitedByMiss = false;
-  private pointerDownHandler: (() => void) | null = null;
+  private pointerDownHandler: ((e: FederatedPointerEvent) => void) | null = null;
 
   constructor(
     kind: TargetKind,
@@ -134,14 +135,18 @@ export abstract class Target {
   }
 
   bindPointerDown(handler: () => void): void {
-    this.pointerDownHandler = handler;
-    this.base.on("pointerdown", handler);
+    this.pointerDownHandler = (e: FederatedPointerEvent) => {
+      if (e.button !== 0) return;
+      handler();
+    };
+    this.base.on("pointerdown", this.pointerDownHandler);
   }
 
-  setSplitterShard(vx: number, vy: number): void {
+  setSplitterShard(vx: number, vy: number, fragmentIndex: number): void {
     this.suppressLifeShrink = true;
     this.linearDriftVx = vx;
     this.linearDriftVy = vy;
+    this.splitterFragmentIndex = fragmentIndex;
   }
 
   get isDead(): boolean {

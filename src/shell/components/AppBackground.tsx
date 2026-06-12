@@ -32,9 +32,9 @@ export const AppBackground = () => {
       .init({
         resizeTo: el,
         backgroundAlpha: 0,
-        antialias: true,
+        antialias: false,
         autoDensity: true,
-        resolution: window.devicePixelRatio || 1,
+        resolution: 1,
         preference: 'webgl',
       })
       .then(

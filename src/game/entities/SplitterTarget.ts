@@ -15,6 +15,7 @@ export class SplitterTarget extends Target {
 
   render(): void {
     this.decoration.clear();
+    if (this.spriteDecorationSuppressed()) return;
     const r = this.initialSize;
     for (let i = 0; i < 3; i++) {
       const angle = (Math.PI * 2 * i) / 3 - Math.PI / 2;
