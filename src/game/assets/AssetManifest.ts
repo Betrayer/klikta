@@ -11,6 +11,19 @@ import gemsSticky from "../../assets/themes/gems/sticky.png";
 import gemsFrag1 from "../../assets/themes/gems/splitter_frag1.png";
 import gemsFrag2 from "../../assets/themes/gems/splitter_frag2.png";
 import gemsFrag3 from "../../assets/themes/gems/splitter_frag3.png";
+import catsRegular from "../../assets/themes/cats/regular.png";
+import catsGolden from "../../assets/themes/cats/golden.png";
+import catsBomb from "../../assets/themes/cats/bomb.png";
+import catsMulti3 from "../../assets/themes/cats/multi_3.png";
+import catsMulti2 from "../../assets/themes/cats/multi_2.png";
+import catsMulti1 from "../../assets/themes/cats/multi_1.png";
+import catsShieldUp from "../../assets/themes/cats/shield_up.png";
+import catsShieldDown from "../../assets/themes/cats/shield_down.png";
+import catsSplitter from "../../assets/themes/cats/splitter.png";
+import catsSticky from "../../assets/themes/cats/sticky.png";
+import catsFrag1 from "../../assets/themes/cats/splitter_frag1.png";
+import catsFrag2 from "../../assets/themes/cats/splitter_frag2.png";
+import catsFrag3 from "../../assets/themes/cats/splitter_frag3.png";
 
 export interface TextureAsset {
   alias: string;
@@ -35,5 +48,20 @@ export const THEME_TEXTURES: Record<string, TextureAsset[]> = {
     { alias: "gems-frag1", src: gemsFrag1 },
     { alias: "gems-frag2", src: gemsFrag2 },
     { alias: "gems-frag3", src: gemsFrag3 },
+  ],
+  cats: [
+    { alias: "cats-regular", src: catsRegular },
+    { alias: "cats-golden", src: catsGolden },
+    { alias: "cats-bomb", src: catsBomb },
+    { alias: "cats-multi-3", src: catsMulti3 },
+    { alias: "cats-multi-2", src: catsMulti2 },
+    { alias: "cats-multi-1", src: catsMulti1 },
+    { alias: "cats-shield-up", src: catsShieldUp },
+    { alias: "cats-shield-down", src: catsShieldDown },
+    { alias: "cats-splitter", src: catsSplitter },
+    { alias: "cats-sticky", src: catsSticky },
+    { alias: "cats-frag1", src: catsFrag1 },
+    { alias: "cats-frag2", src: catsFrag2 },
+    { alias: "cats-frag3", src: catsFrag3 },
   ],
 };

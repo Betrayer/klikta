@@ -1,9 +1,9 @@
 import type { SfxName, SoundPack } from "../themes/types";
 import { defaultSoundPack } from "./defaultPack";
 
-export const GEMS_SOUND_PACK_ID = "gems";
+export const CATS_SOUND_PACK_ID = "cats";
 
-const urls = import.meta.glob("../../assets/audio/packs/gems/*.{mp3,wav,ogg}", {
+const urls = import.meta.glob("../../assets/audio/packs/cats/*.{mp3,wav,ogg}", {
   eager: true,
   query: "?url",
   import: "default",
@@ -69,10 +69,10 @@ sfx.combo_milestone = urlByBaseName.has("combo_milestone")
   ? [urlByBaseName.get("combo_milestone")!]
   : sfx.combo_milestone;
 
-export const gemsSoundPack: SoundPack = {
+export const catsSoundPack: SoundPack = {
   ...defaultSoundPack,
-  id: GEMS_SOUND_PACK_ID,
-  name: "Gems",
+  id: CATS_SOUND_PACK_ID,
+  name: "Cats",
   sfx,
   music: { src: urlByBaseName.get("bg1")?.[0] ?? defaultSoundPack.music.src },
 };
