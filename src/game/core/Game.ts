@@ -248,7 +248,7 @@ export class Game {
       backgroundAlpha: 0,
       antialias: true,
       autoDensity: true,
-      resolution: window.devicePixelRatio || 1,
+      resolution: Math.min(window.devicePixelRatio || 1, 2),
       preference: "webgl",
     });
 
@@ -402,6 +402,7 @@ export class Game {
   };
 
   private handleStagePointerDown = (event: FederatedPointerEvent): void => {
+    if (event.button !== 0) return;
     if (useRunStore.getState().paused) return;
     if (this.app === null || event.target !== this.app.stage) return;
 
@@ -934,7 +935,15 @@ export class Game {
     this.vortexCenter = { x: target.x, y: target.y };
     this.ultimateSystem?.addCharge(CHARGE_PER_HIT[target.kind]);
     this.syncMusicToCombo();
-    audioSystem.playSFX(this.hitSfx(target.kind));
+    const fragIdx = target.splitterFragmentIndex;
+    if (fragIdx !== null) {
+      audioSystem.playSFX("hit_splitter_frag", {
+        index: fragIdx,
+        total: SPLITTER_FRAGMENT_COUNT,
+      });
+    } else {
+      audioSystem.playSFX(this.hitSfx(target.kind));
+    }
     haptic(target.kind === "golden" ? "golden" : "hit");
     this.handleComboMilestone();
   }
@@ -1098,6 +1107,7 @@ export class Game {
       fragment.setSplitterShard(
         Math.cos(angle) * SPLITTER_FRAGMENT_DRIFT_SPEED,
         Math.sin(angle) * SPLITTER_FRAGMENT_DRIFT_SPEED,
+        i,
       );
       this.targetLayer.addChild(fragment.view);
       this.targets.push(fragment);
@@ -1118,7 +1128,10 @@ export class Game {
       bonusScore: bonus,
       lifetimeMs: echo.durationMs,
     });
-    phantom.graphics.on("pointerdown", () => this.handlePhantomClick(phantom));
+    phantom.graphics.on("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      this.handlePhantomClick(phantom);
+    });
     this.phantomLayer.addChild(phantom.graphics);
     this.phantoms.push(phantom);
   }
@@ -1274,6 +1287,8 @@ export class Game {
   private hitSfx(kind: TargetKind): string {
     if (kind === "golden") return "hit_golden";
     if (kind === "multi") return "hit_multi_complete";
+    if (kind === "shielded") return "hit_shielded";
+    if (kind === "splitter") return "hit_splitter";
     return "hit_regular";
   }
 

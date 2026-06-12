@@ -40,6 +40,12 @@ const SWELL_GAIN_MUL = 1.25;
 const MUSIC_CROSSFADE_S = 0.8;
 const SILENT_GAIN = 0.0001;
 
+const SFX_FALLBACK: Record<string, string> = {
+  hit_shielded: "hit_regular",
+  hit_splitter: "hit_regular",
+  hit_splitter_frag: "hit_regular",
+};
+
 class AudioSystem {
   private masterVolume = 1;
   private sfxVolume = 0.9;
@@ -152,7 +158,14 @@ class AudioSystem {
   }
 
   playSFX(name: string, seq?: { index: number; total: number }): void {
-    const list = this.sfx.get(name);
+    let key: string | undefined = name;
+    let list = this.sfx.get(key);
+    let guard = 0;
+    while ((list === undefined || list.length === 0) && key !== undefined && guard < 8) {
+      key = SFX_FALLBACK[key];
+      list = key !== undefined ? this.sfx.get(key) : undefined;
+      guard += 1;
+    }
     if (list === undefined || list.length === 0) return;
     const pick =
       seq !== undefined
