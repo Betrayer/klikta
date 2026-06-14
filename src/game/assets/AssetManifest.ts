@@ -11,6 +11,7 @@ import gemsSticky from "../../assets/themes/gems/sticky.png";
 import gemsFrag1 from "../../assets/themes/gems/splitter_frag1.png";
 import gemsFrag2 from "../../assets/themes/gems/splitter_frag2.png";
 import gemsFrag3 from "../../assets/themes/gems/splitter_frag3.png";
+
 import catsRegular from "../../assets/themes/cats/regular.png";
 import catsGolden from "../../assets/themes/cats/golden.png";
 import catsBomb from "../../assets/themes/cats/bomb.png";
@@ -24,6 +25,8 @@ import catsSticky from "../../assets/themes/cats/sticky.png";
 import catsFrag1 from "../../assets/themes/cats/splitter_frag1.png";
 import catsFrag2 from "../../assets/themes/cats/splitter_frag2.png";
 import catsFrag3 from "../../assets/themes/cats/splitter_frag3.png";
+
+import monstersBackground from "../../assets/themes/monsters/bg1.png";
 import monstersRegular from "../../assets/themes/monsters/regular.png";
 import monstersGolden from "../../assets/themes/monsters/golden.png";
 import monstersBomb from "../../assets/themes/monsters/bomb.png";

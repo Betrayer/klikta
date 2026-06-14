@@ -1,10 +1,10 @@
 import type { Theme } from "./types";
 import { DEFAULT_HUD_SPEC } from "./defaults";
-import { MONSTERS_SOUND_PACK_ID } from "../sound/monstersPack"; // Импорт обновленного звукового пака
+import { MONSTERS_SOUND_PACK_ID } from "../sound/monstersPack";
 
 export const monstersTheme: Theme = {
   id: "monsters",
-  name: "Vampire Castle",
+  name: "Monster slayer",
   ui: {
     primary: "#8b0000",
     accent: "#4b0082",
@@ -13,7 +13,7 @@ export const monstersTheme: Theme = {
     info: "#9370db",
     danger: "#ff0000",
     background: "#1a0a0a",
-    surface: "#2e1a1a",
+    surface: "#3a0808",
     border: "#4a0404",
     text: "#f5f5f5",
   },
