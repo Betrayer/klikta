@@ -49,6 +49,7 @@ export const defaultSoundPack: SoundPack = {
       "hit_splitter_frag_2",
       "hit_splitter_frag_3",
     ]),
+    sticky: variants([]),
     bomb_click: variants(["bomb_click"]),
     miss: variants(["miss"]),
     combo_milestone: variants(["combo_milestone"]),

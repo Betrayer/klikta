@@ -9,21 +9,24 @@ import {
 export class ImageBackground implements BackgroundRenderer {
   readonly view = new Container();
   private readonly textureKey: string | undefined;
+  private readonly fallbackColor: number;
   private sprite: Sprite | null = null;
   private width = 0;
   private height = 0;
 
   constructor(spec: BackgroundSpec) {
     this.textureKey = spec.texture;
+    this.fallbackColor = spec.color ?? 0x101018;
   }
 
   init(viewport: BackgroundViewport): void {
-    const texture =
-      this.textureKey !== undefined
-        ? (Assets.get<Texture>(this.textureKey) ?? Texture.WHITE)
-        : Texture.WHITE;
-    const sprite = new Sprite(texture);
+    const resolved =
+      this.textureKey !== undefined && Assets.cache.has(this.textureKey)
+        ? Assets.get<Texture>(this.textureKey)
+        : undefined;
+    const sprite = new Sprite(resolved ?? Texture.WHITE);
     sprite.anchor.set(0.5);
+    if (resolved === undefined) sprite.tint = this.fallbackColor;
     this.sprite = sprite;
     this.view.addChild(sprite);
     this.width = viewport.w;
