@@ -9,6 +9,7 @@ export type SfxName =
   | "hit_shielded"
   | "hit_splitter"
   | "hit_splitter_frag"
+  | "sticky"
   | "bomb_click"
   | "miss"
   | "combo_milestone"

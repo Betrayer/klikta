@@ -1289,6 +1289,7 @@ export class Game {
     if (kind === "multi") return "hit_multi_complete";
     if (kind === "shielded") return "hit_shielded";
     if (kind === "splitter") return "hit_splitter";
+    if (kind === "sticky") return "sticky";
     return "hit_regular";
   }
 

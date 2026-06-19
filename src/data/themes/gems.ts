@@ -54,11 +54,9 @@ export const gemsTheme: Theme = {
     milestone: [0x4dd0e1, 0xffffff],
   },
   background: {
-    kind: "bokeh",
+    kind: "image",
+    texture: "gems-bg",
     color: 0x0c1622,
-    bokehColor: 0x4dd0e1,
-    bokehDensity: 6,
-    animationSpeedSec: 8,
   },
   fonts: { display: "monospace", body: "system-ui, sans-serif" },
   defaultSoundPack: GEMS_SOUND_PACK_ID,

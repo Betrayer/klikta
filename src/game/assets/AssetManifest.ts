@@ -37,6 +37,9 @@ import monstersSticky from "../../assets/themes/monsters/sticky.png";
 import monstersFrag1 from "../../assets/themes/monsters/splitter_frag1.png";
 import monstersFrag2 from "../../assets/themes/monsters/splitter_frag2.png";
 import monstersFrag3 from "../../assets/themes/monsters/splitter_frag3.png";
+import gemsBg from "../../assets/themes/gems/background.svg";
+import catsBg from "../../assets/themes/cats/background.svg";
+import monstersBg from "../../assets/themes/monsters/bg1.png";
 
 export interface TextureAsset {
   alias: string;
@@ -61,6 +64,7 @@ export const THEME_TEXTURES: Record<string, TextureAsset[]> = {
     { alias: "gems-frag1", src: gemsFrag1 },
     { alias: "gems-frag2", src: gemsFrag2 },
     { alias: "gems-frag3", src: gemsFrag3 },
+    { alias: "gems-bg", src: gemsBg },
   ],
   cats: [
     { alias: "cats-regular", src: catsRegular },
@@ -76,6 +80,7 @@ export const THEME_TEXTURES: Record<string, TextureAsset[]> = {
     { alias: "cats-frag1", src: catsFrag1 },
     { alias: "cats-frag2", src: catsFrag2 },
     { alias: "cats-frag3", src: catsFrag3 },
+    { alias: "cats-bg", src: catsBg },
   ],
   monsters: [
     { alias: "monsters-regular", src: monstersRegular },
@@ -91,5 +96,12 @@ export const THEME_TEXTURES: Record<string, TextureAsset[]> = {
     { alias: "monsters-frag1", src: monstersFrag1 },
     { alias: "monsters-frag2", src: monstersFrag2 },
     { alias: "monsters-frag3", src: monstersFrag3 },
+    { alias: "monsters-bg", src: monstersBg },
   ],
 };
+
+export const themeTextureSrc = (
+  themeId: string,
+  alias: string,
+): string | undefined =>
+  (THEME_TEXTURES[themeId] ?? []).find((t) => t.alias === alias)?.src;

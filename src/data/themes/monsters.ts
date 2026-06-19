@@ -1,6 +1,6 @@
 import type { Theme } from "./types";
 import { DEFAULT_HUD_SPEC } from "./defaults";
-import { MONSTERS_SOUND_PACK_ID } from "../sound/monstersPack"; // Импорт обновленного звукового пака
+import { MONSTERS_SOUND_PACK_ID } from "../sound/monstersPack";
 
 export const monstersTheme: Theme = {
   id: "monsters",
@@ -54,11 +54,9 @@ export const monstersTheme: Theme = {
     milestone: [0x8b0000, 0xffffff],
   },
   background: {
-    kind: "bokeh",
-    color: 0x0f0505,
-    bokehColor: 0x8b0000,
-    bokehDensity: 8,
-    animationSpeedSec: 10,
+    kind: "image",
+    texture: "monsters-bg",
+    color: 0x1a0a0a,
   },
   fonts: { display: "serif", body: "system-ui, sans-serif" },
   defaultSoundPack: MONSTERS_SOUND_PACK_ID,

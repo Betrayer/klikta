@@ -44,6 +44,7 @@ const SFX_FALLBACK: Record<string, string> = {
   hit_shielded: "hit_regular",
   hit_splitter: "hit_regular",
   hit_splitter_frag: "hit_regular",
+  sticky: "hit_regular",
 };
 
 class AudioSystem {

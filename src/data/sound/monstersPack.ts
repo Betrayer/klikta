@@ -64,13 +64,21 @@ if (frag1 || frag2 || frag3) {
   sfx.hit_splitter_frag = [frag1 || [], frag2 || [], frag3 || []];
 }
 
+sfx.sticky = urlByBaseName.has("sticky")
+  ? [urlByBaseName.get("sticky")!]
+  : sfx.sticky;
+
 sfx.bomb_click = urlByBaseName.has("bomb_click")
   ? [urlByBaseName.get("bomb_click")!]
   : sfx.bomb_click;
 sfx.miss = urlByBaseName.has("miss") ? [urlByBaseName.get("miss")!] : sfx.miss;
-sfx.combo_milestone = urlByBaseName.has("combo_milestone")
-  ? [urlByBaseName.get("combo_milestone")!]
-  : sfx.combo_milestone;
+
+const combo = getVariants("combo_milestone");
+if (combo.length > 0) sfx.combo_milestone = combo;
+
+sfx.game_over = urlByBaseName.has("game_over")
+  ? [urlByBaseName.get("game_over")!]
+  : sfx.game_over;
 
 export const monstersSoundPack: SoundPack = {
   ...defaultSoundPack,
