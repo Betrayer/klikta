@@ -5,6 +5,8 @@ import { slateTheme } from "./slate";
 import { gemsTheme } from "./gems";
 import { catsTheme } from "./cats";
 import { monstersTheme } from "./monsters";
+import { fastfoodTheme } from "./fastfood";
+import { orchestraTheme } from "./orchestra";
 
 export const DEFAULT_THEME: Theme = synthwaveTheme;
 export const DEFAULT_THEME_ID = synthwaveTheme.id;
@@ -16,4 +18,6 @@ export const THEMES: Record<string, Theme> = {
   [gemsTheme.id]: gemsTheme,
   [catsTheme.id]: catsTheme,
   [monstersTheme.id]: monstersTheme,
+  [fastfoodTheme.id]: fastfoodTheme,
+  [orchestraTheme.id]: orchestraTheme,
 };
